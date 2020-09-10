@@ -1,0 +1,11 @@
+{
+    "azureSpringCloud.description": "An Azure Spring Cloud extension for Visual Studio Code.",
+    "azureSpringCloud.enableOutputTimestamps": "Prepends each line displayed in the output channel with a timestamp.",
+    "azureSpringCloud.loadMore": "Load More",
+    "azureSpringCloud.openInPortal": "Open in Portal",
+    "azureSpringCloud.refresh": "Refresh",
+    "azureSpringCloud.viewProperties": "View Properties",
+    "azureSpringCloud.deleteConfirmation": "The behavior to use when confirming delete of a resource group.",
+    "azureSpringCloud.deleteConfirmation.EnterName": "Prompts with an input box where you enter the resource group name to delete.",
+    "azureSpringCloud.deleteConfirmation.ClickButton": "Prompts with a warning dialog where you click a button to delete."
+}

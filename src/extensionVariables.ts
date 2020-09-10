@@ -1,0 +1,23 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+import { DiagnosticCollection, Disposable, ExtensionContext } from "vscode";
+import { AzExtTreeDataProvider, IAzExtOutputChannel, IAzureUserInput } from "vscode-azureextensionui";
+
+/**
+ * Namespace for common variables used throughout the extension. They must be initialized in the activate() method of extension.ts
+ */
+// tslint:disable-next-line: export-name
+export namespace ext {
+  export let context: ExtensionContext;
+  export let tree: AzExtTreeDataProvider;
+  export let outputChannel: IAzExtOutputChannel;
+  export let ui: IAzureUserInput;
+  export let ignoreBundle: boolean | undefined;
+  export let prefix: string = 'azureSpringCloud';
+
+  export let diagnosticWatcher: Disposable | undefined;
+  export let diagnosticCollection: DiagnosticCollection;
+}
