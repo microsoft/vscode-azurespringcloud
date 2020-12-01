@@ -8,14 +8,14 @@ import { ServiceResource } from '@azure/arm-appplatform/esm/models';
 import * as Models from '@azure/arm-appplatform/src/models/index';
 import { AzExtTreeItem, AzureParentTreeItem, createAzureClient, TreeItemIconPath } from "vscode-azureextensionui";
 import { ext } from "../extensionVariables";
-import { getResourceGroupFromId } from '../utils/azureUtils';
+import { getResourceGroupFromId } from '../utils/ResourceUtils';
 import { localize } from "../utils/localize";
 import { nonNullProp } from "../utils/nonNull";
 import { treeUtils } from "../utils/treeUtils";
 import { SpringCloudAppTreeItem } from './SpringCloudAppTreeItem';
 
 export class SpringCloudServiceTreeItem extends AzureParentTreeItem {
-  public static contextValue: string = 'azureSpringCloud';
+  public static contextValue: string = 'azureSpringCloud.service';
   public readonly contextValue: string = SpringCloudServiceTreeItem.contextValue;
   public readonly childTypeLabel: string = localize('app', 'App');
   public data: ServiceResource;
@@ -29,16 +29,20 @@ export class SpringCloudServiceTreeItem extends AzureParentTreeItem {
     this.data = service;
   }
 
+  public get client(): AppPlatformManagementClient {
+    return createAzureClient(this.root, AppPlatformManagementClient)
+  }
+
   public get name(): string {
     return nonNullProp(this.data, 'name');
   }
 
-  public get id(): string {
-    return nonNullProp(this.data, 'id');
-  }
-
   public get resourceGroup(): string {
     return getResourceGroupFromId(nonNullProp(this.data, 'id'));
+  }
+
+  public get id(): string {
+    return nonNullProp(this.data, 'id');
   }
 
   public get label(): string {
@@ -74,14 +78,12 @@ export class SpringCloudServiceTreeItem extends AzureParentTreeItem {
   }
 
   public async refreshImpl(): Promise<void> {
-    const client: AppPlatformManagementClient = createAzureClient(this.root, AppPlatformManagementClient);
-    this.data = await client.services.get(this.resourceGroup, this.name);
+    this.data = await this.client.services.get(this.resourceGroup, this.name);
     this.mTime = Date.now();
   }
 
   public async deleteTreeItemImpl(): Promise<void> {
-    const client: AppPlatformManagementClient = createAzureClient(this.root, AppPlatformManagementClient);
-    await client.services.deleteMethod(this.resourceGroup, this.name);
-    ext.outputChannel.appendLog(localize('deletedRg', 'Successfully deleted resource group "{0}".', this.name));
+    await this.client.services.deleteMethod(this.resourceGroup, this.name);
+    ext.outputChannel.appendLog(localize('deletedService', 'Successfully deleted Spring Cloud Service "{0}".', this.name));
   }
 }
