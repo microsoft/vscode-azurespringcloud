@@ -30,36 +30,31 @@
     "activationEvents": [
         "onFileSystem:azureSpringCloud",
         "onCommand:azureSpringCloud.loadMore",
-        "onCommand:azureSpringCloud.openInPortal",
-        "onCommand:azureSpringCloud.refresh",
-        "onCommand:azureSpringCloud.selectSubscriptions",
-        "onCommand:azureSpringCloud.viewProperties",
+        "onCommand:azureSpringCloud.subscription.select",
+        "onCommand:azureSpringCloud.subscription.openInPortal",
+        "onCommand:azureSpringCloud.subscription.createServiceFromPortal",
+        "onCommand:azureSpringCloud.subscription.refresh",
+        "onCommand:azureSpringCloud.service.openInPortal",
+        "onCommand:azureSpringCloud.service.createApp",
+        "onCommand:azureSpringCloud.service.delete",
+        "onCommand:azureSpringCloud.service.viewProperties",
+        "onCommand:azureSpringCloud.service.refresh",
+        "onCommand:azureSpringCloud.app.openInPortal",
+        "onCommand:azureSpringCloud.app.openPublicEndpoint",
+        "onCommand:azureSpringCloud.app.openTestEndpoint",
+        "onCommand:azureSpringCloud.app.start",
+        "onCommand:azureSpringCloud.app.stop",
+        "onCommand:azureSpringCloud.app.restart",
+        "onCommand:azureSpringCloud.app.delete",
+        "onCommand:azureSpringCloud.app.viewProperties",
+        "onCommand:azureSpringCloud.app.refresh",
         "onView:azureSpringCloud"
     ],
     "main": "./main.js",
     "contributes": {
         "commands": [
             {
-                "command": "azureSpringCloud.loadMore",
-                "title": "%azureSpringCloud.loadMore%",
-                "category": "Azure Spring Cloud"
-            },
-            {
-                "command": "azureSpringCloud.openInPortal",
-                "title": "%azureSpringCloud.openInPortal%",
-                "category": "Azure Spring Cloud"
-            },
-            {
-                "command": "azureSpringCloud.refresh",
-                "title": "%azureSpringCloud.refresh%",
-                "category": "Azure Spring Cloud",
-                "icon": {
-                    "light": "resources/light/refresh.svg",
-                    "dark": "resources/dark/refresh.svg"
-                }
-            },
-            {
-                "command": "azureSpringCloud.selectSubscriptions",
+                "command": "azureSpringCloud.subscription.select",
                 "title": "Select Subscriptions...",
                 "icon": {
                     "light": "resources/light/filter.svg",
@@ -67,8 +62,97 @@
                 }
             },
             {
-                "command": "azureSpringCloud.viewProperties",
-                "title": "%azureSpringCloud.viewProperties%",
+                "command": "azureSpringCloud.subscription.openInPortal",
+                "title": "%azureSpringCloud.msg.common.openInPortal%",
+                "category": "Azure Spring Cloud"
+            },
+            {
+                "command": "azureSpringCloud.subscription.createServiceFromPortal",
+                "title": "%azureSpringCloud.msg.subscription.createServiceFromPortal%",
+                "category": "Azure Spring Cloud"
+            },
+            {
+                "command": "azureSpringCloud.subscription.refresh",
+                "title": "%azureSpringCloud.msg.common.refresh%",
+                "category": "Azure Spring Cloud",
+                "icon": {
+                    "light": "resources/light/refresh.svg",
+                    "dark": "resources/dark/refresh.svg"
+                }
+            },
+            {
+                "command": "azureSpringCloud.service.openInPortal",
+                "title": "%azureSpringCloud.msg.common.openInPortal%",
+                "category": "Azure Spring Cloud"
+            },
+            {
+                "command": "azureSpringCloud.service.createApp",
+                "title": "%azureSpringCloud.msg.service.createApp%",
+                "category": "Azure Spring Cloud"
+            },
+            {
+                "command": "azureSpringCloud.service.delete",
+                "title": "%azureSpringCloud.msg.common.delete%",
+                "category": "Azure Spring Cloud"
+            },
+            {
+                "command": "azureSpringCloud.service.viewProperties",
+                "title": "%azureSpringCloud.msg.common.viewProperties%",
+                "category": "Azure Spring Cloud"
+            },
+            {
+                "command": "azureSpringCloud.service.refresh",
+                "title": "%azureSpringCloud.msg.common.refresh%",
+                "category": "Azure Spring Cloud"
+            },
+            {
+                "command": "azureSpringCloud.app.openInPortal",
+                "title": "%azureSpringCloud.msg.common.openInPortal%",
+                "category": "Azure Spring Cloud"
+            },
+            {
+                "command": "azureSpringCloud.app.openPublicEndpoint",
+                "title": "%azureSpringCloud.msg.app.openPublicEndpoint%",
+                "category": "Azure Spring Cloud"
+            },
+            {
+                "command": "azureSpringCloud.app.openTestEndpoint",
+                "title": "%azureSpringCloud.msg.app.openTestEndpoint%",
+                "category": "Azure Spring Cloud"
+            },
+            {
+                "command": "azureSpringCloud.app.start",
+                "title": "%azureSpringCloud.msg.common.start%",
+                "category": "Azure Spring Cloud"
+            },
+            {
+                "command": "azureSpringCloud.app.stop",
+                "title": "%azureSpringCloud.msg.common.stop%",
+                "category": "Azure Spring Cloud"
+            },
+            {
+                "command": "azureSpringCloud.app.restart",
+                "title": "%azureSpringCloud.msg.common.restart%",
+                "category": "Azure Spring Cloud"
+            },
+            {
+                "command": "azureSpringCloud.app.delete",
+                "title": "%azureSpringCloud.msg.common.delete%",
+                "category": "Azure Spring Cloud"
+            },
+            {
+                "command": "azureSpringCloud.app.viewProperties",
+                "title": "%azureSpringCloud.msg.common.viewProperties%",
+                "category": "Azure Spring Cloud"
+            },
+            {
+                "command": "azureSpringCloud.app.refresh",
+                "title": "%azureSpringCloud.msg.common.refresh%",
+                "category": "Azure Spring Cloud"
+            },
+            {
+                "command": "azureSpringCloud.loadMore",
+                "title": "%azureSpringCloud.loadMore%",
                 "category": "Azure Spring Cloud"
             }
         ],
@@ -92,60 +176,112 @@
         "menus": {
             "view/title": [
                 {
-                    "command": "azureSpringCloud.refresh",
+                    "command": "azureSpringCloud.subscription.refresh",
                     "when": "view == azureSpringCloud",
                     "group": "navigation@2"
                 }
             ],
             "view/item/context": [
                 {
-                    "command": "azureSpringCloud.selectSubscriptions",
+                    "command": "azureSpringCloud.subscription.select",
                     "when": "view == azureSpringCloud && viewItem == azureextensionui.azureSubscription",
                     "group": "inline"
                 },
                 {
-                    "command": "azureSpringCloud.openInPortal",
+                    "command": "azureSpringCloud.subscription.openInPortal",
                     "when": "view == azureSpringCloud && viewItem == azureextensionui.azureSubscription",
-                    "group": "9@1"
+                    "group": "1@1"
                 },
                 {
-                    "command": "azureSpringCloud.refresh",
+                    "command": "azureSpringCloud.subscription.createServiceFromPortal",
+                    "when": "view == azureSpringCloud && viewItem == azureextensionui.azureSubscription",
+                    "group": "5@1"
+                },
+                {
+                    "command": "azureSpringCloud.subscription.refresh",
                     "when": "view == azureSpringCloud && viewItem == azureextensionui.azureSubscription",
                     "group": "9@2"
                 },
+
                 {
-                    "command": "azureSpringCloud.viewProperties",
-                    "when": "view == azureSpringCloud && viewItem == azureResourceGroup",
+                    "command": "azureSpringCloud.service.openInPortal",
+                    "when": "view == azureSpringCloud && viewItem == azureSpringCloud.service",
+                    "group": "1@1"
+                },
+                {
+                    "command": "azureSpringCloud.service.createApp",
+                    "when": "view == azureSpringCloud && viewItem == azureSpringCloud.service",
+                    "group": "5@1"
+                },
+                {
+                    "command": "azureSpringCloud.service.delete",
+                    "when": "view == azureSpringCloud && viewItem == azureSpringCloud.service",
+                    "group": "5@2"
+                },
+                {
+                    "command": "azureSpringCloud.service.viewProperties",
+                    "when": "view == azureSpringCloud && viewItem == azureSpringCloud.service",
                     "group": "9@1"
                 },
                 {
-                    "command": "azureSpringCloud.openInPortal",
-                    "when": "view == azureSpringCloud && viewItem == azureResourceGroup",
+                    "command": "azureSpringCloud.service.refresh",
+                    "when": "view == azureSpringCloud && viewItem == azureSpringCloud.service",
                     "group": "9@2"
                 },
+
                 {
-                    "command": "azureSpringCloud.refresh",
-                    "when": "view == azureSpringCloud && viewItem == azureResourceGroup",
-                    "group": "9@3"
+                    "command": "azureSpringCloud.app.openInPortal",
+                    "when": "view == azureSpringCloud && viewItem == azureSpringCloud.app",
+                    "group": "1@1"
                 },
                 {
-                    "command": "azureSpringCloud.viewProperties",
-                    "when": "view == azureSpringCloud && viewItem == azureResource",
+                    "command": "azureSpringCloud.app.openPublicEndpoint",
+                    "when": "view == azureSpringCloud && viewItem == azureSpringCloud.app",
+                    "group": "2@1"
+                },
+                {
+                    "command": "azureSpringCloud.app.openTestEndpoint",
+                    "when": "view == azureSpringCloud && viewItem == azureSpringCloud.app",
+                    "group": "2@2"
+                },
+                {
+                    "command": "azureSpringCloud.app.start",
+                    "when": "view == azureSpringCloud && viewItem == azureSpringCloud.app",
+                    "group": "5@1"
+                },
+                {
+                    "command": "azureSpringCloud.app.stop",
+                    "when": "view == azureSpringCloud && viewItem == azureSpringCloud.app",
+                    "group": "5@2"
+                },
+                {
+                    "command": "azureSpringCloud.app.restart",
+                    "when": "view == azureSpringCloud && viewItem == azureSpringCloud.app",
+                    "group": "5@3"
+                },
+                {
+                    "command": "azureSpringCloud.app.delete",
+                    "when": "view == azureSpringCloud && viewItem == azureSpringCloud.app",
+                    "group": "5@4"
+                },
+                {
+                    "command": "azureSpringCloud.app.viewProperties",
+                    "when": "view == azureSpringCloud && viewItem == azureSpringCloud.app",
                     "group": "9@1"
                 },
                 {
-                    "command": "azureSpringCloud.openInPortal",
-                    "when": "view == azureSpringCloud && viewItem == azureResource",
+                    "command": "azureSpringCloud.app.refresh",
+                    "when": "view == azureSpringCloud && viewItem == azureSpringCloud.app",
                     "group": "9@2"
                 }
             ],
             "commandPalette": [
                 {
-                    "command": "azureSpringCloud.selectSubscriptions",
+                    "command": "azureSpringCloud.subscription.select",
                     "when": "never"
                 },
                 {
-                    "command": "azureSpringCloud.refresh",
+                    "command": "azureSpringCloud.subscription.refresh",
                     "when": "never"
                 },
                 {
@@ -215,6 +351,7 @@
         "mocha": "^7.1.1",
         "mocha-junit-reporter": "^1.23.1",
         "mocha-multi-reporters": "^1.1.7",
+        "opn": "^6.0.0",
         "ts-node": "^7.0.1",
         "tslint": "^6.0.0",
         "tslint-microsoft-contrib": "^6.2.0",
