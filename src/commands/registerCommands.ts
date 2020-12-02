@@ -3,12 +3,12 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { commands } from 'vscode';
 import { AzureTreeItem, IActionContext, registerCommand } from 'vscode-azureextensionui';
+import { SpringCloudAppCommands } from "./SpringCloudAppCommands";
+import { SpringCloudServiceCommands } from "./SpringCloudServiceCommands";
+import { commands } from 'vscode';
 import { ext } from '../extensionVariables';
 import { openInPortal } from './openInPortal';
-import { SpringCloudServiceCommands } from "./SpringCloudServiceCommands";
-import { SpringCloudAppCommands } from "./SpringCloudAppCommands";
 
 export function registerCommands(): void {
   registerCommand("azureSpringCloud.loadMore", loadMore);
@@ -30,6 +30,7 @@ export function registerCommands(): void {
   registerCommand("azureSpringCloud.app.delete", SpringCloudAppCommands.deleteApp);
   registerCommand("azureSpringCloud.app.viewProperties", SpringCloudAppCommands.viewAppProperties);
   registerCommand("azureSpringCloud.app.refresh", refreshNode);
+  registerCommand('azureSpringCloud.app.setting.toggleVisibility', SpringCloudAppCommands.toggleSettingVisibility, 250);
 }
 
 async function refreshNode(_context: IActionContext, node?: AzureTreeItem) {

@@ -4,6 +4,7 @@ import { ext } from "../extensionVariables";
 import { SpringCloudAppTreeItem } from "../tree/SpringCloudAppTreeItem";
 import { localize } from "../utils/localize";
 import { openUrl } from "../utils/openUrl";
+import { AppSettingTreeItem } from "../tree/AppSettingTreeItem";
 
 export class SpringCloudAppCommands {
   public static async openAppInPortal(context: ui.IActionContext, node?: SpringCloudAppTreeItem): Promise<void> {
@@ -60,6 +61,10 @@ export class SpringCloudAppCommands {
   public static async viewAppProperties(context: IActionContext, node?: SpringCloudAppTreeItem): Promise<void> {
     node = await SpringCloudAppCommands.getNode(node, context);
     await openReadOnlyJson(node, node.data);
+  }
+
+  public static async toggleSettingVisibility(_context: IActionContext, node: AppSettingTreeItem) {
+    await node.toggleValueVisibility();
   }
 
   private static async getNode(node: SpringCloudAppTreeItem | undefined, context: IActionContext): Promise<SpringCloudAppTreeItem> {

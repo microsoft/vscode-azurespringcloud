@@ -8,25 +8,25 @@ import { ServiceResource } from '@azure/arm-appplatform/esm/models';
 import * as Models from '@azure/arm-appplatform/src/models/index';
 import { AzExtTreeItem, AzureParentTreeItem, createAzureClient, TreeItemIconPath } from "vscode-azureextensionui";
 import { ext } from "../extensionVariables";
-import { getResourceGroupFromId } from '../utils/ResourceUtils';
 import { localize } from "../utils/localize";
 import { nonNullProp } from "../utils/nonNull";
 import { treeUtils } from "../utils/treeUtils";
 import { SpringCloudAppTreeItem } from './SpringCloudAppTreeItem';
+import SpringCloudResourceId from "../model/SpringCloudResourceId";
 
 export class SpringCloudServiceTreeItem extends AzureParentTreeItem {
   public static contextValue: string = 'azureSpringCloud.service';
   public readonly contextValue: string = SpringCloudServiceTreeItem.contextValue;
   public readonly childTypeLabel: string = localize('app', 'App');
   public data: ServiceResource;
-  public readonly cTime: number = Date.now();
-  public mTime: number = Date.now();
 
   private _nextLink: string | undefined;
+  private resourceId: SpringCloudResourceId;
 
   constructor(parent: AzureParentTreeItem, service: ServiceResource) {
     super(parent);
     this.data = service;
+    this.resourceId = new SpringCloudResourceId(nonNullProp(this.data, 'id'))
   }
 
   public get client(): AppPlatformManagementClient {
@@ -37,8 +37,12 @@ export class SpringCloudServiceTreeItem extends AzureParentTreeItem {
     return nonNullProp(this.data, 'name');
   }
 
+  public get serviceName(): string {
+    return this.name;
+  }
+
   public get resourceGroup(): string {
-    return getResourceGroupFromId(nonNullProp(this.data, 'id'));
+    return this.resourceId.getResourceGroup();
   }
 
   public get id(): string {
@@ -55,7 +59,7 @@ export class SpringCloudServiceTreeItem extends AzureParentTreeItem {
   }
 
   public get iconPath(): TreeItemIconPath {
-    return treeUtils.getIconPath('springCloud');
+    return treeUtils.getPngIconPath('azure-springcloud-small');
   }
 
   public hasMoreChildrenImpl(): boolean {
@@ -79,7 +83,6 @@ export class SpringCloudServiceTreeItem extends AzureParentTreeItem {
 
   public async refreshImpl(): Promise<void> {
     this.data = await this.client.services.get(this.resourceGroup, this.name);
-    this.mTime = Date.now();
   }
 
   public async deleteTreeItemImpl(): Promise<void> {

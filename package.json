@@ -48,6 +48,7 @@
         "onCommand:azureSpringCloud.app.delete",
         "onCommand:azureSpringCloud.app.viewProperties",
         "onCommand:azureSpringCloud.app.refresh",
+        "onCommand:azureSpringCloud.app.setting.toggleVisibility",
         "onView:azureSpringCloud"
     ],
     "main": "./main.js",
@@ -149,6 +150,15 @@
                 "command": "azureSpringCloud.app.refresh",
                 "title": "%azureSpringCloud.msg.common.refresh%",
                 "category": "Azure Spring Cloud"
+            },
+            {
+                "command": "azureSpringCloud.app.setting.toggleVisibility",
+                "title": "%azureSpringCloud.msg.app.setting.toggleVisibility%",
+                "category": "Azure Spring Cloud",
+                "icon": {
+                    "light": "resources/light/Visible.svg",
+                    "dark": "resources/dark/Visible.svg"
+                }
             },
             {
                 "command": "azureSpringCloud.loadMore",
@@ -273,6 +283,11 @@
                     "command": "azureSpringCloud.app.refresh",
                     "when": "view == azureSpringCloud && viewItem == azureSpringCloud.app",
                     "group": "9@2"
+                },
+                {
+                    "command": "azureSpringCloud.app.setting.toggleVisibility",
+                    "when": "view == azureSpringCloud && viewItem == azureSpringCloud.app.setting",
+                    "group": "inline"
                 }
             ],
             "commandPalette": [
@@ -286,6 +301,10 @@
                 },
                 {
                     "command": "azureSpringCloud.loadMore",
+                    "when": "never"
+                },
+                {
+                    "command": "azureSpringCloud.app.setting",
                     "when": "never"
                 }
             ]

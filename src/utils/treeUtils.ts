@@ -12,6 +12,10 @@ export namespace treeUtils {
     return path.join(getResourcesPath(), `${iconName}.svg`);
   }
 
+  export function getPngIconPath(iconName: string): TreeItemIconPath {
+    return path.join(getResourcesPath(), `${iconName}.png`);
+  }
+
   export function getThemedIconPath(iconName: string): TreeItemIconPath {
     return {
       light: path.join(getResourcesPath(), 'light', `${iconName}.svg`),

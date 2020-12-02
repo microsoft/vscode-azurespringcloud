@@ -4,21 +4,32 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { AppPlatformManagementClient } from "@azure/arm-appplatform";
-import { AppResource } from '@azure/arm-appplatform/esm/models';
-import { AzureParentTreeItem, createAzureClient, IActionContext } from "vscode-azureextensionui";
-import { getResourceGroupFromId, getServiceNameFromId } from "../utils/ResourceUtils";
+import { AppResource, DeploymentResourceStatus } from '@azure/arm-appplatform/esm/models';
+import { AzExtTreeItem, AzureParentTreeItem, createAzureClient, DialogResponses, IActionContext, TreeItemIconPath } from "vscode-azureextensionui";
 import { nonNullProp } from "../utils/nonNull";
+import { AppEnvVariablesTreeItem } from "./AppEnvVariablesTreeItem";
+import { AppScalingSettingsTreeItem } from "./AppScalingSettingsTreeItem";
+import { SpringCloudServiceTreeItem } from "./SpringCloudServiceTreeItem";
+import { treeUtils } from "../utils/treeUtils";
+import { AppJvmOptionsTreeItem } from "./AppJvmOptionsTreeItem";
+import { ext } from "../extensionVariables";
 
 export class SpringCloudAppTreeItem extends AzureParentTreeItem {
   public static contextValue: string = 'azureSpringCloud.app';
   public readonly contextValue: string = SpringCloudAppTreeItem.contextValue;
   public data: AppResource;
-  public readonly cTime: number = Date.now();
-  public mTime: number = Date.now();
+  private readonly scalingPropertiesTreeItem: AppScalingSettingsTreeItem;
+  private readonly envPropertiesTreeItem: AppEnvVariablesTreeItem;
+  private readonly jvmOptionsTreeItem: AppJvmOptionsTreeItem;
+  private _status: DeploymentResourceStatus | undefined;
 
-  constructor(parent: AzureParentTreeItem, resource: AppResource) {
+  constructor(parent: SpringCloudServiceTreeItem, resource: AppResource) {
     super(parent);
     this.data = resource;
+    this.scalingPropertiesTreeItem = new AppScalingSettingsTreeItem(this);
+    this.envPropertiesTreeItem = new AppEnvVariablesTreeItem(this);
+    this.jvmOptionsTreeItem = new AppJvmOptionsTreeItem(this);
+    this.refresh();
   }
 
   public get client(): AppPlatformManagementClient {
@@ -30,11 +41,11 @@ export class SpringCloudAppTreeItem extends AzureParentTreeItem {
   }
 
   public get serviceName(): string {
-    return getServiceNameFromId(nonNullProp(this.data, 'id'));
+    return (<SpringCloudServiceTreeItem>this.parent).serviceName;
   }
 
   public get resourceGroup(): string {
-    return getResourceGroupFromId(nonNullProp(this.data, 'id'));
+    return (<SpringCloudServiceTreeItem>this.parent).resourceGroup;
   }
 
   public get id(): string {
@@ -45,20 +56,55 @@ export class SpringCloudAppTreeItem extends AzureParentTreeItem {
     return this.name;
   }
 
+  public get description(): string | undefined {
+    const state: string | undefined = this.data.properties?.provisioningState;
+    return state?.toLowerCase() === 'succeeded' ? undefined : state;
+  }
+
+  public get iconPath(): TreeItemIconPath {
+    switch (this._status) {
+      case "Stopped":
+        return treeUtils.getPngIconPath('azure-springcloud-app-stopped');
+      case "Failed":
+        return treeUtils.getPngIconPath('azure-springcloud-app-failed');
+      case "Allocating":
+      case "Upgrading":
+      case "Compiling":
+        return treeUtils.getPngIconPath('azure-springcloud-app-pending');
+      case "Unknown":
+        return treeUtils.getPngIconPath('azure-springcloud-app-unknown');
+      case "Running":
+      default:
+        return treeUtils.getPngIconPath('azure-springcloud-app-running');
+    }
+  }
+
+  public hasMoreChildrenImpl(): boolean {
+    return false;
+  }
+
+  public async loadMoreChildrenImpl(_clearCache: boolean, _context: IActionContext): Promise<AzExtTreeItem[]> {
+    return [this.envPropertiesTreeItem, this.scalingPropertiesTreeItem, this.jvmOptionsTreeItem];
+  }
+
   public async deleteTreeItemImpl(_context: IActionContext): Promise<void> {
+    await ext.ui.showWarningMessage(`Are you sure to delete Spring Cloud App "${this.name}"?`, {modal: true}, DialogResponses.deleteResponse);
     await this.client.apps.deleteMethod(this.resourceGroup, this.serviceName, this.name);
   }
 
   public async start(): Promise<void> {
     await this.client.deployments.start(this.resourceGroup, this.serviceName, this.name, this.data.properties?.activeDeploymentName!);
+    await this.refresh()
   }
 
   public async stop(): Promise<void> {
     await this.client.deployments.stop(this.resourceGroup, this.serviceName, this.name, this.data.properties?.activeDeploymentName!);
+    await this.refresh()
   }
 
   public async restart(): Promise<void> {
     await this.client.deployments.restart(this.resourceGroup, this.serviceName, this.name, this.data.properties?.activeDeploymentName!);
+    await this.refresh()
   }
 
   public async getPublicEndpoint(): Promise<string | undefined> {
@@ -72,7 +118,9 @@ export class SpringCloudAppTreeItem extends AzureParentTreeItem {
   }
 
   public async refreshImpl(): Promise<void> {
-    this.mTime = Date.now();
+    this.data = await this.client.apps.get(this.resourceGroup, this.serviceName, this.name);
+    const deploymentName = this.data.properties?.activeDeploymentName!;
+    const deployment = await this.client.deployments.get(this.resourceGroup, this.serviceName, this.name, deploymentName);
+    this._status = deployment.properties?.status;
   }
-
 }
