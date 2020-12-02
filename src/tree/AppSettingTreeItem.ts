@@ -1,7 +1,6 @@
 import { AzureParentTreeItem, AzureTreeItem, IActionContext, TreeItemIconPath } from "vscode-azureextensionui";
 import { AppSettingsTreeItem } from "./AppSettingsTreeItem";
 import { treeUtils } from "../utils/treeUtils";
-import { ext } from "../extensionVariables";
 import getThemedIconPath = treeUtils.getThemedIconPath;
 
 export interface Options {
@@ -47,7 +46,7 @@ export class AppSettingTreeItem extends AzureTreeItem {
   }
 
   public get commandId(): string {
-    return ext.prefix + '.toggleAppSettingVisibility';
+    return 'azureSpringCloud.app.setting.toggleVisibility';
   }
 
   public async edit(context: IActionContext): Promise<void> {
