@@ -36,7 +36,7 @@ export async function activateInternal(context: vscode.ExtensionContext, perfSta
 
     const accountTreeItem: AzureAccountTreeItem = new AzureAccountTreeItem();
     context.subscriptions.push(accountTreeItem);
-    ext.tree = new AzExtTreeDataProvider(accountTreeItem, 'azureSpringCloud.loadMore');
+    ext.tree = new AzExtTreeDataProvider(accountTreeItem, 'azureSpringCloud.common.loadMore');
     context.subscriptions.push(vscode.window.createTreeView('azureSpringCloud', { treeDataProvider: ext.tree, showCollapseAll: true, canSelectMany: true }));
     registerCommands();
   });

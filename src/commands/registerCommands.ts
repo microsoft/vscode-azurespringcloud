@@ -11,16 +11,16 @@ import { ext } from '../extensionVariables';
 import { openInPortal } from './openInPortal';
 
 export function registerCommands(): void {
-  registerCommand("azureSpringCloud.loadMore", loadMore);
+  registerCommand("azureSpringCloud.common.loadMore", loadMore);
+  registerCommand("azureSpringCloud.common.refresh", refreshNode);
+  registerCommand('azureSpringCloud.common.toggleVisibility', SpringCloudAppCommands.toggleVisibility, 250);
   registerCommand("azureSpringCloud.subscription.select", selectSubscription);
   registerCommand("azureSpringCloud.subscription.openInPortal", openInPortal);
   registerCommand("azureSpringCloud.subscription.createServiceFromPortal", () => 0);
-  registerCommand("azureSpringCloud.subscription.refresh", refreshNode);
   registerCommand("azureSpringCloud.service.openInPortal", SpringCloudServiceCommands.openServiceInPortal);
   registerCommand("azureSpringCloud.service.createApp", SpringCloudServiceCommands.createApp);
   registerCommand("azureSpringCloud.service.delete", SpringCloudServiceCommands.deleteService);
   registerCommand("azureSpringCloud.service.viewProperties", SpringCloudServiceCommands.viewServiceProperties);
-  registerCommand("azureSpringCloud.service.refresh", refreshNode);
   registerCommand("azureSpringCloud.app.openInPortal", SpringCloudAppCommands.openAppInPortal);
   registerCommand("azureSpringCloud.app.openPublicEndpoint", SpringCloudAppCommands.openPublicEndpoint);
   registerCommand("azureSpringCloud.app.openTestEndpoint", SpringCloudAppCommands.openTestEndpoint);
@@ -29,11 +29,7 @@ export function registerCommands(): void {
   registerCommand("azureSpringCloud.app.restart", SpringCloudAppCommands.restartApp);
   registerCommand("azureSpringCloud.app.delete", SpringCloudAppCommands.deleteApp);
   registerCommand("azureSpringCloud.app.viewProperties", SpringCloudAppCommands.viewAppProperties);
-  registerCommand("azureSpringCloud.app.refresh", refreshNode);
   registerCommand('azureSpringCloud.app.settings.addSetting', SpringCloudAppCommands.addSetting);
-  registerCommand('azureSpringCloud.app.settings.refresh', SpringCloudAppCommands.refreshSettings);
-  registerCommand('azureSpringCloud.app.settings.toggleVisibility', SpringCloudAppCommands.toggleSettingsVisibility, 250);
-  registerCommand('azureSpringCloud.app.setting.toggleVisibility', SpringCloudAppCommands.toggleVisibility, 250);
   registerCommand('azureSpringCloud.app.setting.edit', SpringCloudAppCommands.editSetting);
   registerCommand('azureSpringCloud.app.setting.delete', SpringCloudAppCommands.deleteSetting);
 }

@@ -2,6 +2,7 @@ import { AzureParentTreeItem, IActionContext, TreeItemIconPath } from "vscode-az
 import { treeUtils } from "../utils/treeUtils";
 import { SpringCloudAppTreeItem } from "./SpringCloudAppTreeItem";
 import { AppSettingTreeItem, Options } from "./AppSettingTreeItem";
+import { ext } from "../extensionVariables";
 import getThemedIconPath = treeUtils.getThemedIconPath;
 
 export abstract class AppSettingsTreeItem extends AzureParentTreeItem {
@@ -28,7 +29,7 @@ export abstract class AppSettingsTreeItem extends AzureParentTreeItem {
   }
 
   public async toggleVisibility(context: IActionContext): Promise<void> {
-    const settings: AppSettingTreeItem[] = <AppSettingTreeItem[]>await this.getCachedChildren(context);
+    const settings: AppSettingTreeItem[] = <AppSettingTreeItem[]>await ext.tree.getChildren(this);
     const hidden = settings.every(s => s.hidden);
     settings.forEach(s => s.toggleVisibility(context, !hidden));
   }

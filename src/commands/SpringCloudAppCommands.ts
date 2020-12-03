@@ -64,16 +64,8 @@ export class SpringCloudAppCommands {
     await openReadOnlyJson(node, node.data);
   }
 
-  public static async toggleSettingsVisibility(context: IActionContext, node: AppSettingsTreeItem) {
+  public static async toggleVisibility(context: IActionContext, node: AppSettingTreeItem | AppSettingsTreeItem) {
     await node.toggleVisibility(context);
-  }
-
-  public static async toggleVisibility(context: IActionContext, node: AppSettingTreeItem) {
-    await node.toggleVisibility(context);
-  }
-
-  public static async refreshSettings(_context: IActionContext, node: AppSettingsTreeItem) {
-    await node.refresh();
   }
 
   public static async addSetting(_context: IActionContext, _node: AppSettingsTreeItem) {

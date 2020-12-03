@@ -63,7 +63,7 @@ export class AppSettingTreeItem extends AzureTreeItem {
   }
 
   public get commandId(): string {
-    return 'azureSpringCloud.app.setting.toggleVisibility';
+    return 'azureSpringCloud.common.toggleVisibility';
   }
 
   public get value(): string {

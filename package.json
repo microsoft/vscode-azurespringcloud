@@ -29,16 +29,15 @@
     "preview": true,
     "activationEvents": [
         "onFileSystem:azureSpringCloud",
-        "onCommand:azureSpringCloud.loadMore",
+        "onCommand:azureSpringCloud.common.loadMore",
+        "onCommand:azureSpringCloud.common.refresh",
         "onCommand:azureSpringCloud.subscription.select",
         "onCommand:azureSpringCloud.subscription.openInPortal",
         "onCommand:azureSpringCloud.subscription.createServiceFromPortal",
-        "onCommand:azureSpringCloud.subscription.refresh",
         "onCommand:azureSpringCloud.service.openInPortal",
         "onCommand:azureSpringCloud.service.createApp",
         "onCommand:azureSpringCloud.service.delete",
         "onCommand:azureSpringCloud.service.viewProperties",
-        "onCommand:azureSpringCloud.service.refresh",
         "onCommand:azureSpringCloud.app.openInPortal",
         "onCommand:azureSpringCloud.app.openPublicEndpoint",
         "onCommand:azureSpringCloud.app.openTestEndpoint",
@@ -47,11 +46,8 @@
         "onCommand:azureSpringCloud.app.restart",
         "onCommand:azureSpringCloud.app.delete",
         "onCommand:azureSpringCloud.app.viewProperties",
-        "onCommand:azureSpringCloud.app.refresh",
         "onCommand:azureSpringCloud.app.settings.addSetting",
-        "onCommand:azureSpringCloud.app.settings.refresh",
-        "onCommand:azureSpringCloud.app.settings.toggleVisibility",
-        "onCommand:azureSpringCloud.app.setting.toggleVisibility",
+        "onCommand:azureSpringCloud.common.toggleVisibility",
         "onCommand:azureSpringCloud.app.setting.edit",
         "onCommand:azureSpringCloud.app.setting.delete",
         "onView:azureSpringCloud"
@@ -78,7 +74,7 @@
                 "category": "Azure Spring Cloud"
             },
             {
-                "command": "azureSpringCloud.subscription.refresh",
+                "command": "azureSpringCloud.common.refresh",
                 "title": "%azureSpringCloud.msg.common.refresh%",
                 "category": "Azure Spring Cloud",
                 "icon": {
@@ -104,11 +100,6 @@
             {
                 "command": "azureSpringCloud.service.viewProperties",
                 "title": "%azureSpringCloud.msg.common.viewProperties%",
-                "category": "Azure Spring Cloud"
-            },
-            {
-                "command": "azureSpringCloud.service.refresh",
-                "title": "%azureSpringCloud.msg.common.refresh%",
                 "category": "Azure Spring Cloud"
             },
             {
@@ -152,32 +143,13 @@
                 "category": "Azure Spring Cloud"
             },
             {
-                "command": "azureSpringCloud.app.refresh",
-                "title": "%azureSpringCloud.msg.common.refresh%",
-                "category": "Azure Spring Cloud"
-            },
-            {
                 "command": "azureSpringCloud.app.settings.addSetting",
                 "title": "%azureSpringCloud.msg.common.add%",
                 "category": "Azure Spring Cloud"
             },
             {
-                "command": "azureSpringCloud.app.settings.refresh",
-                "title": "%azureSpringCloud.msg.common.refresh%",
-                "category": "Azure Spring Cloud"
-            },
-            {
-                "command": "azureSpringCloud.app.settings.toggleVisibility",
-                "title": "%azureSpringCloud.msg.app.setting.toggleVisibility%",
-                "category": "Azure Spring Cloud",
-                "icon": {
-                    "light": "resources/light/Visible.svg",
-                    "dark": "resources/dark/Visible.svg"
-                }
-            },
-            {
-                "command": "azureSpringCloud.app.setting.toggleVisibility",
-                "title": "%azureSpringCloud.msg.app.setting.toggleVisibility%",
+                "command": "azureSpringCloud.common.toggleVisibility",
+                "title": "%azureSpringCloud.msg.common.toggleVisibility%",
                 "category": "Azure Spring Cloud",
                 "icon": {
                     "light": "resources/light/Visible.svg",
@@ -195,8 +167,8 @@
                 "category": "Azure Spring Cloud"
             },
             {
-                "command": "azureSpringCloud.loadMore",
-                "title": "%azureSpringCloud.loadMore%",
+                "command": "azureSpringCloud.common.loadMore",
+                "title": "%azureSpringCloud.msg.common.loadMore%",
                 "category": "Azure Spring Cloud"
             }
         ],
@@ -220,7 +192,7 @@
         "menus": {
             "view/title": [
                 {
-                    "command": "azureSpringCloud.subscription.refresh",
+                    "command": "azureSpringCloud.common.refresh",
                     "when": "view == azureSpringCloud",
                     "group": "navigation@2"
                 }
@@ -242,7 +214,7 @@
                     "group": "5@1"
                 },
                 {
-                    "command": "azureSpringCloud.subscription.refresh",
+                    "command": "azureSpringCloud.common.refresh",
                     "when": "view == azureSpringCloud && viewItem == azureextensionui.azureSubscription",
                     "group": "9@2"
                 },
@@ -268,7 +240,7 @@
                     "group": "9@1"
                 },
                 {
-                    "command": "azureSpringCloud.service.refresh",
+                    "command": "azureSpringCloud.common.refresh",
                     "when": "view == azureSpringCloud && viewItem == azureSpringCloud.service",
                     "group": "9@2"
                 },
@@ -314,28 +286,28 @@
                     "group": "9@1"
                 },
                 {
-                    "command": "azureSpringCloud.app.refresh",
+                    "command": "azureSpringCloud.common.refresh",
                     "when": "view == azureSpringCloud && viewItem == azureSpringCloud.app",
                     "group": "9@2"
                 },
                 {
+                    "command": "azureSpringCloud.common.refresh",
+                    "when": "view == azureSpringCloud && viewItem == azureSpringCloud.app.instances",
+                    "group": "9@2"
+                },
+                {
                     "command": "azureSpringCloud.app.settings.addSetting",
+                    "when": "view == azureSpringCloud && viewItem =~ /^azureSpringCloud\\.app\\.(jvmOptions|envVariables)$/",
+                    "group": "1@1"
+                },
+                {
+                    "command": "azureSpringCloud.common.refresh",
                     "when": "view == azureSpringCloud && viewItem =~ /^azureSpringCloud\\.app\\.(jvmOptions|scaleSettings|envVariables)$/",
                     "group": "1@1"
                 },
                 {
-                    "command": "azureSpringCloud.app.settings.refresh",
-                    "when": "view == azureSpringCloud && viewItem =~ /^azureSpringCloud\\.app\\.(jvmOptions|scaleSettings|envVariables)$/",
-                    "group": "1@1"
-                },
-                {
-                    "command": "azureSpringCloud.app.settings.toggleVisibility",
-                    "when": "view == azureSpringCloud && viewItem =~ /^azureSpringCloud\\.app\\.(jvmOptions|scaleSettings|envVariables)$/",
-                    "group": "inline"
-                },
-                {
-                    "command": "azureSpringCloud.app.setting.toggleVisibility",
-                    "when": "view == azureSpringCloud && viewItem =~ /^azureSpringCloud\\.app\\.(jvmOption|scaleSetting|envVariable)$/",
+                    "command": "azureSpringCloud.common.toggleVisibility",
+                    "when": "view == azureSpringCloud && viewItem =~ /^azureSpringCloud\\.app\\.(jvmOption|scaleSetting|envVariable)(|s)$/",
                     "group": "inline"
                 },
                 {
@@ -355,19 +327,15 @@
                     "when": "never"
                 },
                 {
-                    "command": "azureSpringCloud.subscription.refresh",
+                    "command": "azureSpringCloud.common.refresh",
                     "when": "never"
                 },
                 {
-                    "command": "azureSpringCloud.loadMore",
+                    "command": "azureSpringCloud.common.loadMore",
                     "when": "never"
                 },
                 {
-                    "command": "azureSpringCloud.app.settings.toggleVisibility",
-                    "when": "never"
-                },
-                {
-                    "command": "azureSpringCloud.app.setting.toggleVisibility",
+                    "command": "azureSpringCloud.common.toggleVisibility",
                     "when": "never"
                 }
             ]
