@@ -68,7 +68,8 @@ export class SpringCloudAppCommands {
     await node.toggleVisibility(context);
   }
 
-  public static async addSetting(_context: IActionContext, _node: AppSettingsTreeItem) {
+  public static async addSetting(context: IActionContext, node: AppSettingsTreeItem) {
+    await node.createChild(context);
   }
 
   public static async editSetting(context: IActionContext, node: AppSettingTreeItem): Promise<AppSettingTreeItem> {

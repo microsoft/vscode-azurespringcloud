@@ -5,6 +5,11 @@ import { DeploymentResource } from "@azure/arm-appplatform/esm/models";
 
 export class AppScaleSettingsTreeItem extends AppSettingsTreeItem {
   public static contextValue: string = 'azureSpringCloud.app.scaleSettings';
+  private static readonly _options = {
+    hidden: false,
+    type: 'azureSpringCloud.app.scaleSetting',
+    typeLabel: "scale setting"
+  };
   public readonly contextValue: string = AppScaleSettingsTreeItem.contextValue;
   public readonly id: string = AppScaleSettingsTreeItem.contextValue;
   public readonly label: string = 'Scaling Settings';
@@ -21,11 +26,7 @@ export class AppScaleSettingsTreeItem extends AppSettingsTreeItem {
       'Memory/GB': settings?.memoryInGB ?? 0,
       'Capacity': deployment.sku?.capacity ?? 0
     };
-    return Object.entries(vals).map(e => this.toAppSettingItem(e[0], e[1] + '', {
-      hidden: false,
-      type: 'azureSpringCloud.app.scaleSetting',
-      typeLabel: "scale setting"
-    }));
+    return Object.entries(vals).map(e => this.toAppSettingItem(e[0], e[1] + '', Object.assign({}, AppScaleSettingsTreeItem._options)));
   }
 
   public async updateSettingValue(key: string, newVal: string, _context: IActionContext): Promise<string> {

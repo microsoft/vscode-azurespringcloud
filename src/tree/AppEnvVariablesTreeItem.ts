@@ -1,12 +1,20 @@
-import { AzExtTreeItem, IActionContext } from "vscode-azureextensionui";
+import { AzExtTreeItem, IActionContext, ICreateChildImplContext } from "vscode-azureextensionui";
 import { AppSettingsTreeItem } from "./AppSettingsTreeItem";
 import { SpringCloudAppTreeItem } from "./SpringCloudAppTreeItem";
+import { ext } from "../extensionVariables";
 
 export class AppEnvVariablesTreeItem extends AppSettingsTreeItem {
   public static contextValue: string = 'azureSpringCloud.app.envVariables';
   public readonly contextValue: string = AppEnvVariablesTreeItem.contextValue;
   public readonly id: string = AppEnvVariablesTreeItem.contextValue;
   public readonly label: string = 'Environment Variables';
+  private static readonly ENV_VAR_NAME_PATTERN = /^[a-zA-Z_]+[a-zA-Z0-9_]*$/; //TODO: @wangmi confirm
+  private static readonly _options = {
+    hidden: true,
+    type: 'azureSpringCloud.app.envVariable',
+    typeLabel: 'environment variable'
+  };
+  private variables: { [p: string]: string };
 
   public constructor(parent: SpringCloudAppTreeItem) {
     super(parent);
@@ -14,30 +22,47 @@ export class AppEnvVariablesTreeItem extends AppSettingsTreeItem {
 
   public async loadMoreChildrenImpl(_clearCache: boolean, _context: IActionContext): Promise<AzExtTreeItem[]> {
     const deployment = await this.app.getActiveDeployment(true);
-    const vars = deployment.properties?.deploymentSettings?.environmentVariables || {};
-    return Object.entries(vars).map(e => this.toAppSettingItem(e[0], e[1] + '', {
-      hidden: true,
-      type: 'azureSpringCloud.app.envVariable',
-      typeLabel: 'environment variable'
-    }));
+    this.variables = deployment.properties?.deploymentSettings?.environmentVariables || {};
+    return Object.entries(this.variables).map(e => this.toAppSettingItem(e[0], e[1] + '', Object.assign({}, AppEnvVariablesTreeItem._options)));
   }
 
-  public async updateSettingValue(key: string, newVal: string, _context: IActionContext): Promise<string> {
+  public async createChildImpl(context: ICreateChildImplContext): Promise<AzExtTreeItem> {
+    const newKey: string = await ext.ui.showInputBox({
+      prompt: 'Enter new environment variable name',
+      validateInput: (v: string): string | undefined => {
+        if (!AppEnvVariablesTreeItem.ENV_VAR_NAME_PATTERN.test(v)) {
+          return `Environment variable name must match: ${AppEnvVariablesTreeItem.ENV_VAR_NAME_PATTERN}`;
+        }
+        return undefined;
+      }
+    });
+    const newVal: string = await ext.ui.showInputBox({
+      prompt: `Enter value for "${newKey}"`
+    });
+    context.showCreatingTreeItem(newKey);
+    await this.updateSettingValue(newKey, newVal, context);
+    return this.toAppSettingItem(newKey, newVal, Object.assign({}, AppEnvVariablesTreeItem._options))
+  }
+
+  public async updateSettingValue(key: string, newVal: string | undefined, _context: IActionContext): Promise<string> {
     const deployment = await this.app.getActiveDeployment();
-    const envVars: { [propertyName: string]: string; } = deployment.properties?.deploymentSettings?.environmentVariables || {};
-    envVars[key] = newVal;
+    if (newVal === undefined) {
+      delete this.variables[key.trim()];
+    } else {
+      this.variables[key.trim()] = newVal.trim();
+    }
     await this.app.client.deployments.update(this.app.resourceGroup, this.app.serviceName, this.app.name, deployment.name!, {
       properties: {
         deploymentSettings: {
-          environmentVariables: envVars
+          environmentVariables: this.variables
         }
       }
     });
     this.app.refresh();
-    return newVal;
+    return newVal ?? key;
   }
 
-  public async deleteSettingItem(_key: string, _context: IActionContext) {
-    //TODO
+  public async deleteSettingItem(key: string, context: IActionContext) {
+    return this.updateSettingValue(key, undefined, context)
   }
 }
