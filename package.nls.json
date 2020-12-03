@@ -9,6 +9,8 @@
     "azureSpringCloud.msg.common.delete": "Delete",
     "azureSpringCloud.msg.common.viewProperties": "View Properties",
     "azureSpringCloud.msg.common.refresh": "Refresh",
+    "azureSpringCloud.msg.common.add": "Add",
+    "azureSpringCloud.msg.common.edit": "Edit",
     "azureSpringCloud.msg.subscription.createServiceFromPortal": "Create Service in Portal",
     "azureSpringCloud.msg.service.createApp": "Create App",
     "azureSpringCloud.msg.app.openPublicEndpoint": "Access Public Endpoint",

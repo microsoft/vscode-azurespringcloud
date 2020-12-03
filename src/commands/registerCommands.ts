@@ -30,7 +30,12 @@ export function registerCommands(): void {
   registerCommand("azureSpringCloud.app.delete", SpringCloudAppCommands.deleteApp);
   registerCommand("azureSpringCloud.app.viewProperties", SpringCloudAppCommands.viewAppProperties);
   registerCommand("azureSpringCloud.app.refresh", refreshNode);
-  registerCommand('azureSpringCloud.app.setting.toggleVisibility', SpringCloudAppCommands.toggleSettingVisibility, 250);
+  registerCommand('azureSpringCloud.app.settings.addSetting', SpringCloudAppCommands.addSetting);
+  registerCommand('azureSpringCloud.app.settings.refresh', SpringCloudAppCommands.refreshSettings);
+  registerCommand('azureSpringCloud.app.settings.toggleVisibility', SpringCloudAppCommands.toggleSettingsVisibility, 250);
+  registerCommand('azureSpringCloud.app.setting.toggleVisibility', SpringCloudAppCommands.toggleVisibility, 250);
+  registerCommand('azureSpringCloud.app.setting.edit', SpringCloudAppCommands.editSetting);
+  registerCommand('azureSpringCloud.app.setting.delete', SpringCloudAppCommands.deleteSetting);
 }
 
 async function refreshNode(_context: IActionContext, node?: AzureTreeItem) {

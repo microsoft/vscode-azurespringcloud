@@ -4,11 +4,11 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { AppPlatformManagementClient } from "@azure/arm-appplatform";
-import { AppResource, DeploymentResourceStatus, DeploymentsGetResponse } from '@azure/arm-appplatform/esm/models';
+import { AppResource, DeploymentResource, DeploymentResourceStatus } from '@azure/arm-appplatform/esm/models';
 import { AzExtTreeItem, AzureParentTreeItem, createAzureClient, DialogResponses, IActionContext, TreeItemIconPath } from "vscode-azureextensionui";
 import { nonNullProp } from "../utils/nonNull";
 import { AppEnvVariablesTreeItem } from "./AppEnvVariablesTreeItem";
-import { AppScalingSettingsTreeItem } from "./AppScalingSettingsTreeItem";
+import { AppScaleSettingsTreeItem } from "./AppScaleSettingsTreeItem";
 import { SpringCloudServiceTreeItem } from "./SpringCloudServiceTreeItem";
 import { treeUtils } from "../utils/treeUtils";
 import { AppJvmOptionsTreeItem } from "./AppJvmOptionsTreeItem";
@@ -19,16 +19,17 @@ export class SpringCloudAppTreeItem extends AzureParentTreeItem {
   public static contextValue: string = 'azureSpringCloud.app';
   public readonly contextValue: string = SpringCloudAppTreeItem.contextValue;
   public data: AppResource;
-  private readonly scalingPropertiesTreeItem: AppScalingSettingsTreeItem;
+  private readonly scaleSettingsTreeItem: AppScaleSettingsTreeItem;
   private readonly envPropertiesTreeItem: AppEnvVariablesTreeItem;
   private readonly jvmOptionsTreeItem: AppJvmOptionsTreeItem;
   private readonly appInstancesTreeItem: SpringCloudAppInstancesTreeItem;
   private _status: DeploymentResourceStatus | undefined;
+  private activeDeployment: DeploymentResource;
 
   constructor(parent: SpringCloudServiceTreeItem, resource: AppResource) {
     super(parent);
     this.data = resource;
-    this.scalingPropertiesTreeItem = new AppScalingSettingsTreeItem(this);
+    this.scaleSettingsTreeItem = new AppScaleSettingsTreeItem(this);
     this.envPropertiesTreeItem = new AppEnvVariablesTreeItem(this);
     this.jvmOptionsTreeItem = new AppJvmOptionsTreeItem(this);
     this.appInstancesTreeItem = new SpringCloudAppInstancesTreeItem(this);
@@ -87,7 +88,7 @@ export class SpringCloudAppTreeItem extends AzureParentTreeItem {
   }
 
   public async loadMoreChildrenImpl(_clearCache: boolean, _context: IActionContext): Promise<AzExtTreeItem[]> {
-    return [this.appInstancesTreeItem, this.envPropertiesTreeItem, this.scalingPropertiesTreeItem, this.jvmOptionsTreeItem];
+    return [this.appInstancesTreeItem, this.envPropertiesTreeItem, this.scaleSettingsTreeItem, this.jvmOptionsTreeItem];
   }
 
   public async deleteTreeItemImpl(_context: IActionContext): Promise<void> {
@@ -120,9 +121,12 @@ export class SpringCloudAppTreeItem extends AzureParentTreeItem {
     return `${testKeys.primaryTestEndpoint}/${this.name}/default`;
   }
 
-  public async getActiveDeployment(): Promise<DeploymentsGetResponse> {
+  public async getActiveDeployment(force: boolean = false): Promise<DeploymentResource> {
     const deploymentName = this.data.properties?.activeDeploymentName!;
-    return this.client.deployments.get(this.resourceGroup, this.serviceName, this.name, deploymentName!)
+    if (force || !this.activeDeployment) {
+      this.activeDeployment = await this.client.deployments.get(this.resourceGroup, this.serviceName, this.name, deploymentName!)
+    }
+    return this.activeDeployment;
   }
 
   public async refreshImpl(): Promise<void> {

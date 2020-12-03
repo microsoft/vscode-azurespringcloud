@@ -13,9 +13,31 @@ export class AppEnvVariablesTreeItem extends AppSettingsTreeItem {
   }
 
   public async loadMoreChildrenImpl(_clearCache: boolean, _context: IActionContext): Promise<AzExtTreeItem[]> {
-    const deploymentName = this.app.data.properties?.activeDeploymentName!;
-    const deployment = await this.app.client.deployments.get(this.app.resourceGroup, this.app.serviceName, this.app.name, deploymentName);
+    const deployment = await this.app.getActiveDeployment(true);
     const vars = deployment.properties?.deploymentSettings?.environmentVariables || {};
-    return Object.entries(vars).map(e => this.toAppSettingItem(e[0], e[1] + '', {hideValue: true}));
+    return Object.entries(vars).map(e => this.toAppSettingItem(e[0], e[1] + '', {
+      hidden: true,
+      type: 'azureSpringCloud.app.envVariable',
+      typeLabel: 'environment variable'
+    }));
+  }
+
+  public async updateSettingValue(key: string, newVal: string, _context: IActionContext): Promise<string> {
+    const deployment = await this.app.getActiveDeployment();
+    const envVars: { [propertyName: string]: string; } = deployment.properties?.deploymentSettings?.environmentVariables || {};
+    envVars[key] = newVal;
+    await this.app.client.deployments.update(this.app.resourceGroup, this.app.serviceName, this.app.name, deployment.name!, {
+      properties: {
+        deploymentSettings: {
+          environmentVariables: envVars
+        }
+      }
+    });
+    this.app.refresh();
+    return newVal;
+  }
+
+  public async deleteSettingItem(_key: string, _context: IActionContext) {
+    //TODO
   }
 }

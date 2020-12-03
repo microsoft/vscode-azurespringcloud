@@ -1,7 +1,6 @@
-import { AzureParentTreeItem, DialogResponses, IActionContext, TreeItemIconPath } from "vscode-azureextensionui";
+import { AzureParentTreeItem, IActionContext, TreeItemIconPath } from "vscode-azureextensionui";
 import { treeUtils } from "../utils/treeUtils";
 import { SpringCloudAppTreeItem } from "./SpringCloudAppTreeItem";
-import { ext } from "../extensionVariables";
 import { AppSettingTreeItem, Options } from "./AppSettingTreeItem";
 import getThemedIconPath = treeUtils.getThemedIconPath;
 
@@ -28,11 +27,13 @@ export abstract class AppSettingsTreeItem extends AzureParentTreeItem {
     return new AppSettingTreeItem(this, key, value, options);
   }
 
-  public async editItem(key: string, value: string, _context: IActionContext): Promise<string> {
-    return await ext.ui.showInputBox({prompt: `Enter setting value for "${key}"`, value});
+  public async toggleVisibility(context: IActionContext): Promise<void> {
+    const settings: AppSettingTreeItem[] = <AppSettingTreeItem[]>await this.getCachedChildren(context);
+    const hidden = settings.every(s => s.hidden);
+    settings.forEach(s => s.toggleVisibility(context, !hidden));
   }
 
-  public async deleteItem(_key: string, _context: IActionContext) {
-    await ext.ui.showWarningMessage(`Are you sure you want to delete setting "${_key}"?`, {modal: true}, DialogResponses.deleteResponse);
-  }
+  public abstract updateSettingValue(id: string, value: string, _context: IActionContext): Promise<string>;
+
+  public abstract async deleteSettingItem(_key: string, _context: IActionContext);
 }

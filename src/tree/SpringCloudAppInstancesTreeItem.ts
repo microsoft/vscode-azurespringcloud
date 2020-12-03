@@ -38,7 +38,7 @@ export class SpringCloudAppInstancesTreeItem extends AzureParentTreeItem {
   }
 
   public async loadMoreChildrenImpl(_clearCache: boolean): Promise<AzExtTreeItem[]> {
-    const deployment = await this.app.getActiveDeployment() || [];
+    const deployment = await this.app.getActiveDeployment(true) || [];
     return await this.createTreeItemsWithErrorHandling(
       deployment.properties?.instances,
       'invalidSpringCloudAppInstance',

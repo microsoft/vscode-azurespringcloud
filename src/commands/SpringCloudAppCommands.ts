@@ -5,6 +5,7 @@ import { SpringCloudAppTreeItem } from "../tree/SpringCloudAppTreeItem";
 import { localize } from "../utils/localize";
 import { openUrl } from "../utils/openUrl";
 import { AppSettingTreeItem } from "../tree/AppSettingTreeItem";
+import { AppSettingsTreeItem } from "../tree/AppSettingsTreeItem";
 
 export class SpringCloudAppCommands {
   public static async openAppInPortal(context: ui.IActionContext, node?: SpringCloudAppTreeItem): Promise<void> {
@@ -34,7 +35,7 @@ export class SpringCloudAppCommands {
 
   public static async stopApp(context: ui.IActionContext, node?: SpringCloudAppTreeItem): Promise<SpringCloudAppTreeItem> {
     node = await SpringCloudAppCommands.getNode(node, context);
-    await ext.ui.showWarningMessage(`Are you sure to stop Spring Cloud Service "${node.name}"?`, {modal: true}, DialogResponses.deleteResponse);
+    await ext.ui.showWarningMessage(`Are you sure to stop Spring Cloud Service "${node.name}"?`, {modal: true}, DialogResponses.yes);
     await node.runWithTemporaryDescription(localize('stopping', 'Stopping...'), async () => {
       return node!.stop();
     });
@@ -63,8 +64,44 @@ export class SpringCloudAppCommands {
     await openReadOnlyJson(node, node.data);
   }
 
-  public static async toggleSettingVisibility(_context: IActionContext, node: AppSettingTreeItem) {
-    await node.toggleValueVisibility();
+  public static async toggleSettingsVisibility(context: IActionContext, node: AppSettingsTreeItem) {
+    await node.toggleVisibility(context);
+  }
+
+  public static async toggleVisibility(context: IActionContext, node: AppSettingTreeItem) {
+    await node.toggleVisibility(context);
+  }
+
+  public static async refreshSettings(_context: IActionContext, node: AppSettingsTreeItem) {
+    await node.refresh();
+  }
+
+  public static async addSetting(_context: IActionContext, _node: AppSettingsTreeItem) {
+  }
+
+  public static async editSetting(context: IActionContext, node: AppSettingTreeItem): Promise<AppSettingTreeItem> {
+    const prompt = node.key ? `Enter value for "${node.key}"` : `Update ${node.typeLabel}`;
+    const newVal: string = await ext.ui.showInputBox({prompt, value: node.value});
+    if (newVal?.trim()) {
+      await node.runWithTemporaryDescription(localize('editing', 'Editing...'), async () => {
+        await node.updateValue(newVal, context);
+      });
+      return node;
+    } else {
+      return SpringCloudAppCommands.deleteSetting(context, node);
+    }
+  }
+
+  public static async deleteSetting(context: IActionContext, node: AppSettingTreeItem): Promise<AppSettingTreeItem> {
+    if (node.deletable) {
+      await ext.ui.showWarningMessage(`Are you sure to delete ${node.typeLabel} "${node.id}"?`, {modal: true}, DialogResponses.deleteResponse);
+      await node.runWithTemporaryDescription(localize('deleting', 'Deleting...'), async () => {
+        await node.deleteTreeItem(context);
+      });
+    } else {
+      await ext.ui.showWarningMessage(`This ${node.typeLabel} item is not deletable!`, DialogResponses.cancel);
+    }
+    return node;
   }
 
   private static async getNode(node: SpringCloudAppTreeItem | undefined, context: IActionContext): Promise<SpringCloudAppTreeItem> {

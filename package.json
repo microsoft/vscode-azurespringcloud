@@ -48,7 +48,12 @@
         "onCommand:azureSpringCloud.app.delete",
         "onCommand:azureSpringCloud.app.viewProperties",
         "onCommand:azureSpringCloud.app.refresh",
+        "onCommand:azureSpringCloud.app.settings.addSetting",
+        "onCommand:azureSpringCloud.app.settings.refresh",
+        "onCommand:azureSpringCloud.app.settings.toggleVisibility",
         "onCommand:azureSpringCloud.app.setting.toggleVisibility",
+        "onCommand:azureSpringCloud.app.setting.edit",
+        "onCommand:azureSpringCloud.app.setting.delete",
         "onView:azureSpringCloud"
     ],
     "main": "./main.js",
@@ -152,6 +157,25 @@
                 "category": "Azure Spring Cloud"
             },
             {
+                "command": "azureSpringCloud.app.settings.addSetting",
+                "title": "%azureSpringCloud.msg.common.add%",
+                "category": "Azure Spring Cloud"
+            },
+            {
+                "command": "azureSpringCloud.app.settings.refresh",
+                "title": "%azureSpringCloud.msg.common.refresh%",
+                "category": "Azure Spring Cloud"
+            },
+            {
+                "command": "azureSpringCloud.app.settings.toggleVisibility",
+                "title": "%azureSpringCloud.msg.app.setting.toggleVisibility%",
+                "category": "Azure Spring Cloud",
+                "icon": {
+                    "light": "resources/light/Visible.svg",
+                    "dark": "resources/dark/Visible.svg"
+                }
+            },
+            {
                 "command": "azureSpringCloud.app.setting.toggleVisibility",
                 "title": "%azureSpringCloud.msg.app.setting.toggleVisibility%",
                 "category": "Azure Spring Cloud",
@@ -159,6 +183,16 @@
                     "light": "resources/light/Visible.svg",
                     "dark": "resources/dark/Visible.svg"
                 }
+            },
+            {
+                "command": "azureSpringCloud.app.setting.edit",
+                "title": "%azureSpringCloud.msg.common.edit%",
+                "category": "Azure Spring Cloud"
+            },
+            {
+                "command": "azureSpringCloud.app.setting.delete",
+                "title": "%azureSpringCloud.msg.common.delete%",
+                "category": "Azure Spring Cloud"
             },
             {
                 "command": "azureSpringCloud.loadMore",
@@ -285,9 +319,34 @@
                     "group": "9@2"
                 },
                 {
-                    "command": "azureSpringCloud.app.setting.toggleVisibility",
-                    "when": "view == azureSpringCloud && viewItem == azureSpringCloud.app.setting",
+                    "command": "azureSpringCloud.app.settings.addSetting",
+                    "when": "view == azureSpringCloud && viewItem =~ /^azureSpringCloud\\.app\\.(jvmOptions|scaleSettings|envVariables)$/",
+                    "group": "1@1"
+                },
+                {
+                    "command": "azureSpringCloud.app.settings.refresh",
+                    "when": "view == azureSpringCloud && viewItem =~ /^azureSpringCloud\\.app\\.(jvmOptions|scaleSettings|envVariables)$/",
+                    "group": "1@1"
+                },
+                {
+                    "command": "azureSpringCloud.app.settings.toggleVisibility",
+                    "when": "view == azureSpringCloud && viewItem =~ /^azureSpringCloud\\.app\\.(jvmOptions|scaleSettings|envVariables)$/",
                     "group": "inline"
+                },
+                {
+                    "command": "azureSpringCloud.app.setting.toggleVisibility",
+                    "when": "view == azureSpringCloud && viewItem =~ /^azureSpringCloud\\.app\\.(jvmOption|scaleSetting|envVariable)$/",
+                    "group": "inline"
+                },
+                {
+                    "command": "azureSpringCloud.app.setting.edit",
+                    "when": "view == azureSpringCloud && viewItem =~ /^azureSpringCloud\\.app\\.(jvmOption|scaleSetting|envVariable)$/",
+                    "group": "1@1"
+                },
+                {
+                    "command": "azureSpringCloud.app.setting.delete",
+                    "when": "view == azureSpringCloud && viewItem =~ /^azureSpringCloud\\.app\\.(jvmOption|envVariable)$/",
+                    "group": "1@2"
                 }
             ],
             "commandPalette": [
@@ -301,6 +360,10 @@
                 },
                 {
                     "command": "azureSpringCloud.loadMore",
+                    "when": "never"
+                },
+                {
+                    "command": "azureSpringCloud.app.settings.toggleVisibility",
                     "when": "never"
                 },
                 {
