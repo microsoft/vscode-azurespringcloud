@@ -12,11 +12,6 @@ export class SpringCloudServiceCommands {
     await openUrl('https://portal.azure.com/#create/Microsoft.AppPlatform')
   }
 
-  public static async openServiceInPortal(context: ui.IActionContext, node?: SpringCloudServiceTreeItem): Promise<void> {
-    node = await SpringCloudServiceCommands.getNode(node, context);
-    await ui.openInPortal(node.root, node.fullId);
-  }
-
   public static async createApp(context: ui.IActionContext, node?: SpringCloudServiceTreeItem): Promise<void> {
     node = await SpringCloudServiceCommands.getNode(node, context);
   }

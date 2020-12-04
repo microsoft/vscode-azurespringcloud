@@ -31,14 +31,12 @@
         "onFileSystem:azureSpringCloud",
         "onCommand:azureSpringCloud.common.loadMore",
         "onCommand:azureSpringCloud.common.refresh",
+        "onCommand:azureSpringCloud.common.openInPortal",
         "onCommand:azureSpringCloud.subscription.select",
-        "onCommand:azureSpringCloud.subscription.openInPortal",
         "onCommand:azureSpringCloud.subscription.createServiceFromPortal",
-        "onCommand:azureSpringCloud.service.openInPortal",
         "onCommand:azureSpringCloud.service.createApp",
         "onCommand:azureSpringCloud.service.delete",
         "onCommand:azureSpringCloud.service.viewProperties",
-        "onCommand:azureSpringCloud.app.openInPortal",
         "onCommand:azureSpringCloud.app.openPublicEndpoint",
         "onCommand:azureSpringCloud.app.openTestEndpoint",
         "onCommand:azureSpringCloud.app.start",
@@ -64,11 +62,6 @@
                 }
             },
             {
-                "command": "azureSpringCloud.subscription.openInPortal",
-                "title": "%azureSpringCloud.msg.common.openInPortal%",
-                "category": "Azure Spring Cloud"
-            },
-            {
                 "command": "azureSpringCloud.subscription.createServiceFromPortal",
                 "title": "%azureSpringCloud.msg.subscription.createServiceFromPortal%",
                 "category": "Azure Spring Cloud"
@@ -83,7 +76,7 @@
                 }
             },
             {
-                "command": "azureSpringCloud.service.openInPortal",
+                "command": "azureSpringCloud.common.openInPortal",
                 "title": "%azureSpringCloud.msg.common.openInPortal%",
                 "category": "Azure Spring Cloud"
             },
@@ -100,11 +93,6 @@
             {
                 "command": "azureSpringCloud.service.viewProperties",
                 "title": "%azureSpringCloud.msg.common.viewProperties%",
-                "category": "Azure Spring Cloud"
-            },
-            {
-                "command": "azureSpringCloud.app.openInPortal",
-                "title": "%azureSpringCloud.msg.common.openInPortal%",
                 "category": "Azure Spring Cloud"
             },
             {

@@ -8,11 +8,6 @@ import { AppSettingTreeItem } from "../tree/AppSettingTreeItem";
 import { AppSettingsTreeItem } from "../tree/AppSettingsTreeItem";
 
 export class SpringCloudAppCommands {
-  public static async openAppInPortal(context: ui.IActionContext, node?: SpringCloudAppTreeItem): Promise<void> {
-    node = await SpringCloudAppCommands.getNode(node, context);
-    await ui.openInPortal(node.root, node.fullId);
-  }
-
   public static async openPublicEndpoint(context: ui.IActionContext, node?: SpringCloudAppTreeItem): Promise<void> {
     node = await SpringCloudAppCommands.getNode(node, context);
     const endPoint = await node.getPublicEndpoint();

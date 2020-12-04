@@ -3,25 +3,23 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
+import * as ui from 'vscode-azureextensionui';
 import { AzureTreeItem, IActionContext, registerCommand } from 'vscode-azureextensionui';
 import { SpringCloudAppCommands } from "./SpringCloudAppCommands";
 import { SpringCloudServiceCommands } from "./SpringCloudServiceCommands";
 import { commands } from 'vscode';
 import { ext } from '../extensionVariables';
-import { openInPortal } from './openInPortal';
 
 export function registerCommands(): void {
   registerCommand("azureSpringCloud.common.loadMore", loadMore);
   registerCommand("azureSpringCloud.common.refresh", refreshNode);
+  registerCommand("azureSpringCloud.common.openInPortal", openInPortal);
   registerCommand('azureSpringCloud.common.toggleVisibility', SpringCloudAppCommands.toggleVisibility, 250);
   registerCommand("azureSpringCloud.subscription.select", selectSubscription);
   registerCommand("azureSpringCloud.subscription.createServiceFromPortal", SpringCloudServiceCommands.createServiceInPortal);
-  registerCommand("azureSpringCloud.subscription.openInPortal", openInPortal);
-  registerCommand("azureSpringCloud.service.openInPortal", SpringCloudServiceCommands.openServiceInPortal);
   registerCommand("azureSpringCloud.service.createApp", SpringCloudServiceCommands.createApp);
   registerCommand("azureSpringCloud.service.delete", SpringCloudServiceCommands.deleteService);
   registerCommand("azureSpringCloud.service.viewProperties", SpringCloudServiceCommands.viewServiceProperties);
-  registerCommand("azureSpringCloud.app.openInPortal", SpringCloudAppCommands.openAppInPortal);
   registerCommand("azureSpringCloud.app.openPublicEndpoint", SpringCloudAppCommands.openPublicEndpoint);
   registerCommand("azureSpringCloud.app.openTestEndpoint", SpringCloudAppCommands.openTestEndpoint);
   registerCommand("azureSpringCloud.app.start", SpringCloudAppCommands.startApp);
@@ -40,6 +38,10 @@ async function refreshNode(_context: IActionContext, node?: AzureTreeItem) {
 
 async function loadMore(context: IActionContext, node: AzureTreeItem) {
   return await ext.tree.loadMore(node, context);
+}
+
+async function openInPortal(_context: ui.IActionContext, node: AzureTreeItem): Promise<void> {
+  await ui.openInPortal(node.root, node.fullId);
 }
 
 async function selectSubscription() {
