@@ -3,8 +3,15 @@ import { DialogResponses, IActionContext, openReadOnlyJson } from "vscode-azuree
 import { ext } from "../extensionVariables";
 import { SpringCloudServiceTreeItem } from "../tree/SpringCloudServiceTreeItem";
 import { localize } from "../utils/localize";
+import { openUrl } from "../utils/openUrl";
+import { SubscriptionTreeItem } from "../tree/SubscriptionTreeItem";
 
 export class SpringCloudServiceCommands {
+
+  public static async createServiceInPortal(_context: ui.IActionContext, _node?: SubscriptionTreeItem): Promise<void> {
+    await openUrl('https://portal.azure.com/#create/Microsoft.AppPlatform')
+  }
+
   public static async openServiceInPortal(context: ui.IActionContext, node?: SpringCloudServiceTreeItem): Promise<void> {
     node = await SpringCloudServiceCommands.getNode(node, context);
     await ui.openInPortal(node.root, node.fullId);

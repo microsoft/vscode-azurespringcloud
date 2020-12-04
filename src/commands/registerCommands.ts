@@ -15,8 +15,8 @@ export function registerCommands(): void {
   registerCommand("azureSpringCloud.common.refresh", refreshNode);
   registerCommand('azureSpringCloud.common.toggleVisibility', SpringCloudAppCommands.toggleVisibility, 250);
   registerCommand("azureSpringCloud.subscription.select", selectSubscription);
+  registerCommand("azureSpringCloud.subscription.createServiceFromPortal", SpringCloudServiceCommands.createServiceInPortal);
   registerCommand("azureSpringCloud.subscription.openInPortal", openInPortal);
-  registerCommand("azureSpringCloud.subscription.createServiceFromPortal", () => 0);
   registerCommand("azureSpringCloud.service.openInPortal", SpringCloudServiceCommands.openServiceInPortal);
   registerCommand("azureSpringCloud.service.createApp", SpringCloudServiceCommands.createApp);
   registerCommand("azureSpringCloud.service.delete", SpringCloudServiceCommands.deleteService);
