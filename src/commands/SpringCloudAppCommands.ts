@@ -2,34 +2,33 @@ import * as ui from "vscode-azureextensionui";
 import { DialogResponses, IActionContext, openReadOnlyJson } from "vscode-azureextensionui";
 import { ext } from "../extensionVariables";
 import { SpringCloudAppTreeItem } from "../tree/SpringCloudAppTreeItem";
-import { localize } from "../utils/localize";
-import { openUrl } from "../utils/openUrl";
+import { localize, openUrl } from "../utils";
 import { AppSettingTreeItem } from "../tree/AppSettingTreeItem";
 import { AppSettingsTreeItem } from "../tree/AppSettingsTreeItem";
 
-export class SpringCloudAppCommands {
-  public static async openPublicEndpoint(context: ui.IActionContext, node?: SpringCloudAppTreeItem): Promise<void> {
-    node = await SpringCloudAppCommands.getNode(node, context);
+export namespace SpringCloudAppCommands {
+  export async function openPublicEndpoint(context: ui.IActionContext, node?: SpringCloudAppTreeItem): Promise<void> {
+    node = await getNode(node, context);
     const endPoint = await node.getPublicEndpoint();
     await openUrl(endPoint!);
   }
 
-  public static async openTestEndpoint(context: ui.IActionContext, node?: SpringCloudAppTreeItem): Promise<void> {
-    node = await SpringCloudAppCommands.getNode(node, context);
+  export async function openTestEndpoint(context: ui.IActionContext, node?: SpringCloudAppTreeItem): Promise<void> {
+    node = await getNode(node, context);
     const endpoint = await node.getTestEndpoint();
     await openUrl(endpoint!);
   }
 
-  public static async startApp(context: ui.IActionContext, node?: SpringCloudAppTreeItem): Promise<SpringCloudAppTreeItem> {
-    node = await SpringCloudAppCommands.getNode(node, context);
+  export async function startApp(context: ui.IActionContext, node?: SpringCloudAppTreeItem): Promise<SpringCloudAppTreeItem> {
+    node = await getNode(node, context);
     await node.runWithTemporaryDescription(localize('starting', 'Starting...'), async () => {
       return node!.start();
     });
     return node;
   }
 
-  public static async stopApp(context: ui.IActionContext, node?: SpringCloudAppTreeItem): Promise<SpringCloudAppTreeItem> {
-    node = await SpringCloudAppCommands.getNode(node, context);
+  export async function stopApp(context: ui.IActionContext, node?: SpringCloudAppTreeItem): Promise<SpringCloudAppTreeItem> {
+    node = await getNode(node, context);
     await ext.ui.showWarningMessage(`Are you sure to stop Spring Cloud Service "${node.name}"?`, {modal: true}, DialogResponses.yes);
     await node.runWithTemporaryDescription(localize('stopping', 'Stopping...'), async () => {
       return node!.stop();
@@ -37,16 +36,16 @@ export class SpringCloudAppCommands {
     return node;
   }
 
-  public static async restartApp(context: ui.IActionContext, node?: SpringCloudAppTreeItem): Promise<SpringCloudAppTreeItem> {
-    node = await SpringCloudAppCommands.getNode(node, context);
+  export async function restartApp(context: ui.IActionContext, node?: SpringCloudAppTreeItem): Promise<SpringCloudAppTreeItem> {
+    node = await getNode(node, context);
     await node.runWithTemporaryDescription(localize('restart', 'Restarting...'), async () => {
       return node!.restart();
     });
     return node;
   }
 
-  public static async deleteApp(context: ui.IActionContext, node?: SpringCloudAppTreeItem): Promise<SpringCloudAppTreeItem> {
-    node = await SpringCloudAppCommands.getNode(node, context);
+  export async function deleteApp(context: ui.IActionContext, node?: SpringCloudAppTreeItem): Promise<SpringCloudAppTreeItem> {
+    node = await getNode(node, context);
     await ext.ui.showWarningMessage(`Are you sure to delete Spring Cloud App "${node.name}"?`, {modal: true}, DialogResponses.deleteResponse);
     await node.runWithTemporaryDescription(localize('deleting', 'Deleting...'), async () => {
       return node!.deleteTreeItem(context);
@@ -54,20 +53,20 @@ export class SpringCloudAppCommands {
     return node;
   }
 
-  public static async viewAppProperties(context: IActionContext, node?: SpringCloudAppTreeItem): Promise<void> {
-    node = await SpringCloudAppCommands.getNode(node, context);
+  export async function viewAppProperties(context: IActionContext, node?: SpringCloudAppTreeItem): Promise<void> {
+    node = await getNode(node, context);
     await openReadOnlyJson(node, node.data);
   }
 
-  public static async toggleVisibility(context: IActionContext, node: AppSettingTreeItem | AppSettingsTreeItem) {
+  export async function toggleVisibility(context: IActionContext, node: AppSettingTreeItem | AppSettingsTreeItem) {
     await node.toggleVisibility(context);
   }
 
-  public static async addSetting(context: IActionContext, node: AppSettingsTreeItem) {
+  export async function addSetting(context: IActionContext, node: AppSettingsTreeItem) {
     await node.createChild(context);
   }
 
-  public static async editSetting(context: IActionContext, node: AppSettingTreeItem): Promise<AppSettingTreeItem> {
+  export async function editSetting(context: IActionContext, node: AppSettingTreeItem): Promise<AppSettingTreeItem> {
     const prompt = node.key ? `Enter value for "${node.key}"` : `Update ${node.typeLabel}`;
     const newVal: string = await ext.ui.showInputBox({prompt, value: node.value});
     if (newVal?.trim()) {
@@ -80,7 +79,7 @@ export class SpringCloudAppCommands {
     }
   }
 
-  public static async deleteSetting(context: IActionContext, node: AppSettingTreeItem): Promise<AppSettingTreeItem> {
+  export async function deleteSetting(context: IActionContext, node: AppSettingTreeItem): Promise<AppSettingTreeItem> {
     if (node.deletable) {
       await ext.ui.showWarningMessage(`Are you sure to delete ${node.typeLabel} "${node.id}"?`, {modal: true}, DialogResponses.deleteResponse);
       await node.runWithTemporaryDescription(localize('deleting', 'Deleting...'), async () => {
@@ -92,7 +91,7 @@ export class SpringCloudAppCommands {
     return node;
   }
 
-  private static async getNode(node: SpringCloudAppTreeItem | undefined, context: IActionContext): Promise<SpringCloudAppTreeItem> {
+  async function getNode(node: SpringCloudAppTreeItem | undefined, context: IActionContext): Promise<SpringCloudAppTreeItem> {
     return node ?? await ext.tree.showTreeItemPicker<SpringCloudAppTreeItem>(SpringCloudAppTreeItem.contextValue, context);
   }
 }

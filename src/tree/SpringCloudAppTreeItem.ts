@@ -6,11 +6,11 @@
 import { AppPlatformManagementClient } from "@azure/arm-appplatform";
 import { AppResource, DeploymentResource, DeploymentResourceStatus } from '@azure/arm-appplatform/esm/models';
 import { AzExtTreeItem, AzureParentTreeItem, createAzureClient, DialogResponses, IActionContext, TreeItemIconPath } from "vscode-azureextensionui";
-import { nonNullProp } from "../utils/nonNull";
+import { nonNullProp } from "../utils";
 import { AppEnvVariablesTreeItem } from "./AppEnvVariablesTreeItem";
 import { AppScaleSettingsTreeItem } from "./AppScaleSettingsTreeItem";
 import { SpringCloudServiceTreeItem } from "./SpringCloudServiceTreeItem";
-import { treeUtils } from "../utils/treeUtils";
+import { TreeUtils } from "../utils/treeUtils";
 import { AppJvmOptionsTreeItem } from "./AppJvmOptionsTreeItem";
 import { ext } from "../extensionVariables";
 import { SpringCloudAppInstancesTreeItem } from "./SpringCloudAppInstancesTreeItem";
@@ -68,18 +68,18 @@ export class SpringCloudAppTreeItem extends AzureParentTreeItem {
   public get iconPath(): TreeItemIconPath {
     switch (this._status) {
       case "Stopped":
-        return treeUtils.getPngIconPath('azure-springcloud-app-stopped');
+        return TreeUtils.getPngIconPath('azure-springcloud-app-stopped');
       case "Failed":
-        return treeUtils.getPngIconPath('azure-springcloud-app-failed');
+        return TreeUtils.getPngIconPath('azure-springcloud-app-failed');
       case "Allocating":
       case "Upgrading":
       case "Compiling":
-        return treeUtils.getPngIconPath('azure-springcloud-app-pending');
+        return TreeUtils.getPngIconPath('azure-springcloud-app-pending');
       case "Unknown":
-        return treeUtils.getPngIconPath('azure-springcloud-app-unknown');
+        return TreeUtils.getPngIconPath('azure-springcloud-app-unknown');
       case "Running":
       default:
-        return treeUtils.getPngIconPath('azure-springcloud-app-running');
+        return TreeUtils.getPngIconPath('azure-springcloud-app-running');
     }
   }
 

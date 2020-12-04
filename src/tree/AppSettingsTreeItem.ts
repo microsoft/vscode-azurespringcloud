@@ -1,9 +1,9 @@
 import { AzureParentTreeItem, IActionContext, TreeItemIconPath } from "vscode-azureextensionui";
-import { treeUtils } from "../utils/treeUtils";
+import { TreeUtils } from "../utils/treeUtils";
 import { SpringCloudAppTreeItem } from "./SpringCloudAppTreeItem";
 import { AppSettingTreeItem, Options } from "./AppSettingTreeItem";
 import { ext } from "../extensionVariables";
-import getThemedIconPath = treeUtils.getThemedIconPath;
+import getThemedIconPath = TreeUtils.getThemedIconPath;
 
 export abstract class AppSettingsTreeItem extends AzureParentTreeItem {
   public readonly childTypeLabel: string = 'App Setting';

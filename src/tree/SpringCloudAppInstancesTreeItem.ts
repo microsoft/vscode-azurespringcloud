@@ -5,8 +5,8 @@
 
 import { AppPlatformManagementClient } from '@azure/arm-appplatform';
 import { AzExtTreeItem, AzureParentTreeItem, createAzureClient, TreeItemIconPath } from "vscode-azureextensionui";
-import { localize } from "../utils/localize";
-import { treeUtils } from "../utils/treeUtils";
+import { localize } from "../utils";
+import { TreeUtils } from "../utils/treeUtils";
 import { SpringCloudAppTreeItem } from './SpringCloudAppTreeItem';
 import { SpringCloudAppInstanceTreeItem } from "./SpringCloudAppInstanceTreeItem";
 
@@ -30,7 +30,7 @@ export class SpringCloudAppInstancesTreeItem extends AzureParentTreeItem {
   }
 
   public get iconPath(): TreeItemIconPath {
-    return treeUtils.getIconPath('azure-springcloud-app-instances');
+    return TreeUtils.getIconPath('azure-springcloud-app-instances');
   }
 
   public hasMoreChildrenImpl(): boolean {

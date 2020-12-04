@@ -17,7 +17,7 @@ import {
 } from 'vscode-azureextensionui';
 // tslint:disable-next-line:no-submodule-imports
 import { AzureExtensionApiProvider } from 'vscode-azureextensionui/api';
-import { registerCommands } from './commands/registerCommands';
+import { registerCommands } from './commands';
 import { ext } from './extensionVariables';
 import { AzureAccountTreeItem } from './tree/AzureAccountTreeItem';
 

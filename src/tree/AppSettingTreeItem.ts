@@ -1,7 +1,7 @@
 import { AzureParentTreeItem, AzureTreeItem, IActionContext, TreeItemIconPath } from "vscode-azureextensionui";
 import { AppSettingsTreeItem } from "./AppSettingsTreeItem";
-import { treeUtils } from "../utils/treeUtils";
-import getThemedIconPath = treeUtils.getThemedIconPath;
+import { TreeUtils } from "../utils/treeUtils";
+import getThemedIconPath = TreeUtils.getThemedIconPath;
 
 export interface Options {
   hidden?: boolean;

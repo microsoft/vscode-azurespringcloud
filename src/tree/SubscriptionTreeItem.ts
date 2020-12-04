@@ -5,7 +5,7 @@
 
 import { AppPlatformManagementClient } from '@azure/arm-appplatform';
 import { AzExtTreeItem, createAzureClient, SubscriptionTreeItemBase } from 'vscode-azureextensionui';
-import { localize } from '../utils/localize';
+import { localize } from '../utils';
 import * as Models from '@azure/arm-appplatform/src/models/index';
 import { SpringCloudServiceTreeItem } from './SpringCloudServiceTreeItem';
 

@@ -1,5 +1,5 @@
 import { AzureTreeItem, TreeItemIconPath } from "vscode-azureextensionui";
-import { treeUtils } from "../utils/treeUtils";
+import { TreeUtils } from "../utils/treeUtils";
 import { SpringCloudAppInstancesTreeItem } from "./SpringCloudAppInstancesTreeItem";
 import { DeploymentInstance } from "@azure/arm-appplatform/src/models/index";
 
@@ -27,6 +27,6 @@ export class SpringCloudAppInstanceTreeItem extends AzureTreeItem {
   }
 
   public get iconPath(): TreeItemIconPath {
-    return treeUtils.getIconPath('azure-springcloud-app-instance');
+    return TreeUtils.getIconPath('azure-springcloud-app-instance');
   }
 }

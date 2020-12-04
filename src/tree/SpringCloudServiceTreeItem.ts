@@ -8,9 +8,8 @@ import { ServiceResource } from '@azure/arm-appplatform/esm/models';
 import * as Models from '@azure/arm-appplatform/src/models/index';
 import { AzExtTreeItem, AzureParentTreeItem, createAzureClient, TreeItemIconPath } from "vscode-azureextensionui";
 import { ext } from "../extensionVariables";
-import { localize } from "../utils/localize";
-import { nonNullProp } from "../utils/nonNull";
-import { treeUtils } from "../utils/treeUtils";
+import { localize, nonNullProp } from "../utils";
+import { TreeUtils } from "../utils/treeUtils";
 import { SpringCloudAppTreeItem } from './SpringCloudAppTreeItem';
 import SpringCloudResourceId from "../model/SpringCloudResourceId";
 
@@ -59,7 +58,7 @@ export class SpringCloudServiceTreeItem extends AzureParentTreeItem {
   }
 
   public get iconPath(): TreeItemIconPath {
-    return treeUtils.getPngIconPath('azure-springcloud-small');
+    return TreeUtils.getPngIconPath('azure-springcloud-small');
   }
 
   public hasMoreChildrenImpl(): boolean {

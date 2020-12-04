@@ -1,9 +1,22 @@
 /*---------------------------------------------------------------------------------------------
  *  Copyright (c) Microsoft Corporation. All rights reserved.
- *  Licensed under the MIT License. See License.md in the project root for license information.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { isNullOrUndefined } from 'util';
+import * as nls from 'vscode-nls';
+// tslint:disable-next-line:no-require-imports
+import opn = require("opn");
+
+export const localize: nls.LocalizeFunc = nls.loadMessageBundle();
+
+export async function openUrl(url: string): Promise<void> {
+  // Using this functionality is blocked by https://github.com/Microsoft/vscode/issues/25852
+  // Specifically, opening the Live Metrics Stream for Linux Function Apps doesn't work in this extension.
+  // await vscode.env.openExternal(vscode.Uri.parse(url));
+
+  // tslint:disable-next-line: no-unsafe-any
+  opn(url);
+}
 
 /**
  * Retrieves a property by name from an object and checks that it's not null and not undefined.  It is strongly typed
@@ -18,7 +31,7 @@ export function nonNullProp<TSource, TKey extends keyof TSource>(source: TSource
  * Validates that a given value is not null and not undefined.
  */
 export function nonNullValue<T>(value: T | undefined, propertyNameOrMessage?: string): T {
-  if (isNullOrUndefined(value)) {
+  if (value === null || value === undefined) {
     throw new Error(
       // tslint:disable-next-line:prefer-template
       'Internal error: Expected value to be neither null nor undefined'

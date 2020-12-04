@@ -7,7 +7,7 @@ import * as path from 'path';
 import { TreeItemIconPath } from 'vscode-azureextensionui';
 import { ext } from '../extensionVariables';
 
-export namespace treeUtils {
+export namespace TreeUtils {
   export function getIconPath(iconName: string): TreeItemIconPath {
     return path.join(getResourcesPath(), `${iconName}.svg`);
   }
