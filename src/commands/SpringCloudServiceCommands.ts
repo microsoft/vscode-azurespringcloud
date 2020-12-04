@@ -13,6 +13,7 @@ export namespace SpringCloudServiceCommands {
 
   export async function createApp(context: ui.IActionContext, node?: SpringCloudServiceTreeItem): Promise<void> {
     node = await getNode(node, context);
+    await node.createChild(context);
   }
 
   export async function deleteService(context: ui.IActionContext, node?: SpringCloudServiceTreeItem): Promise<SpringCloudServiceTreeItem> {

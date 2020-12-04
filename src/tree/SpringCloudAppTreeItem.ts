@@ -5,14 +5,13 @@
 
 import { AppPlatformManagementClient } from "@azure/arm-appplatform";
 import { AppResource, DeploymentResource, DeploymentResourceStatus } from '@azure/arm-appplatform/esm/models';
-import { AzExtTreeItem, AzureParentTreeItem, createAzureClient, DialogResponses, IActionContext, TreeItemIconPath } from "vscode-azureextensionui";
+import { AzExtTreeItem, AzureParentTreeItem, createAzureClient, IActionContext, TreeItemIconPath } from "vscode-azureextensionui";
 import { nonNullProp } from "../utils";
 import { AppEnvVariablesTreeItem } from "./AppEnvVariablesTreeItem";
 import { AppScaleSettingsTreeItem } from "./AppScaleSettingsTreeItem";
 import { SpringCloudServiceTreeItem } from "./SpringCloudServiceTreeItem";
 import { TreeUtils } from "../utils/treeUtils";
 import { AppJvmOptionsTreeItem } from "./AppJvmOptionsTreeItem";
-import { ext } from "../extensionVariables";
 import { SpringCloudAppInstancesTreeItem } from "./SpringCloudAppInstancesTreeItem";
 
 export class SpringCloudAppTreeItem extends AzureParentTreeItem {
@@ -92,7 +91,6 @@ export class SpringCloudAppTreeItem extends AzureParentTreeItem {
   }
 
   public async deleteTreeItemImpl(_context: IActionContext): Promise<void> {
-    await ext.ui.showWarningMessage(`Are you sure to delete Spring Cloud App "${this.name}"?`, {modal: true}, DialogResponses.deleteResponse);
     await this.client.apps.deleteMethod(this.resourceGroup, this.serviceName, this.name);
   }
 

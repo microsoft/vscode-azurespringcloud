@@ -6,12 +6,28 @@
 import { AppPlatformManagementClient } from '@azure/arm-appplatform';
 import { ServiceResource } from '@azure/arm-appplatform/esm/models';
 import * as Models from '@azure/arm-appplatform/src/models/index';
-import { AzExtTreeItem, AzureParentTreeItem, createAzureClient, TreeItemIconPath } from "vscode-azureextensionui";
+import {
+  AzExtTreeItem,
+  AzureParentTreeItem,
+  AzureWizard,
+  AzureWizardExecuteStep,
+  AzureWizardPromptStep,
+  createAzureClient,
+  ICreateChildImplContext,
+  TreeItemIconPath,
+  VerifyProvidersStep
+} from "vscode-azureextensionui";
 import { ext } from "../extensionVariables";
 import { localize, nonNullProp } from "../utils";
 import { TreeUtils } from "../utils/treeUtils";
 import { SpringCloudAppTreeItem } from './SpringCloudAppTreeItem';
 import SpringCloudResourceId from "../model/SpringCloudResourceId";
+import ISpringCloudAppWizardContext from "../model/ISpringCloudAppWizardContext";
+import { AppNameStep } from "../commands/steps/AppNameStep";
+import { AppStackStep } from "../commands/steps/AppStackStep";
+import { SpringCloudAppCreateStep } from "../commands/steps/SpringCloudAppCreateStep";
+import { SpringCloudAppDeploymentCreateStep } from "../commands/steps/SpringCloudAppDeploymentCreateStep";
+import { SpringCloudAppUpdateStep } from "../commands/steps/SpringCloudAppUpdateStep";
 
 export class SpringCloudServiceTreeItem extends AzureParentTreeItem {
   public static contextValue: string = 'azureSpringCloud.service';
@@ -87,5 +103,29 @@ export class SpringCloudServiceTreeItem extends AzureParentTreeItem {
   public async deleteTreeItemImpl(): Promise<void> {
     await this.client.services.deleteMethod(this.resourceGroup, this.name);
     ext.outputChannel.appendLog(localize('deletedService', 'Successfully deleted Spring Cloud Service "{0}".', this.name));
+  }
+
+  public async createChildImpl(context: ICreateChildImplContext): Promise<AzExtTreeItem> {
+    const wizardContext: ISpringCloudAppWizardContext = Object.assign(context, this.root, {
+      service: this.data
+    });
+
+    const promptSteps: AzureWizardPromptStep<ISpringCloudAppWizardContext>[] = [];
+    const executeSteps: AzureWizardExecuteStep<ISpringCloudAppWizardContext>[] = [];
+    promptSteps.push(new AppNameStep());
+    promptSteps.push(new AppStackStep());
+    executeSteps.push(new VerifyProvidersStep(['Microsoft.AppPlatform']));
+    executeSteps.push(new SpringCloudAppCreateStep());
+    executeSteps.push(new SpringCloudAppDeploymentCreateStep());
+    executeSteps.push(new SpringCloudAppUpdateStep());
+    const title: string = localize('appCreatingTitle', 'Create new Spring Cloud App in Azure');
+    const wizard: AzureWizard<ISpringCloudAppWizardContext> = new AzureWizard(wizardContext, {promptSteps, executeSteps, title});
+
+    await wizard.prompt();
+    context.showCreatingTreeItem(nonNullProp(wizardContext, 'newAppName'));
+
+    await wizard.execute();
+
+    return new SpringCloudAppTreeItem(this, nonNullProp(wizardContext, 'newApp'));
   }
 }
