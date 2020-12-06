@@ -6,8 +6,11 @@ import { localize, openUrl } from "../utils";
 import { AppSettingTreeItem } from "../tree/AppSettingTreeItem";
 import { AppSettingsTreeItem } from "../tree/AppSettingsTreeItem";
 import { SpringCloudAppInstanceTreeItem } from "../tree/SpringCloudAppInstanceTreeItem";
+import { OpenDialogOptions, Uri, window } from "vscode";
 
 export namespace SpringCloudAppCommands {
+
+
   export async function openPublicEndpoint(context: ui.IActionContext, node?: SpringCloudAppTreeItem): Promise<void> {
     node = await getNode(node, context);
     const endPoint = await node.getPublicEndpoint();
@@ -51,6 +54,25 @@ export namespace SpringCloudAppCommands {
     await node.runWithTemporaryDescription(localize('deleting', 'Deleting...'), async () => {
       return node!.deleteTreeItem(context);
     });
+    return node;
+  }
+
+  export async function deploy(context: ui.IActionContext, node?: SpringCloudAppTreeItem): Promise<SpringCloudAppTreeItem> {
+    node = await getNode(node, context);
+    const options: OpenDialogOptions = {
+      canSelectMany: false,
+      openLabel: 'Select',
+      filters: {
+        'Jar files': ['jar']
+      }
+    };
+    const fileUri: Uri[] | undefined = await window.showOpenDialog(options);
+    if (fileUri && fileUri[0]) {
+      const artifactUrl: string = fileUri[0].fsPath;
+      await node.runWithTemporaryDescription(localize('deploying', 'Deploying...'), async () => {
+        return await node!.deployArtifact(context, artifactUrl);
+      });
+    }
     return node;
   }
 

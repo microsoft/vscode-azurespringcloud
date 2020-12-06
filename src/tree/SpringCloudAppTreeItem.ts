@@ -4,15 +4,27 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { AppPlatformManagementClient } from "@azure/arm-appplatform";
-import { AppResource, DeploymentResource } from '@azure/arm-appplatform/esm/models';
-import { AzExtTreeItem, AzureParentTreeItem, createAzureClient, IActionContext, TreeItemIconPath } from "vscode-azureextensionui";
-import { nonNullProp } from "../utils";
+import { AppResource, DeploymentResource, ResourceUploadDefinition } from '@azure/arm-appplatform/esm/models';
+import * as ui from "vscode-azureextensionui";
+import {
+  AzExtTreeItem,
+  AzureParentTreeItem,
+  AzureWizard,
+  AzureWizardExecuteStep,
+  createAzureClient,
+  IActionContext,
+  TreeItemIconPath
+} from "vscode-azureextensionui";
+import { localize, nonNullProp } from "../utils";
 import { AppEnvVariablesTreeItem } from "./AppEnvVariablesTreeItem";
 import { AppScaleSettingsTreeItem } from "./AppScaleSettingsTreeItem";
 import { SpringCloudServiceTreeItem } from "./SpringCloudServiceTreeItem";
 import { TreeUtils } from "../utils/treeUtils";
 import { AppJvmOptionsTreeItem } from "./AppJvmOptionsTreeItem";
 import { SpringCloudAppInstancesTreeItem } from "./SpringCloudAppInstancesTreeItem";
+import { IAppDeploymentWizardContext } from "../model/IAppDeploymentWizardContext";
+import { UploadArtifactStep } from "../commands/steps/deployment/UploadArtifactStep";
+import { UpdateDeploymentStep } from "../commands/steps/deployment/UpdateDeploymentStep";
 
 export class SpringCloudAppTreeItem extends AzureParentTreeItem {
   public static contextValue: string = 'azureSpringCloud.app';
@@ -125,6 +137,24 @@ export class SpringCloudAppTreeItem extends AzureParentTreeItem {
       this.deployment = await this.client.deployments.get(this.resourceGroup, this.serviceName, this.name, deploymentName!)
     }
     return this.deployment;
+  }
+
+  public async deployArtifact(context: ui.IActionContext, artifactUrl: string) {
+    const uploadDefinition: ResourceUploadDefinition = await this.client.apps.getResourceUploadUrl(this.resourceGroup, this.serviceName, this.name);
+    const deployment = await this.getActiveDeployment();
+    const wizardContext: IAppDeploymentWizardContext = Object.assign(context, this.root, {
+      uploadDefinition,
+      artifactUrl,
+      deployment,
+      app: this.app
+    });
+
+    const executeSteps: AzureWizardExecuteStep<IAppDeploymentWizardContext>[] = [];
+    executeSteps.push(new UploadArtifactStep());
+    executeSteps.push(new UpdateDeploymentStep());
+    const title: string = localize('appDeployingTitle', 'Deploying artifact to "{0}"', this.name);
+    const wizard: AzureWizard<IAppDeploymentWizardContext> = new AzureWizard(wizardContext, {executeSteps, title});
+    await wizard.execute();
   }
 
   public async refreshImpl(): Promise<void> {

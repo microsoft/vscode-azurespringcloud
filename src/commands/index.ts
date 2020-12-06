@@ -29,6 +29,7 @@ export function registerCommands(): void {
   registerCommand("azureSpringCloud.app.stop", SpringCloudAppCommands.stopApp);
   registerCommand("azureSpringCloud.app.restart", SpringCloudAppCommands.restartApp);
   registerCommand("azureSpringCloud.app.delete", SpringCloudAppCommands.deleteApp);
+  registerCommand("azureSpringCloud.app.deploy", SpringCloudAppCommands.deploy);
   registerCommand("azureSpringCloud.app.instance.startStreamingLog", SpringCloudAppCommands.startStreamingLogs);
   registerCommand("azureSpringCloud.app.instance.stopStreamingLog", SpringCloudAppCommands.stopStreamingLogs);
   registerCommand('azureSpringCloud.app.settings.addSetting', SpringCloudAppCommands.addSetting);
