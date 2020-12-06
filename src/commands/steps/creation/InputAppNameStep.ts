@@ -1,7 +1,7 @@
 import { AzureNameStep, createAzureClient, IAzureNamingRules } from "vscode-azureextensionui";
-import ISpringCloudAppWizardContext from "../../model/ISpringCloudAppWizardContext";
-import { localize } from "../../utils";
-import { ext } from "../../extensionVariables";
+import IAppCreationWizardContext from "../../../model/IAppCreationWizardContext";
+import { localize } from "../../../utils";
+import { ext } from "../../../extensionVariables";
 import { AppPlatformManagementClient } from "@azure/arm-appplatform";
 
 const appNamingRules: IAzureNamingRules = {
@@ -10,8 +10,8 @@ const appNamingRules: IAzureNamingRules = {
   invalidCharsRegExp: /[^a-zA-Z0-9\-]/
 };
 
-export class AppNameStep extends AzureNameStep<ISpringCloudAppWizardContext> {
-  public async prompt(context: ISpringCloudAppWizardContext): Promise<void> {
+export class InputAppNameStep extends AzureNameStep<IAppCreationWizardContext> {
+  public async prompt(context: IAppCreationWizardContext): Promise<void> {
     const client: AppPlatformManagementClient = await createAzureClient(context, AppPlatformManagementClient);
     const prompt: string = localize('appNamePrompt', 'Enter a globally unique name for the new Spring Cloud app.');
     context.newAppName = (await ext.ui.showInputBox({
@@ -33,11 +33,11 @@ export class AppNameStep extends AzureNameStep<ISpringCloudAppWizardContext> {
     }
   }
 
-  public shouldPrompt(context: ISpringCloudAppWizardContext): boolean {
+  public shouldPrompt(context: IAppCreationWizardContext): boolean {
     return !context.newAppName;
   }
 
-  protected async isRelatedNameAvailable(_context: ISpringCloudAppWizardContext, _name: string): Promise<boolean> {
+  protected async isRelatedNameAvailable(_context: IAppCreationWizardContext, _name: string): Promise<boolean> {
     return false;
   }
 }

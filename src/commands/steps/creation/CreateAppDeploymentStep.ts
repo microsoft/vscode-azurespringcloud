@@ -2,15 +2,15 @@ import { AppPlatformManagementClient } from "@azure/arm-appplatform";
 import { RuntimeVersion } from "@azure/arm-appplatform/esm/models";
 import { Progress } from "vscode";
 import { AzureWizardExecuteStep, createAzureClient } from "vscode-azureextensionui";
-import { ext } from "../../extensionVariables";
-import ISpringCloudAppWizardContext from "../../model/ISpringCloudAppWizardContext";
-import SpringCloudResourceId from "../../model/SpringCloudResourceId";
-import { localize, nonNullProp } from "../../utils";
+import { ext } from "../../../extensionVariables";
+import IAppCreationWizardContext from "../../../model/IAppCreationWizardContext";
+import SpringCloudResourceId from "../../../model/SpringCloudResourceId";
+import { localize, nonNullProp } from "../../../utils";
 
-export class SpringCloudAppDeploymentCreateStep extends AzureWizardExecuteStep<ISpringCloudAppWizardContext> {
+export class CreateAppDeploymentStep extends AzureWizardExecuteStep<IAppCreationWizardContext> {
   public priority: number = 140;
 
-  public async execute(context: ISpringCloudAppWizardContext, progress: Progress<{ message?: string; increment?: number }>): Promise<void> {
+  public async execute(context: IAppCreationWizardContext, progress: Progress<{ message?: string; increment?: number }>): Promise<void> {
 
     const message: string = localize('creatingNewAppDeployment', 'Creating default Spring Cloud app deployment...');
     ext.outputChannel.appendLog(message);
@@ -45,7 +45,7 @@ export class SpringCloudAppDeploymentCreateStep extends AzureWizardExecuteStep<I
     return Promise.resolve(undefined);
   }
 
-  public shouldExecute(_context: ISpringCloudAppWizardContext): boolean {
+  public shouldExecute(_context: IAppCreationWizardContext): boolean {
     return true;
   }
 }

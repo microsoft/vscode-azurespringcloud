@@ -22,12 +22,12 @@ import { localize, nonNullProp } from "../utils";
 import { TreeUtils } from "../utils/treeUtils";
 import { SpringCloudAppTreeItem } from './SpringCloudAppTreeItem';
 import SpringCloudResourceId from "../model/SpringCloudResourceId";
-import ISpringCloudAppWizardContext from "../model/ISpringCloudAppWizardContext";
-import { AppNameStep } from "../commands/steps/AppNameStep";
-import { AppStackStep } from "../commands/steps/AppStackStep";
-import { SpringCloudAppCreateStep } from "../commands/steps/SpringCloudAppCreateStep";
-import { SpringCloudAppDeploymentCreateStep } from "../commands/steps/SpringCloudAppDeploymentCreateStep";
-import { SpringCloudAppUpdateStep } from "../commands/steps/SpringCloudAppUpdateStep";
+import IAppCreationWizardContext from "../model/IAppCreationWizardContext";
+import { InputAppNameStep } from "../commands/steps/creation/InputAppNameStep";
+import { SelectAppStackStep } from "../commands/steps/creation/SelectAppStackStep";
+import { CreateAppStep } from "../commands/steps/creation/CreateAppStep";
+import { CreateAppDeploymentStep } from "../commands/steps/creation/CreateAppDeploymentStep";
+import { UpdateAppStep } from "../commands/steps/creation/UpdateAppStep";
 
 export class SpringCloudServiceTreeItem extends AzureParentTreeItem {
   public static contextValue: string = 'azureSpringCloud.service';
@@ -110,20 +110,20 @@ export class SpringCloudServiceTreeItem extends AzureParentTreeItem {
   }
 
   public async createChildImpl(context: ICreateChildImplContext): Promise<AzExtTreeItem> {
-    const wizardContext: ISpringCloudAppWizardContext = Object.assign(context, this.root, {
+    const wizardContext: IAppCreationWizardContext = Object.assign(context, this.root, {
       service: this.service
     });
 
-    const promptSteps: AzureWizardPromptStep<ISpringCloudAppWizardContext>[] = [];
-    const executeSteps: AzureWizardExecuteStep<ISpringCloudAppWizardContext>[] = [];
-    promptSteps.push(new AppNameStep());
-    promptSteps.push(new AppStackStep());
+    const promptSteps: AzureWizardPromptStep<IAppCreationWizardContext>[] = [];
+    const executeSteps: AzureWizardExecuteStep<IAppCreationWizardContext>[] = [];
+    promptSteps.push(new InputAppNameStep());
+    promptSteps.push(new SelectAppStackStep());
     executeSteps.push(new VerifyProvidersStep(['Microsoft.AppPlatform']));
-    executeSteps.push(new SpringCloudAppCreateStep());
-    executeSteps.push(new SpringCloudAppDeploymentCreateStep());
-    executeSteps.push(new SpringCloudAppUpdateStep());
+    executeSteps.push(new CreateAppStep());
+    executeSteps.push(new CreateAppDeploymentStep());
+    executeSteps.push(new UpdateAppStep());
     const title: string = localize('appCreatingTitle', 'Create new Spring Cloud App in Azure');
-    const wizard: AzureWizard<ISpringCloudAppWizardContext> = new AzureWizard(wizardContext, {promptSteps, executeSteps, title});
+    const wizard: AzureWizard<IAppCreationWizardContext> = new AzureWizard(wizardContext, {promptSteps, executeSteps, title});
 
     await wizard.prompt();
     context.showCreatingTreeItem(nonNullProp(wizardContext, 'newAppName'));
