@@ -32,18 +32,20 @@
         "onCommand:azureSpringCloud.common.loadMore",
         "onCommand:azureSpringCloud.common.refresh",
         "onCommand:azureSpringCloud.common.openInPortal",
+        "onCommand:azureSpringCloud.common.viewProperties",
         "onCommand:azureSpringCloud.subscription.select",
         "onCommand:azureSpringCloud.subscription.createServiceFromPortal",
         "onCommand:azureSpringCloud.service.createApp",
         "onCommand:azureSpringCloud.service.delete",
-        "onCommand:azureSpringCloud.service.viewProperties",
         "onCommand:azureSpringCloud.app.openPublicEndpoint",
         "onCommand:azureSpringCloud.app.openTestEndpoint",
         "onCommand:azureSpringCloud.app.start",
         "onCommand:azureSpringCloud.app.stop",
         "onCommand:azureSpringCloud.app.restart",
         "onCommand:azureSpringCloud.app.delete",
-        "onCommand:azureSpringCloud.app.viewProperties",
+        "onCommand:azureSpringCloud.app.deploy",
+        "onCommand:azureSpringCloud.instance.startStreamingLog",
+        "onCommand:azureSpringCloud.instance.stopStreamingLog",
         "onCommand:azureSpringCloud.app.settings.addSetting",
         "onCommand:azureSpringCloud.common.toggleVisibility",
         "onCommand:azureSpringCloud.app.setting.edit",
@@ -91,7 +93,7 @@
                 "category": "Azure Spring Cloud"
             },
             {
-                "command": "azureSpringCloud.service.viewProperties",
+                "command": "azureSpringCloud.common.viewProperties",
                 "title": "%azureSpringCloud.msg.common.viewProperties%",
                 "category": "Azure Spring Cloud"
             },
@@ -126,8 +128,18 @@
                 "category": "Azure Spring Cloud"
             },
             {
-                "command": "azureSpringCloud.app.viewProperties",
-                "title": "%azureSpringCloud.msg.common.viewProperties%",
+                "command": "azureSpringCloud.app.deploy",
+                "title": "%azureSpringCloud.msg.app.deploy%",
+                "category": "Azure Spring Cloud"
+            },
+            {
+                "command": "azureSpringCloud.app.instance.startStreamingLog",
+                "title": "%azureSpringCloud.msg.app.instance.startStreamingLog%",
+                "category": "Azure Spring Cloud"
+            },
+            {
+                "command": "azureSpringCloud.app.instance.stopStreamingLog",
+                "title": "%azureSpringCloud.msg.app.instance.stopStreamingLog%",
                 "category": "Azure Spring Cloud"
             },
             {
@@ -223,7 +235,7 @@
                     "group": "5@2"
                 },
                 {
-                    "command": "azureSpringCloud.service.viewProperties",
+                    "command": "azureSpringCloud.common.viewProperties",
                     "when": "view == azureSpringCloud && viewItem == azureSpringCloud.service",
                     "group": "9@1"
                 },
@@ -269,7 +281,12 @@
                     "group": "5@4"
                 },
                 {
-                    "command": "azureSpringCloud.app.viewProperties",
+                    "command": "azureSpringCloud.app.deploy",
+                    "when": "view == azureSpringCloud && viewItem == azureSpringCloud.app",
+                    "group": "6@1"
+                },
+                {
+                    "command": "azureSpringCloud.common.viewProperties",
                     "when": "view == azureSpringCloud && viewItem == azureSpringCloud.app",
                     "group": "9@1"
                 },
@@ -282,6 +299,21 @@
                     "command": "azureSpringCloud.common.refresh",
                     "when": "view == azureSpringCloud && viewItem == azureSpringCloud.app.instances",
                     "group": "9@2"
+                },
+                {
+                    "command": "azureSpringCloud.app.instance.startStreamingLog",
+                    "when": "view == azureSpringCloud && viewItem == azureSpringCloud.app.instance",
+                    "group": "6@1"
+                },
+                {
+                    "command": "azureSpringCloud.app.instance.stopStreamingLog",
+                    "when": "view == azureSpringCloud && viewItem == azureSpringCloud.app.instance",
+                    "group": "6@2"
+                },
+                {
+                    "command": "azureSpringCloud.common.viewProperties",
+                    "when": "view == azureSpringCloud && viewItem == azureSpringCloud.app.instance",
+                    "group": "9@1"
                 },
                 {
                     "command": "azureSpringCloud.app.settings.addSetting",

@@ -1,5 +1,5 @@
 import * as ui from "vscode-azureextensionui";
-import { DialogResponses, IActionContext, openReadOnlyJson } from "vscode-azureextensionui";
+import { DialogResponses, IActionContext } from "vscode-azureextensionui";
 import { ext } from "../extensionVariables";
 import { SpringCloudServiceTreeItem } from "../tree/SpringCloudServiceTreeItem";
 import { localize, openUrl } from "../utils";
@@ -23,11 +23,6 @@ export namespace SpringCloudServiceCommands {
       return node!.deleteTreeItem(context);
     });
     return node;
-  }
-
-  export async function viewServiceProperties(context: IActionContext, node?: SpringCloudServiceTreeItem): Promise<void> {
-    node = await getNode(node, context);
-    await openReadOnlyJson(node, node.data);
   }
 
   async function getNode(node: SpringCloudServiceTreeItem | undefined, context: IActionContext) {

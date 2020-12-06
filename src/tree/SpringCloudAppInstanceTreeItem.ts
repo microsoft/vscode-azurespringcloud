@@ -2,6 +2,7 @@ import { AzureTreeItem, TreeItemIconPath } from "vscode-azureextensionui";
 import { TreeUtils } from "../utils/treeUtils";
 import { SpringCloudAppInstancesTreeItem } from "./SpringCloudAppInstancesTreeItem";
 import { DeploymentInstance } from "@azure/arm-appplatform/src/models/index";
+import { AppResource } from "@azure/arm-appplatform/esm/models";
 
 export class SpringCloudAppInstanceTreeItem extends AzureTreeItem {
   public static contextValue: string = 'azureSpringCloud.app.instance';
@@ -12,6 +13,10 @@ export class SpringCloudAppInstanceTreeItem extends AzureTreeItem {
   public constructor(parent: SpringCloudAppInstancesTreeItem, instance: DeploymentInstance) {
     super(parent);
     this.instance = instance;
+  }
+
+  public get data(): AppResource {
+    return this.instance;
   }
 
   public get id(): string {

@@ -33,15 +33,15 @@ export class SpringCloudServiceTreeItem extends AzureParentTreeItem {
   public static contextValue: string = 'azureSpringCloud.service';
   public readonly contextValue: string = SpringCloudServiceTreeItem.contextValue;
   public readonly childTypeLabel: string = localize('app', 'App');
-  public data: ServiceResource;
+  public service: ServiceResource;
 
   private _nextLink: string | undefined;
   private resourceId: SpringCloudResourceId;
 
   constructor(parent: AzureParentTreeItem, service: ServiceResource) {
     super(parent);
-    this.data = service;
-    this.resourceId = new SpringCloudResourceId(nonNullProp(this.data, 'id'))
+    this.service = service;
+    this.resourceId = new SpringCloudResourceId(nonNullProp(this.service, 'id'))
   }
 
   public get client(): AppPlatformManagementClient {
@@ -49,7 +49,7 @@ export class SpringCloudServiceTreeItem extends AzureParentTreeItem {
   }
 
   public get name(): string {
-    return nonNullProp(this.data, 'name');
+    return nonNullProp(this.service, 'name');
   }
 
   public get serviceName(): string {
@@ -60,8 +60,12 @@ export class SpringCloudServiceTreeItem extends AzureParentTreeItem {
     return this.resourceId.getResourceGroup();
   }
 
+  public get data(): ServiceResource {
+    return this.service;
+  }
+
   public get id(): string {
-    return nonNullProp(this.data, 'id');
+    return nonNullProp(this.service, 'id');
   }
 
   public get label(): string {
@@ -69,7 +73,7 @@ export class SpringCloudServiceTreeItem extends AzureParentTreeItem {
   }
 
   public get description(): string | undefined {
-    const state: string | undefined = this.data.properties?.provisioningState;
+    const state: string | undefined = this.service.properties?.provisioningState;
     return state?.toLowerCase() === 'succeeded' ? undefined : state;
   }
 
@@ -97,7 +101,7 @@ export class SpringCloudServiceTreeItem extends AzureParentTreeItem {
   }
 
   public async refreshImpl(): Promise<void> {
-    this.data = await this.client.services.get(this.resourceGroup, this.name);
+    this.service = await this.client.services.get(this.resourceGroup, this.name);
   }
 
   public async deleteTreeItemImpl(): Promise<void> {
@@ -107,7 +111,7 @@ export class SpringCloudServiceTreeItem extends AzureParentTreeItem {
 
   public async createChildImpl(context: ICreateChildImplContext): Promise<AzExtTreeItem> {
     const wizardContext: ISpringCloudAppWizardContext = Object.assign(context, this.root, {
-      service: this.data
+      service: this.service
     });
 
     const promptSteps: AzureWizardPromptStep<ISpringCloudAppWizardContext>[] = [];

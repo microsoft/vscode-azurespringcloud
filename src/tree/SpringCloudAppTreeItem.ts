@@ -42,6 +42,10 @@ export class SpringCloudAppTreeItem extends AzureParentTreeItem {
     return (<SpringCloudServiceTreeItem>this.parent).resourceGroup;
   }
 
+  public get data(): AppResource {
+    return this.app;
+  }
+
   public get id(): string {
     return nonNullProp(this.app, 'id');
   }

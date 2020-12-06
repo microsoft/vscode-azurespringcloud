@@ -1,10 +1,11 @@
 import * as ui from "vscode-azureextensionui";
-import { DialogResponses, IActionContext, openReadOnlyJson } from "vscode-azureextensionui";
+import { DialogResponses, IActionContext } from "vscode-azureextensionui";
 import { ext } from "../extensionVariables";
 import { SpringCloudAppTreeItem } from "../tree/SpringCloudAppTreeItem";
 import { localize, openUrl } from "../utils";
 import { AppSettingTreeItem } from "../tree/AppSettingTreeItem";
 import { AppSettingsTreeItem } from "../tree/AppSettingsTreeItem";
+import { SpringCloudAppInstanceTreeItem } from "../tree/SpringCloudAppInstanceTreeItem";
 
 export namespace SpringCloudAppCommands {
   export async function openPublicEndpoint(context: ui.IActionContext, node?: SpringCloudAppTreeItem): Promise<void> {
@@ -53,9 +54,12 @@ export namespace SpringCloudAppCommands {
     return node;
   }
 
-  export async function viewAppProperties(context: IActionContext, node?: SpringCloudAppTreeItem): Promise<void> {
-    node = await getNode(node, context);
-    await openReadOnlyJson(node, node.app);
+  export async function startStreamingLogs(_context: ui.IActionContext, node?: SpringCloudAppInstanceTreeItem): Promise<SpringCloudAppInstanceTreeItem> {
+    return node!;
+  }
+
+  export async function stopStreamingLogs(_context: ui.IActionContext, node?: SpringCloudAppInstanceTreeItem): Promise<SpringCloudAppInstanceTreeItem> {
+    return node!;
   }
 
   export async function toggleVisibility(context: IActionContext, node: AppSettingTreeItem | AppSettingsTreeItem) {
