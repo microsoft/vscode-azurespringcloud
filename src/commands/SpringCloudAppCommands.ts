@@ -55,7 +55,7 @@ export namespace SpringCloudAppCommands {
 
   export async function viewAppProperties(context: IActionContext, node?: SpringCloudAppTreeItem): Promise<void> {
     node = await getNode(node, context);
-    await openReadOnlyJson(node, node.data);
+    await openReadOnlyJson(node, node.app);
   }
 
   export async function toggleVisibility(context: IActionContext, node: AppSettingTreeItem | AppSettingsTreeItem) {

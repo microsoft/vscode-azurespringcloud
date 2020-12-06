@@ -14,26 +14,24 @@ export class AppScaleSettingsTreeItem extends AppSettingsTreeItem {
   public readonly id: string = AppScaleSettingsTreeItem.contextValue;
   public readonly label: string = 'Scaling Settings';
 
-  public constructor(parent: SpringCloudAppTreeItem) {
-    super(parent);
+  public constructor(parent: SpringCloudAppTreeItem, deployment: DeploymentResource) {
+    super(parent, deployment);
   }
 
   public async loadMoreChildrenImpl(_clearCache: boolean, _context: IActionContext): Promise<AzExtTreeItem[]> {
-    const deployment = await this.app.getActiveDeployment(true);
-    const settings = deployment.properties?.deploymentSettings;
+    const settings = this.deployment.properties?.deploymentSettings;
     const vals = {
       'vCPU': settings?.cpu ?? 0,
       'Memory/GB': settings?.memoryInGB ?? 0,
-      'Capacity': deployment.sku?.capacity ?? 0
+      'Capacity': this.deployment.sku?.capacity ?? 0
     };
     return Object.entries(vals).map(e => this.toAppSettingItem(e[0], e[1] + '', Object.assign({}, AppScaleSettingsTreeItem._options)));
   }
 
   public async updateSettingValue(key: string, newVal: string, _context: IActionContext): Promise<string> {
-    const deployment = await this.app.getActiveDeployment();
-    const resource = AppScaleSettingsTreeItem.toResource(key, newVal, deployment);
-    await this.app.client.deployments.update(this.app.resourceGroup, this.app.serviceName, this.app.name, deployment.name!, resource)
-    this.app.refresh();
+    const resource = AppScaleSettingsTreeItem.toResource(key, newVal, this.deployment);
+    await this.client.deployments.update(this.parent.resourceGroup, this.parent.serviceName, this.parent.name, this.deployment.name!, resource)
+    this.parent.refresh();
     return newVal;
   }
 

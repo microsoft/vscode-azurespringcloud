@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { AppPlatformManagementClient } from "@azure/arm-appplatform";
-import { AppResource, DeploymentResource, DeploymentResourceStatus } from '@azure/arm-appplatform/esm/models';
+import { AppResource, DeploymentResource } from '@azure/arm-appplatform/esm/models';
 import { AzExtTreeItem, AzureParentTreeItem, createAzureClient, IActionContext, TreeItemIconPath } from "vscode-azureextensionui";
 import { nonNullProp } from "../utils";
 import { AppEnvVariablesTreeItem } from "./AppEnvVariablesTreeItem";
@@ -17,21 +17,12 @@ import { SpringCloudAppInstancesTreeItem } from "./SpringCloudAppInstancesTreeIt
 export class SpringCloudAppTreeItem extends AzureParentTreeItem {
   public static contextValue: string = 'azureSpringCloud.app';
   public readonly contextValue: string = SpringCloudAppTreeItem.contextValue;
-  public data: AppResource;
-  private readonly scaleSettingsTreeItem: AppScaleSettingsTreeItem;
-  private readonly envPropertiesTreeItem: AppEnvVariablesTreeItem;
-  private readonly jvmOptionsTreeItem: AppJvmOptionsTreeItem;
-  private readonly appInstancesTreeItem: SpringCloudAppInstancesTreeItem;
-  private _status: DeploymentResourceStatus | undefined;
-  private activeDeployment: DeploymentResource;
+  private deployment: DeploymentResource | undefined;
+  public app: AppResource;
 
   constructor(parent: SpringCloudServiceTreeItem, resource: AppResource) {
     super(parent);
-    this.data = resource;
-    this.scaleSettingsTreeItem = new AppScaleSettingsTreeItem(this);
-    this.envPropertiesTreeItem = new AppEnvVariablesTreeItem(this);
-    this.jvmOptionsTreeItem = new AppJvmOptionsTreeItem(this);
-    this.appInstancesTreeItem = new SpringCloudAppInstancesTreeItem(this);
+    this.app = resource;
     this.refresh();
   }
 
@@ -40,7 +31,7 @@ export class SpringCloudAppTreeItem extends AzureParentTreeItem {
   }
 
   public get name(): string {
-    return nonNullProp(this.data, 'name');
+    return nonNullProp(this.app, 'name');
   }
 
   public get serviceName(): string {
@@ -52,7 +43,7 @@ export class SpringCloudAppTreeItem extends AzureParentTreeItem {
   }
 
   public get id(): string {
-    return nonNullProp(this.data, 'id');
+    return nonNullProp(this.app, 'id');
   }
 
   public get label(): string {
@@ -60,12 +51,12 @@ export class SpringCloudAppTreeItem extends AzureParentTreeItem {
   }
 
   public get description(): string | undefined {
-    const state: string | undefined = this.data.properties?.provisioningState;
+    const state: string | undefined = this.app.properties?.provisioningState;
     return state?.toLowerCase() === 'succeeded' ? undefined : state;
   }
 
   public get iconPath(): TreeItemIconPath {
-    switch (this._status) {
+    switch (this.deployment?.properties?.status) {
       case "Stopped":
         return TreeUtils.getPngIconPath('azure-springcloud-app-stopped');
       case "Failed":
@@ -87,7 +78,12 @@ export class SpringCloudAppTreeItem extends AzureParentTreeItem {
   }
 
   public async loadMoreChildrenImpl(_clearCache: boolean, _context: IActionContext): Promise<AzExtTreeItem[]> {
-    return [this.appInstancesTreeItem, this.envPropertiesTreeItem, this.scaleSettingsTreeItem, this.jvmOptionsTreeItem];
+    this.deployment = await this.getActiveDeployment(true);
+    const appInstancesTreeItem = new SpringCloudAppInstancesTreeItem(this, this.deployment);
+    const envPropertiesTreeItem = new AppEnvVariablesTreeItem(this, this.deployment);
+    const scaleSettingsTreeItem = new AppScaleSettingsTreeItem(this, this.deployment);
+    const jvmOptionsTreeItem = new AppJvmOptionsTreeItem(this, this.deployment);
+    return [appInstancesTreeItem, envPropertiesTreeItem, scaleSettingsTreeItem, jvmOptionsTreeItem];
   }
 
   public async deleteTreeItemImpl(_context: IActionContext): Promise<void> {
@@ -95,22 +91,22 @@ export class SpringCloudAppTreeItem extends AzureParentTreeItem {
   }
 
   public async start(): Promise<void> {
-    await this.client.deployments.start(this.resourceGroup, this.serviceName, this.name, this.data.properties?.activeDeploymentName!);
+    await this.client.deployments.start(this.resourceGroup, this.serviceName, this.name, this.app.properties?.activeDeploymentName!);
     await this.refresh()
   }
 
   public async stop(): Promise<void> {
-    await this.client.deployments.stop(this.resourceGroup, this.serviceName, this.name, this.data.properties?.activeDeploymentName!);
+    await this.client.deployments.stop(this.resourceGroup, this.serviceName, this.name, this.app.properties?.activeDeploymentName!);
     await this.refresh()
   }
 
   public async restart(): Promise<void> {
-    await this.client.deployments.restart(this.resourceGroup, this.serviceName, this.name, this.data.properties?.activeDeploymentName!);
+    await this.client.deployments.restart(this.resourceGroup, this.serviceName, this.name, this.app.properties?.activeDeploymentName!);
     await this.refresh()
   }
 
   public async getPublicEndpoint(): Promise<string | undefined> {
-    return this.data.properties?.url;
+    return this.app.properties?.url;
   }
 
   public async getTestEndpoint(): Promise<string | undefined> {
@@ -120,16 +116,15 @@ export class SpringCloudAppTreeItem extends AzureParentTreeItem {
   }
 
   public async getActiveDeployment(force: boolean = false): Promise<DeploymentResource> {
-    const deploymentName = this.data.properties?.activeDeploymentName!;
-    if (force || !this.activeDeployment) {
-      this.activeDeployment = await this.client.deployments.get(this.resourceGroup, this.serviceName, this.name, deploymentName!)
+    const deploymentName = this.app.properties?.activeDeploymentName!;
+    if (force || !this.deployment) {
+      this.deployment = await this.client.deployments.get(this.resourceGroup, this.serviceName, this.name, deploymentName!)
     }
-    return this.activeDeployment;
+    return this.deployment;
   }
 
   public async refreshImpl(): Promise<void> {
-    this.data = await this.client.apps.get(this.resourceGroup, this.serviceName, this.name);
-    const deployment = await this.getActiveDeployment();
-    this._status = deployment.properties?.status;
+    this.app = await this.client.apps.get(this.resourceGroup, this.serviceName, this.name);
+    this.deployment = await this.getActiveDeployment(true);
   }
 }

@@ -3,21 +3,26 @@ import { TreeUtils } from "../utils/treeUtils";
 import { SpringCloudAppTreeItem } from "./SpringCloudAppTreeItem";
 import { AppSettingTreeItem, Options } from "./AppSettingTreeItem";
 import { ext } from "../extensionVariables";
+import { DeploymentResource } from "@azure/arm-appplatform/esm/models";
+import { AppPlatformManagementClient } from "@azure/arm-appplatform";
 import getThemedIconPath = TreeUtils.getThemedIconPath;
 
 export abstract class AppSettingsTreeItem extends AzureParentTreeItem {
   public readonly childTypeLabel: string = 'App Setting';
+  public parent: SpringCloudAppTreeItem;
+  protected deployment: DeploymentResource;
 
-  protected constructor(parent: SpringCloudAppTreeItem) {
+  protected constructor(parent: SpringCloudAppTreeItem, deployment: DeploymentResource) {
     super(parent);
-  }
-
-  public get app(): SpringCloudAppTreeItem {
-    return <SpringCloudAppTreeItem>this.parent;
+    this.deployment = deployment;
   }
 
   public get iconPath(): TreeItemIconPath {
     return getThemedIconPath('settings');
+  }
+
+  public get client(): AppPlatformManagementClient {
+    return this.parent.client;
   }
 
   public hasMoreChildrenImpl(): boolean {
@@ -32,6 +37,11 @@ export abstract class AppSettingsTreeItem extends AzureParentTreeItem {
     const settings: AppSettingTreeItem[] = <AppSettingTreeItem[]>await ext.tree.getChildren(this);
     const hidden = settings.every(s => s.hidden);
     settings.forEach(s => s.toggleVisibility && s.toggleVisibility(context, !hidden));
+  }
+
+  public async refreshImpl(): Promise<void> {
+    this.deployment = await this.parent.getActiveDeployment(true);
+    return super.refreshImpl?.();
   }
 
   public abstract updateSettingValue(id: string, value: string, _context: IActionContext): Promise<string>;

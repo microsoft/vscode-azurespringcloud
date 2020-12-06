@@ -17,13 +17,12 @@ export class AppJvmOptionsTreeItem extends AppSettingsTreeItem {
   private static readonly JVM_OPTION_PATTERN = /^-[a-zA-Z_]+\S*$/; //TODO: @wangmi confirm
   private options: string[];
 
-  public constructor(parent: SpringCloudAppTreeItem) {
-    super(parent);
+  public constructor(parent: SpringCloudAppTreeItem, deployment: DeploymentResource) {
+    super(parent, deployment);
   }
 
   public async loadMoreChildrenImpl(_clearCache: boolean, _context: IActionContext): Promise<AzExtTreeItem[]> {
-    const deployment = await this.app.getActiveDeployment(true);
-    const optionsStr = deployment.properties?.deploymentSettings?.jvmOptions?.trim();
+    const optionsStr = this.deployment.properties?.deploymentSettings?.jvmOptions?.trim();
     this.options = optionsStr ? optionsStr?.split(/\s+/) : [];
     return this.options.map(option => this.toAppSettingItem('', option.trim(), Object.assign({}, AppJvmOptionsTreeItem._options)));
   }
@@ -46,21 +45,20 @@ export class AppJvmOptionsTreeItem extends AppSettingsTreeItem {
   }
 
   public async updateSettingValue(oldVal: string | undefined, newVal: string, _context: IActionContext): Promise<string> {
-    const deployment: DeploymentResource = await this.app.getActiveDeployment();
     if (oldVal === undefined) {
       this.options.push(newVal);
     } else if (oldVal !== newVal.trim()) {
       const index = this.options.indexOf(oldVal);
       this.options.splice(index, 1, newVal);
     }
-    await this.app.client.deployments.update(this.app.resourceGroup, this.app.serviceName, this.app.name, deployment.name!, {
+    await this.client.deployments.update(this.parent.resourceGroup, this.parent.serviceName, this.parent.name, this.deployment.name!, {
       properties: {
         deploymentSettings: {
           jvmOptions: this.options.join(' ')
         }
       }
     });
-    this.app.refresh();
+    this.parent.refresh();
     return newVal;
   }
 

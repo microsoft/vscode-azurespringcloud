@@ -2,6 +2,7 @@ import { AzExtTreeItem, IActionContext, ICreateChildImplContext } from "vscode-a
 import { AppSettingsTreeItem } from "./AppSettingsTreeItem";
 import { SpringCloudAppTreeItem } from "./SpringCloudAppTreeItem";
 import { ext } from "../extensionVariables";
+import { DeploymentResource } from "@azure/arm-appplatform/esm/models";
 
 export class AppEnvVariablesTreeItem extends AppSettingsTreeItem {
   public static contextValue: string = 'azureSpringCloud.app.envVariables';
@@ -16,13 +17,12 @@ export class AppEnvVariablesTreeItem extends AppSettingsTreeItem {
   };
   private variables: { [p: string]: string };
 
-  public constructor(parent: SpringCloudAppTreeItem) {
-    super(parent);
+  public constructor(parent: SpringCloudAppTreeItem, deployment: DeploymentResource) {
+    super(parent, deployment);
   }
 
   public async loadMoreChildrenImpl(_clearCache: boolean, _context: IActionContext): Promise<AzExtTreeItem[]> {
-    const deployment = await this.app.getActiveDeployment(true);
-    this.variables = deployment.properties?.deploymentSettings?.environmentVariables || {};
+    this.variables = this.deployment.properties?.deploymentSettings?.environmentVariables || {};
     return Object.entries(this.variables).map(e => this.toAppSettingItem(e[0], e[1] + '', Object.assign({}, AppEnvVariablesTreeItem._options)));
   }
 
@@ -45,20 +45,19 @@ export class AppEnvVariablesTreeItem extends AppSettingsTreeItem {
   }
 
   public async updateSettingValue(key: string, newVal: string | undefined, _context: IActionContext): Promise<string> {
-    const deployment = await this.app.getActiveDeployment();
     if (newVal === undefined) {
       delete this.variables[key.trim()];
     } else {
       this.variables[key.trim()] = newVal.trim();
     }
-    await this.app.client.deployments.update(this.app.resourceGroup, this.app.serviceName, this.app.name, deployment.name!, {
+    await this.client.deployments.update(this.parent.resourceGroup, this.parent.serviceName, this.parent.name, this.deployment.name!, {
       properties: {
         deploymentSettings: {
           environmentVariables: this.variables
         }
       }
     });
-    this.app.refresh();
+    this.parent.refresh();
     return newVal ?? key;
   }
 
