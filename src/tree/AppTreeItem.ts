@@ -18,21 +18,21 @@ import {
 import { localize, nonNullProp } from "../utils";
 import { AppEnvVariablesTreeItem } from "./AppEnvVariablesTreeItem";
 import { AppScaleSettingsTreeItem } from "./AppScaleSettingsTreeItem";
-import { SpringCloudServiceTreeItem } from "./SpringCloudServiceTreeItem";
+import { ServiceTreeItem } from "./ServiceTreeItem";
 import { TreeUtils } from "../utils/treeUtils";
 import { AppJvmOptionsTreeItem } from "./AppJvmOptionsTreeItem";
-import { SpringCloudAppInstancesTreeItem } from "./SpringCloudAppInstancesTreeItem";
+import { AppInstancesTreeItem } from "./AppInstancesTreeItem";
 import { IAppDeploymentWizardContext } from "../model/IAppDeploymentWizardContext";
 import { UploadArtifactStep } from "../commands/steps/deployment/UploadArtifactStep";
 import { UpdateDeploymentStep } from "../commands/steps/deployment/UpdateDeploymentStep";
 
-export class SpringCloudAppTreeItem extends AzureParentTreeItem {
+export class AppTreeItem extends AzureParentTreeItem {
   public static contextValue: string = 'azureSpringCloud.app';
-  public readonly contextValue: string = SpringCloudAppTreeItem.contextValue;
+  public readonly contextValue: string = AppTreeItem.contextValue;
   private deployment: DeploymentResource | undefined;
   public app: AppResource;
 
-  constructor(parent: SpringCloudServiceTreeItem, resource: AppResource) {
+  constructor(parent: ServiceTreeItem, resource: AppResource) {
     super(parent);
     this.app = resource;
     this.refresh();
@@ -47,11 +47,11 @@ export class SpringCloudAppTreeItem extends AzureParentTreeItem {
   }
 
   public get serviceName(): string {
-    return (<SpringCloudServiceTreeItem>this.parent).serviceName;
+    return (<ServiceTreeItem>this.parent).serviceName;
   }
 
   public get resourceGroup(): string {
-    return (<SpringCloudServiceTreeItem>this.parent).resourceGroup;
+    return (<ServiceTreeItem>this.parent).resourceGroup;
   }
 
   public get data(): AppResource {
@@ -95,7 +95,7 @@ export class SpringCloudAppTreeItem extends AzureParentTreeItem {
 
   public async loadMoreChildrenImpl(_clearCache: boolean, _context: IActionContext): Promise<AzExtTreeItem[]> {
     this.deployment = await this.getActiveDeployment(true);
-    const appInstancesTreeItem = new SpringCloudAppInstancesTreeItem(this, this.deployment);
+    const appInstancesTreeItem = new AppInstancesTreeItem(this, this.deployment);
     const envPropertiesTreeItem = new AppEnvVariablesTreeItem(this, this.deployment);
     const scaleSettingsTreeItem = new AppScaleSettingsTreeItem(this, this.deployment);
     const jvmOptionsTreeItem = new AppJvmOptionsTreeItem(this, this.deployment);

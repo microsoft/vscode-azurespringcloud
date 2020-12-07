@@ -1,6 +1,6 @@
 import { AzExtTreeItem, IActionContext, ICreateChildImplContext } from "vscode-azureextensionui";
 import { AppSettingsTreeItem } from "./AppSettingsTreeItem";
-import { SpringCloudAppTreeItem } from "./SpringCloudAppTreeItem";
+import { AppTreeItem } from "./AppTreeItem";
 import { ext } from "../extensionVariables";
 import { DeploymentResource } from "@azure/arm-appplatform/esm/models";
 
@@ -17,7 +17,7 @@ export class AppJvmOptionsTreeItem extends AppSettingsTreeItem {
   private static readonly JVM_OPTION_PATTERN = /^-[a-zA-Z_]+\S*$/; //TODO: @wangmi confirm
   private options: string[];
 
-  public constructor(parent: SpringCloudAppTreeItem, deployment: DeploymentResource) {
+  public constructor(parent: AppTreeItem, deployment: DeploymentResource) {
     super(parent, deployment);
   }
 

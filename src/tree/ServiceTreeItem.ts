@@ -20,7 +20,7 @@ import {
 import { ext } from "../extensionVariables";
 import { localize, nonNullProp } from "../utils";
 import { TreeUtils } from "../utils/treeUtils";
-import { SpringCloudAppTreeItem } from './SpringCloudAppTreeItem';
+import { AppTreeItem } from './AppTreeItem';
 import SpringCloudResourceId from "../model/SpringCloudResourceId";
 import IAppCreationWizardContext from "../model/IAppCreationWizardContext";
 import { InputAppNameStep } from "../commands/steps/creation/InputAppNameStep";
@@ -29,9 +29,9 @@ import { CreateAppStep } from "../commands/steps/creation/CreateAppStep";
 import { CreateAppDeploymentStep } from "../commands/steps/creation/CreateAppDeploymentStep";
 import { UpdateAppStep } from "../commands/steps/creation/UpdateAppStep";
 
-export class SpringCloudServiceTreeItem extends AzureParentTreeItem {
+export class ServiceTreeItem extends AzureParentTreeItem {
   public static contextValue: string = 'azureSpringCloud.service';
-  public readonly contextValue: string = SpringCloudServiceTreeItem.contextValue;
+  public readonly contextValue: string = ServiceTreeItem.contextValue;
   public readonly childTypeLabel: string = localize('app', 'App');
   public service: ServiceResource;
 
@@ -95,7 +95,7 @@ export class SpringCloudServiceTreeItem extends AzureParentTreeItem {
     return await this.createTreeItemsWithErrorHandling(
       apps,
       'invalidSpringCloudApp',
-      app => new SpringCloudAppTreeItem(this, app),
+      app => new AppTreeItem(this, app),
       app => app.name
     );
   }
@@ -130,6 +130,6 @@ export class SpringCloudServiceTreeItem extends AzureParentTreeItem {
 
     await wizard.execute();
 
-    return new SpringCloudAppTreeItem(this, nonNullProp(wizardContext, 'newApp'));
+    return new AppTreeItem(this, nonNullProp(wizardContext, 'newApp'));
   }
 }

@@ -7,7 +7,7 @@ import { AppPlatformManagementClient } from '@azure/arm-appplatform';
 import { AzExtTreeItem, createAzureClient, SubscriptionTreeItemBase } from 'vscode-azureextensionui';
 import { localize } from '../utils';
 import * as Models from '@azure/arm-appplatform/src/models/index';
-import { SpringCloudServiceTreeItem } from './SpringCloudServiceTreeItem';
+import { ServiceTreeItem } from './ServiceTreeItem';
 
 export class SubscriptionTreeItem extends SubscriptionTreeItemBase {
   public readonly childTypeLabel: string = localize('springCloud', 'Spring Cloud');
@@ -29,7 +29,7 @@ export class SubscriptionTreeItem extends SubscriptionTreeItemBase {
     return await this.createTreeItemsWithErrorHandling(
       services,
       'invalidSpringCloudService',
-      service => new SpringCloudServiceTreeItem(this, service),
+      service => new ServiceTreeItem(this, service),
       service => service.name
     );
   }

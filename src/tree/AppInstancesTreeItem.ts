@@ -7,20 +7,20 @@ import { AppPlatformManagementClient } from '@azure/arm-appplatform';
 import { AzExtTreeItem, AzureParentTreeItem, createAzureClient, TreeItemIconPath } from "vscode-azureextensionui";
 import { localize } from "../utils";
 import { TreeUtils } from "../utils/treeUtils";
-import { SpringCloudAppTreeItem } from './SpringCloudAppTreeItem';
-import { SpringCloudAppInstanceTreeItem } from "./SpringCloudAppInstanceTreeItem";
+import { AppTreeItem } from './AppTreeItem';
+import { AppInstanceTreeItem } from "./AppInstanceTreeItem";
 import { DeploymentResource } from "@azure/arm-appplatform/esm/models";
 
-export class SpringCloudAppInstancesTreeItem extends AzureParentTreeItem {
+export class AppInstancesTreeItem extends AzureParentTreeItem {
   public static contextValue: string = 'azureSpringCloud.app.instances';
-  public readonly contextValue: string = SpringCloudAppInstancesTreeItem.contextValue;
+  public readonly contextValue: string = AppInstancesTreeItem.contextValue;
   public readonly childTypeLabel: string = localize('appInstance', 'AppInstance');
-  public readonly id: string = SpringCloudAppInstancesTreeItem.contextValue;
+  public readonly id: string = AppInstancesTreeItem.contextValue;
   public readonly label: string = 'App Instances';
-  public readonly parent: SpringCloudAppTreeItem;
+  public readonly parent: AppTreeItem;
   private deployment: DeploymentResource;
 
-  public constructor(parent: SpringCloudAppTreeItem, deployment: DeploymentResource) {
+  public constructor(parent: AppTreeItem, deployment: DeploymentResource) {
     super(parent);
     this.deployment = deployment;
   }
@@ -41,7 +41,7 @@ export class SpringCloudAppInstancesTreeItem extends AzureParentTreeItem {
     return await this.createTreeItemsWithErrorHandling(
       this.deployment.properties?.instances,
       'invalidSpringCloudAppInstance',
-      instance => new SpringCloudAppInstanceTreeItem(this, instance),
+      instance => new AppInstanceTreeItem(this, instance),
       instance => instance.name
     );
   }

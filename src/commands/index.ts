@@ -5,13 +5,13 @@
 
 import * as ui from 'vscode-azureextensionui';
 import { AzureTreeItem, IActionContext, openReadOnlyJson, registerCommand } from 'vscode-azureextensionui';
-import { SpringCloudAppCommands } from "./SpringCloudAppCommands";
-import { SpringCloudServiceCommands } from "./SpringCloudServiceCommands";
+import { SpringCloudAppCommands } from "./AppCommands";
+import { SpringCloudServiceCommands } from "./ServiceCommands";
 import { commands } from 'vscode';
 import { ext } from '../extensionVariables';
-import { SpringCloudAppTreeItem } from "../tree/SpringCloudAppTreeItem";
-import { SpringCloudServiceTreeItem } from "../tree/SpringCloudServiceTreeItem";
-import { SpringCloudAppInstanceTreeItem } from "../tree/SpringCloudAppInstanceTreeItem";
+import { AppTreeItem } from "../tree/AppTreeItem";
+import { ServiceTreeItem } from "../tree/ServiceTreeItem";
+import { AppInstanceTreeItem } from "../tree/AppInstanceTreeItem";
 
 export function registerCommands(): void {
   registerCommand("azureSpringCloud.common.loadMore", loadMore);
@@ -49,7 +49,7 @@ async function openInPortal(_context: ui.IActionContext, node: AzureTreeItem): P
   await ui.openInPortal(node.root, node.fullId);
 }
 
-async function viewProperties(_context: IActionContext, node: SpringCloudServiceTreeItem | SpringCloudAppTreeItem | SpringCloudAppInstanceTreeItem): Promise<void> {
+async function viewProperties(_context: IActionContext, node: ServiceTreeItem | AppTreeItem | AppInstanceTreeItem): Promise<void> {
   await openReadOnlyJson(node, node.data);
 }
 

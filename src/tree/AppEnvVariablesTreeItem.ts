@@ -1,6 +1,6 @@
 import { AzExtTreeItem, IActionContext, ICreateChildImplContext } from "vscode-azureextensionui";
 import { AppSettingsTreeItem } from "./AppSettingsTreeItem";
-import { SpringCloudAppTreeItem } from "./SpringCloudAppTreeItem";
+import { AppTreeItem } from "./AppTreeItem";
 import { ext } from "../extensionVariables";
 import { DeploymentResource } from "@azure/arm-appplatform/esm/models";
 
@@ -17,7 +17,7 @@ export class AppEnvVariablesTreeItem extends AppSettingsTreeItem {
   };
   private variables: { [p: string]: string };
 
-  public constructor(parent: SpringCloudAppTreeItem, deployment: DeploymentResource) {
+  public constructor(parent: AppTreeItem, deployment: DeploymentResource) {
     super(parent, deployment);
   }
 

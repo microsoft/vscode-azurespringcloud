@@ -1,16 +1,16 @@
 import { AzureTreeItem, TreeItemIconPath } from "vscode-azureextensionui";
 import { TreeUtils } from "../utils/treeUtils";
-import { SpringCloudAppInstancesTreeItem } from "./SpringCloudAppInstancesTreeItem";
+import { AppInstancesTreeItem } from "./AppInstancesTreeItem";
 import { DeploymentInstance } from "@azure/arm-appplatform/src/models/index";
 import { AppResource } from "@azure/arm-appplatform/esm/models";
 
-export class SpringCloudAppInstanceTreeItem extends AzureTreeItem {
+export class AppInstanceTreeItem extends AzureTreeItem {
   public static contextValue: string = 'azureSpringCloud.app.instance';
-  public contextValue: string = SpringCloudAppInstanceTreeItem.contextValue;
-  public readonly parent: SpringCloudAppInstancesTreeItem;
+  public contextValue: string = AppInstanceTreeItem.contextValue;
+  public readonly parent: AppInstancesTreeItem;
   private instance: DeploymentInstance;
 
-  public constructor(parent: SpringCloudAppInstancesTreeItem, instance: DeploymentInstance) {
+  public constructor(parent: AppInstancesTreeItem, instance: DeploymentInstance) {
     super(parent);
     this.instance = instance;
   }

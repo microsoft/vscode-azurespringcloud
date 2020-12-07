@@ -1,6 +1,6 @@
 import { AzExtTreeItem, IActionContext } from "vscode-azureextensionui";
 import { AppSettingsTreeItem } from "./AppSettingsTreeItem";
-import { SpringCloudAppTreeItem } from "./SpringCloudAppTreeItem";
+import { AppTreeItem } from "./AppTreeItem";
 import { DeploymentResource } from "@azure/arm-appplatform/esm/models";
 
 export class AppScaleSettingsTreeItem extends AppSettingsTreeItem {
@@ -14,7 +14,7 @@ export class AppScaleSettingsTreeItem extends AppSettingsTreeItem {
   public readonly id: string = AppScaleSettingsTreeItem.contextValue;
   public readonly label: string = 'Scaling Settings';
 
-  public constructor(parent: SpringCloudAppTreeItem, deployment: DeploymentResource) {
+  public constructor(parent: AppTreeItem, deployment: DeploymentResource) {
     super(parent, deployment);
   }
 
