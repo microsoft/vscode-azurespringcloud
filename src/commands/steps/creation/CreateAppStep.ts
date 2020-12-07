@@ -11,7 +11,7 @@ export class CreateAppStep extends AzureWizardExecuteStep<IAppCreationWizardCont
 
   public async execute(context: IAppCreationWizardContext, progress: Progress<{ message?: string; increment?: number }>): Promise<void> {
 
-    const message: string = localize('creatingNewApp', 'Creating new Spring Cloud app "{0}"...', context.newAppName);
+    const message: string = localize('creatingNewApp', 'Creating and provisioning new app "{0}"...', context.newAppName);
     ext.outputChannel.appendLog(message);
     progress.report({message});
 

@@ -47,6 +47,7 @@
         "onCommand:azureSpringCloud.instance.startStreamingLog",
         "onCommand:azureSpringCloud.instance.stopStreamingLog",
         "onCommand:azureSpringCloud.app.settings.addSetting",
+        "onCommand:azureSpringCloud.app.settings.edit",
         "onCommand:azureSpringCloud.common.toggleVisibility",
         "onCommand:azureSpringCloud.app.setting.edit",
         "onCommand:azureSpringCloud.app.setting.delete",
@@ -145,6 +146,11 @@
             {
                 "command": "azureSpringCloud.app.settings.addSetting",
                 "title": "%azureSpringCloud.msg.common.add%",
+                "category": "Azure Spring Cloud"
+            },
+            {
+                "command": "azureSpringCloud.app.settings.edit",
+                "title": "%azureSpringCloud.msg.common.edit%",
                 "category": "Azure Spring Cloud"
             },
             {
@@ -317,6 +323,11 @@
                     "command": "azureSpringCloud.app.settings.addSetting",
                     "when": "view == azureSpringCloud && viewItem =~ /^azureSpringCloud\\.app\\.(jvmOptions|envVariables)$/",
                     "group": "1@1"
+                },
+                {
+                    "command": "azureSpringCloud.app.settings.edit",
+                    "when": "view == azureSpringCloud && viewItem =~ /^azureSpringCloud\\.app\\.(jvmOptions|scaleSettings)$/",
+                    "group": "1@2"
                 },
                 {
                     "command": "azureSpringCloud.common.refresh",

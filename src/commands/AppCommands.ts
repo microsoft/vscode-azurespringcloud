@@ -8,8 +8,7 @@ import { AppSettingsTreeItem } from "../tree/AppSettingsTreeItem";
 import { OpenDialogOptions, Uri, window } from "vscode";
 import { AppInstanceTreeItem } from "../tree/AppInstanceTreeItem";
 
-export namespace SpringCloudAppCommands {
-
+export namespace AppCommands {
 
   export async function openPublicEndpoint(context: ui.IActionContext, node?: AppTreeItem): Promise<void> {
     node = await getNode(node, context);
@@ -48,13 +47,10 @@ export namespace SpringCloudAppCommands {
     return node;
   }
 
-  export async function deleteApp(context: ui.IActionContext, node?: AppTreeItem): Promise<AppTreeItem> {
+  export async function deleteApp(context: ui.IActionContext, node?: AppTreeItem) {
     node = await getNode(node, context);
     await ext.ui.showWarningMessage(`Are you sure to delete Spring Cloud App "${node.name}"?`, {modal: true}, DialogResponses.deleteResponse);
-    await node.runWithTemporaryDescription(localize('deleting', 'Deleting...'), async () => {
-      return node!.deleteTreeItem(context);
-    });
-    return node;
+    await node!.deleteTreeItem(context);
   }
 
   export async function deploy(context: ui.IActionContext, node?: AppTreeItem): Promise<AppTreeItem> {
@@ -101,7 +97,7 @@ export namespace SpringCloudAppCommands {
       });
       return node;
     } else {
-      return SpringCloudAppCommands.deleteSetting(context, node);
+      return AppCommands.deleteSetting(context, node);
     }
   }
 

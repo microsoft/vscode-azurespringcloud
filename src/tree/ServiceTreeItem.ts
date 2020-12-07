@@ -28,6 +28,7 @@ import { SelectAppStackStep } from "../commands/steps/creation/SelectAppStackSte
 import { CreateAppStep } from "../commands/steps/creation/CreateAppStep";
 import { CreateAppDeploymentStep } from "../commands/steps/creation/CreateAppDeploymentStep";
 import { UpdateAppStep } from "../commands/steps/creation/UpdateAppStep";
+import { ProgressLocation, window } from "vscode";
 
 export class ServiceTreeItem extends AzureParentTreeItem {
   public static contextValue: string = 'azureSpringCloud.service';
@@ -105,8 +106,15 @@ export class ServiceTreeItem extends AzureParentTreeItem {
   }
 
   public async deleteTreeItemImpl(): Promise<void> {
-    await this.client.services.deleteMethod(this.resourceGroup, this.name);
-    ext.outputChannel.appendLog(localize('deletedService', 'Successfully deleted Spring Cloud Service "{0}".', this.name));
+    const deleting: string = localize('deletingSpringCLoudService', 'Deleting Spring Cloud service "{0}"...', this.name);
+    const deleted: string = localize('deletedSpringCloudService', 'Successfully deleted Spring Cloud service "{0}".', this.name);
+
+    await window.withProgress({location: ProgressLocation.Notification, title: deleting}, async (): Promise<void> => {
+      ext.outputChannel.appendLog(deleting);
+      await this.client.services.deleteMethod(this.resourceGroup, this.name);
+      window.showInformationMessage(deleted);
+      ext.outputChannel.appendLog(deleted);
+    });
   }
 
   public async createChildImpl(context: ICreateChildImplContext): Promise<AzExtTreeItem> {
@@ -122,13 +130,15 @@ export class ServiceTreeItem extends AzureParentTreeItem {
     executeSteps.push(new CreateAppStep());
     executeSteps.push(new CreateAppDeploymentStep());
     executeSteps.push(new UpdateAppStep());
-    const title: string = localize('appCreatingTitle', 'Create new Spring Cloud App in Azure');
+    const title: string = localize('creatingSpringCouldApp', 'Creating new Spring Cloud App in Azure');
     const wizard: AzureWizard<IAppCreationWizardContext> = new AzureWizard(wizardContext, {promptSteps, executeSteps, title});
 
     await wizard.prompt();
-    context.showCreatingTreeItem(nonNullProp(wizardContext, 'newAppName'));
-
+    const appName = nonNullProp(wizardContext, 'newAppName');
+    context.showCreatingTreeItem(appName);
     await wizard.execute();
+    const createSucceeded: string = localize('createdSpringCouldApp', 'Successfully created Spring Cloud app "{0}".', appName);
+    window.showInformationMessage(createSucceeded);
 
     return new AppTreeItem(this, nonNullProp(wizardContext, 'newApp'));
   }

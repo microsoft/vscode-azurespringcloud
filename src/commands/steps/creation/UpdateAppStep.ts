@@ -9,7 +9,7 @@ export class UpdateAppStep extends AzureWizardExecuteStep<IAppCreationWizardCont
   public priority: number = 145;
 
   public async execute(context: IAppCreationWizardContext, progress: Progress<{ message?: string; increment?: number }>): Promise<void> {
-    const message: string = localize('updatingNewApp', 'Update Spring Cloud app "{0}"...', context.newAppName);
+    const message: string = localize('updatingNewApp', 'Activating deployment for Spring Cloud app "{0}"...', context.newAppName);
     progress.report({message});
 
     const appName: string = nonNullProp(context, 'newAppName');

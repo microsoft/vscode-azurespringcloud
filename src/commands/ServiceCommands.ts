@@ -5,7 +5,7 @@ import { ServiceTreeItem } from "../tree/ServiceTreeItem";
 import { localize, openUrl } from "../utils";
 import { SubscriptionTreeItem } from "../tree/SubscriptionTreeItem";
 
-export namespace SpringCloudServiceCommands {
+export namespace ServiceCommands {
 
   export async function createServiceInPortal(_context: ui.IActionContext, _node?: SubscriptionTreeItem): Promise<void> {
     await openUrl('https://portal.azure.com/#create/Microsoft.AppPlatform')

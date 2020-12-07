@@ -25,6 +25,8 @@ import { AppInstancesTreeItem } from "./AppInstancesTreeItem";
 import { IAppDeploymentWizardContext } from "../model/IAppDeploymentWizardContext";
 import { UploadArtifactStep } from "../commands/steps/deployment/UploadArtifactStep";
 import { UpdateDeploymentStep } from "../commands/steps/deployment/UpdateDeploymentStep";
+import { ext } from "../extensionVariables";
+import { ProgressLocation, window } from "vscode";
 
 export class AppTreeItem extends AzureParentTreeItem {
   public static contextValue: string = 'azureSpringCloud.app';
@@ -103,7 +105,15 @@ export class AppTreeItem extends AzureParentTreeItem {
   }
 
   public async deleteTreeItemImpl(_context: IActionContext): Promise<void> {
-    await this.client.apps.deleteMethod(this.resourceGroup, this.serviceName, this.name);
+    const deleting: string = localize('deletingSpringCLoudApp', 'Deleting Spring Cloud app "{0}"...', this.name);
+    const deleted: string = localize('deletedSpringCLoudApp', 'Successfully deleted Spring Cloud app "{0}".', this.name);
+
+    await window.withProgress({location: ProgressLocation.Notification, title: deleting}, async (): Promise<void> => {
+      ext.outputChannel.appendLog(deleting);
+      await this.client.apps.deleteMethod(this.resourceGroup, this.serviceName, this.name);
+      window.showInformationMessage(deleted);
+      ext.outputChannel.appendLog(deleted);
+    });
   }
 
   public async start(): Promise<void> {
@@ -152,7 +162,7 @@ export class AppTreeItem extends AzureParentTreeItem {
     const executeSteps: AzureWizardExecuteStep<IAppDeploymentWizardContext>[] = [];
     executeSteps.push(new UploadArtifactStep());
     executeSteps.push(new UpdateDeploymentStep());
-    const title: string = localize('appDeployingTitle', 'Deploying artifact to "{0}"', this.name);
+    const title: string = localize('deployingArtifact', 'Deploying artifact to "{0}"', this.name);
     const wizard: AzureWizard<IAppDeploymentWizardContext> = new AzureWizard(wizardContext, {executeSteps, title});
     await wizard.execute();
   }
