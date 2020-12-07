@@ -3,19 +3,19 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import * as nls from 'vscode-nls';
-// tslint:disable-next-line:no-require-imports
+// tslint:disable-next-line:no-require-imports no-implicit-dependencies
 import opn = require("opn");
+import * as nls from 'vscode-nls';
 
 export const localize: nls.LocalizeFunc = nls.loadMessageBundle();
 
 export async function openUrl(url: string): Promise<void> {
-  // Using this functionality is blocked by https://github.com/Microsoft/vscode/issues/25852
-  // Specifically, opening the Live Metrics Stream for Linux Function Apps doesn't work in this extension.
-  // await vscode.env.openExternal(vscode.Uri.parse(url));
+    // Using this functionality is blocked by https://github.com/Microsoft/vscode/issues/25852
+    // Specifically, opening the Live Metrics Stream for Linux Function Apps doesn't work in this extension.
+    // await vscode.env.openExternal(vscode.Uri.parse(url));
 
-  // tslint:disable-next-line: no-unsafe-any
-  opn(url);
+    // tslint:disable-next-line: no-unsafe-any
+    opn(url);
 }
 
 /**
@@ -23,34 +23,34 @@ export async function openUrl(url: string): Promise<void> {
  * for the property and will give a compile error if the given name is not a property of the source.
  */
 export function nonNullProp<TSource, TKey extends keyof TSource>(source: TSource, name: TKey): NonNullable<TSource[TKey]> {
-  const value: NonNullable<TSource[TKey]> = <NonNullable<TSource[TKey]>>source[name];
-  return nonNullValue(value, <string>name);
+    const value: NonNullable<TSource[TKey]> = <NonNullable<TSource[TKey]>>source[name];
+    return nonNullValue(value, <string>name);
 }
 
 /**
  * Validates that a given value is not null and not undefined.
  */
 export function nonNullValue<T>(value: T | undefined, propertyNameOrMessage?: string): T {
-  if (value === null || value === undefined) {
-    throw new Error(
-      // tslint:disable-next-line:prefer-template
-      'Internal error: Expected value to be neither null nor undefined'
-      + (propertyNameOrMessage ? `: ${propertyNameOrMessage}` : ''));
-  }
+    if (value === null || value === undefined) {
+        throw new Error(
+            // tslint:disable-next-line:prefer-template
+            'Internal error: Expected value to be neither null nor undefined'
+            + (propertyNameOrMessage ? `: ${propertyNameOrMessage}` : ''));
+    }
 
-  return value;
+    return value;
 }
 
 /**
  * Validates that a given string is not null, undefined, nor empty
  */
 export function nonNullOrEmptyValue(value: string | undefined, propertyNameOrMessage?: string): string {
-  if (!value) {
-    throw new Error(
-      // tslint:disable-next-line:prefer-template
-      'Internal error: Expected value to be neither null, undefined, nor empty'
-      + (propertyNameOrMessage ? `: ${propertyNameOrMessage}` : ''));
-  }
+    if (!value) {
+        throw new Error(
+            // tslint:disable-next-line:prefer-template
+            'Internal error: Expected value to be neither null, undefined, nor empty'
+            + (propertyNameOrMessage ? `: ${propertyNameOrMessage}` : ''));
+    }
 
-  return value;
+    return value;
 }

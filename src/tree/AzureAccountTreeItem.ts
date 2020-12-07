@@ -7,11 +7,11 @@ import { AzureAccountTreeItemBase, ISubscriptionContext } from 'vscode-azureexte
 import { SubscriptionTreeItem } from './SubscriptionTreeItem';
 
 export class AzureAccountTreeItem extends AzureAccountTreeItemBase {
-  public constructor(testAccount?: {}) {
-    super(undefined, testAccount);
-  }
+    public constructor(testAccount?: {}) {
+        super(undefined, testAccount);
+    }
 
-  public createSubscriptionTreeItem(root: ISubscriptionContext): SubscriptionTreeItem {
-    return new SubscriptionTreeItem(this, root);
-  }
+    public createSubscriptionTreeItem(root: ISubscriptionContext): SubscriptionTreeItem {
+        return new SubscriptionTreeItem(this, root);
+    }
 }

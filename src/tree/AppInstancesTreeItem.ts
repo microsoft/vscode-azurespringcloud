@@ -4,49 +4,49 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { AppPlatformManagementClient } from '@azure/arm-appplatform';
+import { DeploymentResource } from "@azure/arm-appplatform/esm/models";
 import { AzExtTreeItem, AzureParentTreeItem, createAzureClient, TreeItemIconPath } from "vscode-azureextensionui";
 import { localize } from "../utils";
 import { TreeUtils } from "../utils/treeUtils";
-import { AppTreeItem } from './AppTreeItem';
 import { AppInstanceTreeItem } from "./AppInstanceTreeItem";
-import { DeploymentResource } from "@azure/arm-appplatform/esm/models";
+import { AppTreeItem } from './AppTreeItem';
 
 export class AppInstancesTreeItem extends AzureParentTreeItem {
-  public static contextValue: string = 'azureSpringCloud.app.instances';
-  public readonly contextValue: string = AppInstancesTreeItem.contextValue;
-  public readonly childTypeLabel: string = localize('appInstance', 'AppInstance');
-  public readonly id: string = AppInstancesTreeItem.contextValue;
-  public readonly label: string = 'App Instances';
-  public readonly parent: AppTreeItem;
-  private deployment: DeploymentResource;
+    public static contextValue: string = 'azureSpringCloud.app.instances';
+    public readonly contextValue: string = AppInstancesTreeItem.contextValue;
+    public readonly childTypeLabel: string = localize('appInstance', 'AppInstance');
+    public readonly id: string = AppInstancesTreeItem.contextValue;
+    public readonly label: string = 'App Instances';
+    public readonly parent: AppTreeItem;
+    private deployment: DeploymentResource;
 
-  public constructor(parent: AppTreeItem, deployment: DeploymentResource) {
-    super(parent);
-    this.deployment = deployment;
-  }
+    public constructor(parent: AppTreeItem, deployment: DeploymentResource) {
+        super(parent);
+        this.deployment = deployment;
+    }
 
-  public get client(): AppPlatformManagementClient {
-    return createAzureClient(this.root, AppPlatformManagementClient)
-  }
+    public get client(): AppPlatformManagementClient {
+        return createAzureClient(this.root, AppPlatformManagementClient);
+    }
 
-  public get iconPath(): TreeItemIconPath {
-    return TreeUtils.getIconPath('azure-springcloud-app-instances');
-  }
+    public get iconPath(): TreeItemIconPath {
+        return TreeUtils.getIconPath('azure-springcloud-app-instances');
+    }
 
-  public hasMoreChildrenImpl(): boolean {
-    return false;
-  }
+    public hasMoreChildrenImpl(): boolean {
+        return false;
+    }
 
-  public async loadMoreChildrenImpl(_clearCache: boolean): Promise<AzExtTreeItem[]> {
-    return await this.createTreeItemsWithErrorHandling(
-      this.deployment.properties?.instances,
-      'invalidSpringCloudAppInstance',
-      instance => new AppInstanceTreeItem(this, instance),
-      instance => instance.name
-    );
-  }
+    public async loadMoreChildrenImpl(_clearCache: boolean): Promise<AzExtTreeItem[]> {
+        return await this.createTreeItemsWithErrorHandling(
+            this.deployment.properties?.instances,
+            'invalidSpringCloudAppInstance',
+            instance => new AppInstanceTreeItem(this, instance),
+            instance => instance.name
+        );
+    }
 
-  public async refreshImpl(): Promise<void> {
-    this.deployment = await this.parent.getActiveDeployment(true);
-  }
+    public async refreshImpl(): Promise<void> {
+        this.deployment = await this.parent.getActiveDeployment(true);
+    }
 }

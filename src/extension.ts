@@ -7,43 +7,42 @@
 
 import * as vscode from 'vscode';
 import {
-  AzExtTreeDataProvider,
-  AzureUserInput,
-  callWithTelemetryAndErrorHandling,
-  createApiProvider,
-  createAzExtOutputChannel,
-  IActionContext,
-  registerUIExtensionVariables
+    AzExtTreeDataProvider,
+    AzureUserInput,
+    callWithTelemetryAndErrorHandling,
+    createApiProvider,
+    createAzExtOutputChannel,
+    IActionContext,
+    registerUIExtensionVariables
 } from 'vscode-azureextensionui';
-// tslint:disable-next-line:no-submodule-imports
 import { AzureExtensionApiProvider } from 'vscode-azureextensionui/api';
 import { registerCommands } from './commands';
 import { ext } from './extensionVariables';
 import { AzureAccountTreeItem } from './tree/AzureAccountTreeItem';
 
 export async function activateInternal(context: vscode.ExtensionContext, perfStats: { loadStartTime: number; loadEndTime: number }, ignoreBundle?: boolean): Promise<AzureExtensionApiProvider> {
-  ext.context = context;
-  ext.ignoreBundle = ignoreBundle;
-  ext.outputChannel = createAzExtOutputChannel('Azure Spring Cloud', ext.prefix);
-  context.subscriptions.push(ext.outputChannel);
-  ext.ui = new AzureUserInput(context.globalState);
+    ext.context = context;
+    ext.ignoreBundle = ignoreBundle;
+    ext.outputChannel = createAzExtOutputChannel('Azure Spring Cloud', ext.prefix);
+    context.subscriptions.push(ext.outputChannel);
+    ext.ui = new AzureUserInput(context.globalState);
 
-  registerUIExtensionVariables(ext);
+    registerUIExtensionVariables(ext);
 
-  await callWithTelemetryAndErrorHandling('azureSpringCloud.activate', async (activateContext: IActionContext) => {
-    activateContext.telemetry.properties.isActivationEvent = 'true';
-    activateContext.telemetry.measurements.mainFileLoad = (perfStats.loadEndTime - perfStats.loadStartTime) / 1000;
+    await callWithTelemetryAndErrorHandling('azureSpringCloud.activate', async (activateContext: IActionContext) => {
+        activateContext.telemetry.properties.isActivationEvent = 'true';
+        activateContext.telemetry.measurements.mainFileLoad = (perfStats.loadEndTime - perfStats.loadStartTime) / 1000;
 
-    const accountTreeItem: AzureAccountTreeItem = new AzureAccountTreeItem();
-    context.subscriptions.push(accountTreeItem);
-    ext.tree = new AzExtTreeDataProvider(accountTreeItem, 'azureSpringCloud.common.loadMore');
-    context.subscriptions.push(vscode.window.createTreeView('azureSpringCloud', { treeDataProvider: ext.tree, showCollapseAll: true, canSelectMany: true }));
-    registerCommands();
-  });
+        const accountTreeItem: AzureAccountTreeItem = new AzureAccountTreeItem();
+        context.subscriptions.push(accountTreeItem);
+        ext.tree = new AzExtTreeDataProvider(accountTreeItem, 'azureSpringCloud.common.loadMore');
+        context.subscriptions.push(vscode.window.createTreeView('azureSpringCloud', {treeDataProvider: ext.tree, showCollapseAll: true, canSelectMany: true}));
+        registerCommands();
+    });
 
-  return createApiProvider([]);
+    return createApiProvider([]);
 }
 
 export function deactivateInternal(): void {
-  ext.diagnosticWatcher?.dispose();
+    ext.diagnosticWatcher?.dispose();
 }

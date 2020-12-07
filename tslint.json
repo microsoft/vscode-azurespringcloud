@@ -87,7 +87,10 @@
         "no-use-before-declare": false,
         "newline-per-chained-call": false,
         "no-dynamic-delete": false,
-        "trailing-comma": false
+        "trailing-comma": false,
+        "no-submodule-imports": false,
+        "no-non-null-assertion": false,
+        "no-unexternalized-strings": false
     },
     "linterOptions": {
         "exclude": [

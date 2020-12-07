@@ -1,5 +1,5 @@
 export interface IScaleSettings {
-  capacity?: number;
-  cpu?: number;
-  memory?: number;
+    capacity?: number;
+    cpu?: number;
+    memory?: number;
 }

@@ -11,13 +11,13 @@ import { AzExtTreeDataProvider, IAzExtOutputChannel, IAzureUserInput } from "vsc
  */
 // tslint:disable-next-line: export-name
 export namespace ext {
-  export let context: ExtensionContext;
-  export let tree: AzExtTreeDataProvider;
-  export let outputChannel: IAzExtOutputChannel;
-  export let ui: IAzureUserInput;
-  export let ignoreBundle: boolean | undefined;
-  export let prefix: string = 'azureSpringCloud';
+    export let context: ExtensionContext;
+    export let tree: AzExtTreeDataProvider;
+    export let outputChannel: IAzExtOutputChannel;
+    export let ui: IAzureUserInput;
+    export let ignoreBundle: boolean | undefined;
+    export let prefix: string = 'azureSpringCloud';
 
-  export let diagnosticWatcher: Disposable | undefined;
-  export let diagnosticCollection: DiagnosticCollection;
+    export let diagnosticWatcher: Disposable | undefined;
+    export let diagnosticCollection: DiagnosticCollection;
 }
