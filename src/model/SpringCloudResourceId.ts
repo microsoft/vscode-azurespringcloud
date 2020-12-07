@@ -9,15 +9,15 @@ export default class SpringCloudResourceId {
     return this.parts[2];
   }
 
-  public getResourceGroup(): string {
+  public get resourceGroup(): string {
     return this.parts[4];
   }
 
-  public getServiceName(): string {
+  public get serviceName(): string {
     return this.parts[8];
   }
 
-  public getAppName(): string {
+  public get appName(): string {
     return this.parts[10];
   }
 }

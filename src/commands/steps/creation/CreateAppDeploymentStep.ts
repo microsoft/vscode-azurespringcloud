@@ -3,7 +3,7 @@ import { RuntimeVersion } from "@azure/arm-appplatform/esm/models";
 import { Progress } from "vscode";
 import { AzureWizardExecuteStep, createAzureClient } from "vscode-azureextensionui";
 import { ext } from "../../../extensionVariables";
-import IAppCreationWizardContext from "../../../model/IAppCreationWizardContext";
+import IAppCreationWizardContext from "./IAppCreationWizardContext";
 import SpringCloudResourceId from "../../../model/SpringCloudResourceId";
 import { localize, nonNullProp } from "../../../utils";
 
@@ -21,7 +21,7 @@ export class CreateAppDeploymentStep extends AzureWizardExecuteStep<IAppCreation
 
     const client: AppPlatformManagementClient = await createAzureClient(context, AppPlatformManagementClient);
     const appId = new SpringCloudResourceId(context.newApp!.id!);
-    context.newDeployment = await client.deployments.createOrUpdate(appId.getResourceGroup(), appId.getServiceName(), appId.getAppName(), deploymentName, {
+    context.newDeployment = await client.deployments.createOrUpdate(appId.resourceGroup, appId.serviceName, appId.appName, deploymentName, {
       properties: {
         source: {    //refer: https://dev.azure.com/msazure/AzureDMSS/_git/AzureDMSS-PortalExtension?path=%2Fsrc%2FSpringCloudPortalExt%2FClient%2FShared%2FAppsApi.ts&version=GBdev&_a=contents
           type: 'Jar',
@@ -41,7 +41,7 @@ export class CreateAppDeploymentStep extends AzureWizardExecuteStep<IAppCreation
         name: 'S0',
       }
     });
-    await client.deployments.start(appId.getResourceGroup(), appId.getServiceName(), appId.getAppName(), deploymentName);
+    await client.deployments.start(appId.resourceGroup, appId.serviceName, appId.appName, deploymentName);
     return Promise.resolve(undefined);
   }
 

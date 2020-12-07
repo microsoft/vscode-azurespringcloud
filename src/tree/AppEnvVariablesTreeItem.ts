@@ -44,6 +44,10 @@ export class AppEnvVariablesTreeItem extends AppSettingsTreeItem {
     return this.toAppSettingItem(newKey, newVal, Object.assign({}, AppEnvVariablesTreeItem._options))
   }
 
+  public async updateSettingsValue(_context: IActionContext): Promise<void> {
+    return Promise.resolve(undefined);
+  }
+
   public async updateSettingValue(key: string, newVal: string | undefined, _context: IActionContext): Promise<string> {
     if (newVal === undefined) {
       delete this.variables[key.trim()];

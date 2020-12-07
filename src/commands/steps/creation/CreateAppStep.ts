@@ -1,4 +1,4 @@
-import IAppCreationWizardContext from "../../../model/IAppCreationWizardContext";
+import IAppCreationWizardContext from "./IAppCreationWizardContext";
 import { AzureWizardExecuteStep, createAzureClient } from "vscode-azureextensionui";
 import { Progress } from "vscode";
 import { localize, nonNullProp } from "../../../utils";
@@ -18,7 +18,7 @@ export class CreateAppStep extends AzureWizardExecuteStep<IAppCreationWizardCont
     const appName: string = nonNullProp(context, 'newAppName');
     const client: AppPlatformManagementClient = await createAzureClient(context, AppPlatformManagementClient);
     const serviceId = new SpringCloudResourceId(context.service.id!);
-    context.newApp = await client.apps.createOrUpdate(serviceId.getResourceGroup(), serviceId.getServiceName(), appName, {
+    context.newApp = await client.apps.createOrUpdate(serviceId.resourceGroup, serviceId.serviceName, appName, {
       properties: {
         publicProperty: true
       }

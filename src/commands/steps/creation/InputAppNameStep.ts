@@ -1,5 +1,5 @@
 import { AzureNameStep, createAzureClient, IAzureNamingRules } from "vscode-azureextensionui";
-import IAppCreationWizardContext from "../../../model/IAppCreationWizardContext";
+import IAppCreationWizardContext from "./IAppCreationWizardContext";
 import { localize } from "../../../utils";
 import { ext } from "../../../extensionVariables";
 import { AppPlatformManagementClient } from "@azure/arm-appplatform";

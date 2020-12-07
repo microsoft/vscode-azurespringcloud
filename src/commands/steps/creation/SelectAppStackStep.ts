@@ -1,5 +1,5 @@
 import { AzureWizardPromptStep, IAzureQuickPickItem } from "vscode-azureextensionui";
-import IAppCreationWizardContext from "../../../model/IAppCreationWizardContext";
+import IAppCreationWizardContext from "./IAppCreationWizardContext";
 import { RuntimeVersion } from "@azure/arm-appplatform/esm/models";
 import { localize } from "../../../utils";
 import { ext } from "../../../extensionVariables";

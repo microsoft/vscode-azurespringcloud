@@ -22,7 +22,7 @@ import { localize, nonNullProp } from "../utils";
 import { TreeUtils } from "../utils/treeUtils";
 import { AppTreeItem } from './AppTreeItem';
 import SpringCloudResourceId from "../model/SpringCloudResourceId";
-import IAppCreationWizardContext from "../model/IAppCreationWizardContext";
+import IAppCreationWizardContext from "../commands/steps/creation/IAppCreationWizardContext";
 import { InputAppNameStep } from "../commands/steps/creation/InputAppNameStep";
 import { SelectAppStackStep } from "../commands/steps/creation/SelectAppStackStep";
 import { CreateAppStep } from "../commands/steps/creation/CreateAppStep";
@@ -58,7 +58,7 @@ export class ServiceTreeItem extends AzureParentTreeItem {
   }
 
   public get resourceGroup(): string {
-    return this.resourceId.getResourceGroup();
+    return this.resourceId.resourceGroup;
   }
 
   public get data(): ServiceResource {

@@ -2,7 +2,7 @@ import { AzureWizardExecuteStep } from "vscode-azureextensionui";
 import { Progress } from "vscode";
 import { localize } from "../../../utils";
 import { ext } from "../../../extensionVariables";
-import { IAppDeploymentWizardContext } from "../../../model/IAppDeploymentWizardContext";
+import { IAppDeploymentWizardContext } from "./IAppDeploymentWizardContext";
 import { AnonymousCredential, ShareFileClient } from "@azure/storage-file-share";
 
 export class UploadArtifactStep extends AzureWizardExecuteStep<IAppDeploymentWizardContext> {

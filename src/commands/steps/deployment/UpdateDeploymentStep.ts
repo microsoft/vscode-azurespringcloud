@@ -4,7 +4,7 @@ import { localize } from "../../../utils";
 import { ext } from "../../../extensionVariables";
 import { AppPlatformManagementClient } from "@azure/arm-appplatform";
 import SpringCloudResourceId from "../../../model/SpringCloudResourceId";
-import { IAppDeploymentWizardContext } from "../../../model/IAppDeploymentWizardContext";
+import { IAppDeploymentWizardContext } from "./IAppDeploymentWizardContext";
 
 export class UpdateDeploymentStep extends AzureWizardExecuteStep<IAppDeploymentWizardContext> {
   public priority: number = 140;
@@ -16,7 +16,7 @@ export class UpdateDeploymentStep extends AzureWizardExecuteStep<IAppDeploymentW
 
     const client: AppPlatformManagementClient = await createAzureClient(context, AppPlatformManagementClient);
     const appId = new SpringCloudResourceId(context.app.id!);
-    await client.deployments.createOrUpdate(appId.getResourceGroup(), appId.getServiceName(), appId.getAppName(), context.deployment.name || 'default', {
+    await client.deployments.createOrUpdate(appId.resourceGroup, appId.serviceName, appId.appName, context.deployment.name || 'default', {
       properties: {
         source: {
           type: 'Jar',

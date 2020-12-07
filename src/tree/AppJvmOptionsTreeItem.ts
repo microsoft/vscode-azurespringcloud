@@ -1,8 +1,13 @@
-import { AzExtTreeItem, IActionContext, ICreateChildImplContext } from "vscode-azureextensionui";
+import { AzExtTreeItem, AzureWizard, AzureWizardExecuteStep, AzureWizardPromptStep, IActionContext, ICreateChildImplContext } from "vscode-azureextensionui";
 import { AppSettingsTreeItem } from "./AppSettingsTreeItem";
 import { AppTreeItem } from "./AppTreeItem";
 import { ext } from "../extensionVariables";
 import { DeploymentResource } from "@azure/arm-appplatform/esm/models";
+import { localize } from "../utils";
+import { window } from "vscode";
+import { InputJvmOptionsStep } from "../commands/steps/settings/jvmoptions/InputJvmOptionsStep";
+import { UpdateJvmOptionsStep } from "../commands/steps/settings/jvmoptions/UpdateJvmOptionsStep";
+import { IJvmOptionsUpdateWizardContext } from "../commands/steps/settings/jvmoptions/IJvmOptionsUpdateWizardContext";
 
 export class AppJvmOptionsTreeItem extends AppSettingsTreeItem {
   public static contextValue: string = 'azureSpringCloud.app.jvmOptions';
@@ -44,6 +49,26 @@ export class AppJvmOptionsTreeItem extends AppSettingsTreeItem {
     return this.toAppSettingItem('', newVal, Object.assign({}, AppJvmOptionsTreeItem._options))
   }
 
+  public async updateSettingsValue(context: IActionContext, newJvmOptions?: string): Promise<void> {
+    const wizardContext: IJvmOptionsUpdateWizardContext = Object.assign(context, this.root, {
+      app: this.parent.app,
+      deployment: this.deployment,
+      newJvmOptions
+    });
+
+    const promptSteps: AzureWizardPromptStep<IJvmOptionsUpdateWizardContext>[] = [];
+    const executeSteps: AzureWizardExecuteStep<IJvmOptionsUpdateWizardContext>[] = [];
+    promptSteps.push(new InputJvmOptionsStep());
+    executeSteps.push(new UpdateJvmOptionsStep());
+    const title: string = localize('updatingJvmOptions', 'Updating JVM options of Spring Cloud app "{0}"', this.parent.name);
+    const wizard: AzureWizard<IJvmOptionsUpdateWizardContext> = new AzureWizard(wizardContext, {promptSteps, executeSteps, title});
+    await wizard.prompt();
+    await wizard.execute();
+    const createSucceeded: string = localize('updatedJvmOptions', 'Successfully updated JVM options of Spring Cloud app "{0}".', this.parent.name);
+    window.showInformationMessage(createSucceeded);
+    this.refresh();
+  }
+
   public async updateSettingValue(oldVal: string | undefined, newVal: string, _context: IActionContext): Promise<string> {
     if (oldVal === undefined) {
       this.options.push(newVal);
@@ -51,14 +76,8 @@ export class AppJvmOptionsTreeItem extends AppSettingsTreeItem {
       const index = this.options.indexOf(oldVal);
       this.options.splice(index, 1, newVal);
     }
-    await this.client.deployments.update(this.parent.resourceGroup, this.parent.serviceName, this.parent.name, this.deployment.name!, {
-      properties: {
-        deploymentSettings: {
-          jvmOptions: this.options.join(' ')
-        }
-      }
-    });
-    this.parent.refresh();
+    const newJvmOptions = this.options.join(' ');
+    await this.updateSettingsValue(_context, newJvmOptions);
     return newVal;
   }
 

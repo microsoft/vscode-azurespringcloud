@@ -22,7 +22,7 @@ import { ServiceTreeItem } from "./ServiceTreeItem";
 import { TreeUtils } from "../utils/treeUtils";
 import { AppJvmOptionsTreeItem } from "./AppJvmOptionsTreeItem";
 import { AppInstancesTreeItem } from "./AppInstancesTreeItem";
-import { IAppDeploymentWizardContext } from "../model/IAppDeploymentWizardContext";
+import { IAppDeploymentWizardContext } from "../commands/steps/deployment/IAppDeploymentWizardContext";
 import { UploadArtifactStep } from "../commands/steps/deployment/UploadArtifactStep";
 import { UpdateDeploymentStep } from "../commands/steps/deployment/UpdateDeploymentStep";
 import { ext } from "../extensionVariables";

@@ -88,8 +88,14 @@ export namespace AppCommands {
     await node.createChild(context);
   }
 
+  export async function editSettings(context: IActionContext, node: AppSettingsTreeItem) {
+    await node.runWithTemporaryDescription(localize('editing', 'Editing...'), async () => {
+      await node.updateSettingsValue(context);
+    });
+  }
+
   export async function editSetting(context: IActionContext, node: AppSettingTreeItem): Promise<AppSettingTreeItem> {
-    const prompt = node.key ? `Enter value for "${node.key}"` : `Update ${node.typeLabel}`;
+    const prompt = node.key ? `Enter new value of "${node.key}"` : `Update ${node.typeLabel}`;
     const newVal: string = await ext.ui.showInputBox({prompt, value: node.value});
     if (newVal?.trim()) {
       await node.runWithTemporaryDescription(localize('editing', 'Editing...'), async () => {
