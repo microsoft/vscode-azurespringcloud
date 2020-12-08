@@ -44,6 +44,7 @@
         "onCommand:azureSpringCloud.app.restart",
         "onCommand:azureSpringCloud.app.delete",
         "onCommand:azureSpringCloud.app.deploy",
+        "onCommand:azureSpringCloud.app.scale",
         "onCommand:azureSpringCloud.instance.startStreamingLog",
         "onCommand:azureSpringCloud.instance.stopStreamingLog",
         "onCommand:azureSpringCloud.app.settings.addSetting",
@@ -131,6 +132,11 @@
             {
                 "command": "azureSpringCloud.app.deploy",
                 "title": "%azureSpringCloud.menu.app.deploy%",
+                "category": "Azure Spring Cloud"
+            },
+            {
+                "command": "azureSpringCloud.app.scale",
+                "title": "%azureSpringCloud.menu.app.scale%",
                 "category": "Azure Spring Cloud"
             },
             {
@@ -283,6 +289,11 @@
                     "command": "azureSpringCloud.app.delete",
                     "when": "view == azureSpringCloud && viewItem == azureSpringCloud.app",
                     "group": "5@4"
+                },
+                {
+                    "command": "azureSpringCloud.app.scale",
+                    "when": "view == azureSpringCloud && viewItem == azureSpringCloud.app",
+                    "group": "5@5"
                 },
                 {
                     "command": "azureSpringCloud.app.deploy",

@@ -30,6 +30,7 @@ export function registerCommands(): void {
     registerCommand("azureSpringCloud.app.restart", AppCommands.restartApp);
     registerCommand("azureSpringCloud.app.delete", AppCommands.deleteApp);
     registerCommand("azureSpringCloud.app.deploy", AppCommands.deploy);
+    registerCommand("azureSpringCloud.app.scale", AppCommands.scale);
     registerCommand("azureSpringCloud.app.instance.startStreamingLog", AppCommands.startStreamingLogs);
     registerCommand("azureSpringCloud.app.instance.stopStreamingLog", AppCommands.stopStreamingLogs);
     registerCommand('azureSpringCloud.app.settings.addSetting', AppCommands.addSetting);

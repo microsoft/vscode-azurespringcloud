@@ -17,6 +17,7 @@
     "azureSpringCloud.menu.app.openPublicEndpoint": "Access Public Endpoint",
     "azureSpringCloud.menu.app.openTestEndpoint": "Access Test Endpoint",
     "azureSpringCloud.menu.app.deploy": "Deploy",
+    "azureSpringCloud.menu.app.scale": "Scale",
     "azureSpringCloud.menu.app.instance.startStreamingLog": "Start Streaming Logs",
     "azureSpringCloud.menu.app.instance.stopStreamingLog": "Stop Streaming Logs",
     "azureSpringCloud.deleteConfirmation": "The behavior to use when confirming delete of a resource group.",

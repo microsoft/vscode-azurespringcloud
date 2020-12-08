@@ -32,6 +32,7 @@ export class AppTreeItem extends AzureParentTreeItem {
     public readonly contextValue: string = AppTreeItem.contextValue;
     public app: AppResource;
     private deployment: DeploymentResource | undefined;
+    private scaleSettingsTreeItem: AppScaleSettingsTreeItem;
 
     constructor(parent: ServiceTreeItem, resource: AppResource) {
         super(parent);
@@ -95,12 +96,12 @@ export class AppTreeItem extends AzureParentTreeItem {
     }
 
     public async loadMoreChildrenImpl(_clearCache: boolean, _context: IActionContext): Promise<AzExtTreeItem[]> {
-        this.deployment = await this.getActiveDeployment(true);
+        this.deployment = await this.getActiveDeployment();
+        this.scaleSettingsTreeItem = new AppScaleSettingsTreeItem(this, this.deployment);
         const appInstancesTreeItem: AppInstancesTreeItem = new AppInstancesTreeItem(this, this.deployment);
         const envPropertiesTreeItem: AppEnvVariablesTreeItem = new AppEnvVariablesTreeItem(this, this.deployment);
-        const scaleSettingsTreeItem: AppScaleSettingsTreeItem = new AppScaleSettingsTreeItem(this, this.deployment);
         const jvmOptionsTreeItem: AppJvmOptionsTreeItem = new AppJvmOptionsTreeItem(this, this.deployment);
-        return [appInstancesTreeItem, envPropertiesTreeItem, scaleSettingsTreeItem, jvmOptionsTreeItem];
+        return [appInstancesTreeItem, envPropertiesTreeItem, this.scaleSettingsTreeItem, jvmOptionsTreeItem];
     }
 
     public async deleteTreeItemImpl(_context: IActionContext): Promise<void> {
@@ -163,6 +164,10 @@ export class AppTreeItem extends AzureParentTreeItem {
         const title: string = localize('deployingArtifact', 'Deploying artifact to "{0}"', this.name);
         const wizard: AzureWizard<IAppDeploymentWizardContext> = new AzureWizard(wizardContext, {executeSteps, title});
         await wizard.execute();
+    }
+
+    public async scaleInstances(context: IActionContext): Promise<void> {
+        await this.scaleSettingsTreeItem.updateSettingsValue(context);
     }
 
     public async refreshImpl(): Promise<void> {

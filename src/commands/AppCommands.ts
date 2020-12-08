@@ -70,6 +70,12 @@ export namespace AppCommands {
         return node;
     }
 
+    export async function scale(context: IActionContext, node?: AppTreeItem): Promise<AppTreeItem> {
+        node = await getNode(node, context);
+        await node.scaleInstances(context);
+        return node;
+    }
+
     export async function startStreamingLogs(_context: IActionContext, node?: AppInstanceTreeItem): Promise<AppInstanceTreeItem> {
         return node!;
     }
