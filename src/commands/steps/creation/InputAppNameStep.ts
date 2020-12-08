@@ -1,26 +1,35 @@
 import { AppPlatformManagementClient } from "@azure/arm-appplatform";
-import { AzureNameStep, createAzureClient, IAzureNamingRules } from "vscode-azureextensionui";
+import { AppResource } from "@azure/arm-appplatform/esm/models";
+import { AppResourceCollection } from "@azure/arm-appplatform/src/models/index";
+import { AzureNameStep, createAzureClient } from "vscode-azureextensionui";
 import { ext } from "../../../extensionVariables";
+import { SpringCloudResourceId } from "../../../model/SpringCloudResourceId";
 import { localize } from "../../../utils";
 import { IAppCreationWizardContext } from "./IAppCreationWizardContext";
 
-const appNamingRules: IAzureNamingRules = {
-    minLength: 2,
-    maxLength: 60,
-    invalidCharsRegExp: /[^a-zA-Z0-9\-]/
-};
-
 export class InputAppNameStep extends AzureNameStep<IAppCreationWizardContext> {
+    private static readonly VALID_NAME_REGEX: RegExp = /^[a-z][a-z0-9-]{2,30}[a-z0-9]$/;
 
-    private static async validateAppName(name: string, _client: AppPlatformManagementClient): Promise<string | undefined> {
+    private static async validateAppName(name: string, context: IAppCreationWizardContext, client: AppPlatformManagementClient): Promise<string | undefined> {
         name = name.trim();
-        if (name.length < appNamingRules.minLength || name.length > appNamingRules.maxLength) {
-            return localize('invalidLength', 'The name must be between {0} and {1} characters.', appNamingRules.minLength, appNamingRules.maxLength);
-        } else if (appNamingRules.invalidCharsRegExp.test(name)) {
-            return localize('invalidChars', "The name can only contain letters, numbers, or hyphens.");
+        if (name) {
+            if (!InputAppNameStep.VALID_NAME_REGEX.test(name)) {
+                return localize('invalidName', `
+                    The name is invalid. It can contain only lowercase letters, numbers and hyphens.
+                    The first character must be a letter.
+                    The last character must be a letter or number.
+                    The value must be between 4 and 32 characters long.
+                `);
+            } else {
+                const serviceId: SpringCloudResourceId = new SpringCloudResourceId(context.service.id!);
+                const apps: AppResourceCollection = await client.apps.list(serviceId.resourceGroup, serviceId.serviceName);
+                if (apps.every((app: AppResource) => app.name !== name)) {
+                    return undefined;
+                }
+                return localize('existAppName', "App with this name already exists.");
+            }
         } else {
-            //TODO: validate if app with same name exists
-            return undefined;
+            return localize('emptyName', 'The name is required.');
         }
     }
 
@@ -29,7 +38,7 @@ export class InputAppNameStep extends AzureNameStep<IAppCreationWizardContext> {
         const prompt: string = localize('appNamePrompt', 'Enter a globally unique name for the new Spring Cloud app.');
         context.newAppName = (await ext.ui.showInputBox({
             prompt,
-            validateInput: async (name: string): Promise<string | undefined> => InputAppNameStep.validateAppName(name, client)
+            validateInput: async (name: string): Promise<string | undefined> => InputAppNameStep.validateAppName(name, context, client)
         })).trim();
         return Promise.resolve(undefined);
     }
