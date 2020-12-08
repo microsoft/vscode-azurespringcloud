@@ -7,15 +7,14 @@ import { IScaleSettingsUpdateWizardContext } from "../commands/steps/settings/sc
 import { UpdateScaleSettingsStep } from "../commands/steps/settings/scalesettings/UpdateScaleSettingsStep";
 import { localize } from "../utils";
 import { AppSettingsTreeItem } from "./AppSettingsTreeItem";
-import { IOptions } from "./AppSettingTreeItem";
+import { AppSettingTreeItem, IOptions } from "./AppSettingTreeItem";
 import { AppTreeItem } from "./AppTreeItem";
 
 export class AppScaleSettingsTreeItem extends AppSettingsTreeItem {
     public static contextValue: string = 'azureSpringCloud.app.scaleSettings';
     private static readonly _options: IOptions = {
         hidden: false,
-        settingType: 'azureSpringCloud.app.scaleSetting',
-        typeLabel: "scale setting"
+        contextValue: 'azureSpringCloud.app.scaleSetting',
     };
     public readonly contextValue: string = AppScaleSettingsTreeItem.contextValue;
     public readonly id: string = AppScaleSettingsTreeItem.contextValue;
@@ -25,64 +24,56 @@ export class AppScaleSettingsTreeItem extends AppSettingsTreeItem {
         super(parent, deployment);
     }
 
-    public async loadMoreChildrenImpl(_clearCache: boolean, _context: IActionContext): Promise<AzExtTreeItem[]> {
+    public get settings(): IScaleSettings {
         const settings: DeploymentSettings | undefined = this.deployment.properties?.deploymentSettings;
-        const vals: {} = {
-            vCPU: settings?.cpu ?? 0,
-            'Memory/GB': settings?.memoryInGB ?? 0,
-            Capacity: this.deployment.sku?.capacity ?? 0
+        return {
+            cpu: settings?.cpu ?? 0,
+            memory: settings?.memoryInGB ?? 0,
+            capacity: this.deployment.sku?.capacity ?? 0
         };
-        return Object.entries(vals).map(e => this.toAppSettingItem(e[0], e[1] + '', Object.assign({}, AppScaleSettingsTreeItem._options)));
     }
 
-    public async updateSettingsValue(context: IActionContext, newSettings?: IScaleSettings): Promise<void> {
-        const deploymentSettings: DeploymentSettings | undefined = this.deployment.properties?.deploymentSettings;
-        const oldSettings: IScaleSettings = {
-            cpu: deploymentSettings?.cpu,
-            memory: deploymentSettings?.memoryInGB,
-            capacity: this.deployment.sku?.capacity
-        };
+    public async loadMoreChildrenImpl(_clearCache: boolean, _context: IActionContext): Promise<AzExtTreeItem[]> {
+        return Object.entries(this.settings).map(e => this.toAppSettingItem(e[0], `${e[1]}`, Object.assign({}, AppScaleSettingsTreeItem._options)));
+    }
+
+    public async updateSettingsValue(context: IActionContext, key?: string): Promise<string> {
+        const scaling: string = localize('scaling', 'Scaling Spring Cloud app "{0}"', this.parent.name);
+        const scaled: string = localize('scaled', 'Successfully scaled Spring Cloud app "{0}".', this.parent.name);
+
         const wizardContext: IScaleSettingsUpdateWizardContext = Object.assign(context, this.root, {
             app: this.parent.app,
             deployment: this.deployment,
-            newSettings: Object.assign(oldSettings, newSettings || {})
+            newSettings: { ...this.settings },
+            oldSettings: this.settings
         });
 
+        const steps: AzureWizardPromptStep<IScaleSettingsUpdateWizardContext>[] = [
+            new InputNumberStep("Capacity", 'capacity', { max: 500, min: 1 }),
+            new InputNumberStep("Memory/GB", 'memory', { max: 8, min: 1 }),
+            new InputNumberStep("vCPU", 'cpu', { max: 4, min: 1 })
+        ];
         const promptSteps: AzureWizardPromptStep<IScaleSettingsUpdateWizardContext>[] = [];
         const executeSteps: AzureWizardExecuteStep<IScaleSettingsUpdateWizardContext>[] = [];
-        if (!newSettings) {
-            promptSteps.push(new InputNumberStep("Capacity", 'capacity'));
-            promptSteps.push(new InputNumberStep("Memory/GB", 'memory'));
-            promptSteps.push(new InputNumberStep("vCPU", 'cpu'));
+        if (!key) {
+            promptSteps.push(...steps);
+        } else {
+            promptSteps.push(steps[['capacity', 'memory', 'cpu'].indexOf(key)]);
         }
         executeSteps.push(new UpdateScaleSettingsStep());
-        const title: string = localize('scaling', 'Scaling Spring Cloud app "{0}"', this.parent.name);
-        const wizard: AzureWizard<IScaleSettingsUpdateWizardContext> = new AzureWizard(wizardContext, {promptSteps, executeSteps, title});
+        const wizard: AzureWizard<IScaleSettingsUpdateWizardContext> = new AzureWizard(wizardContext, { promptSteps, executeSteps, title: scaling });
         await wizard.prompt();
         await wizard.execute();
-        const createSucceeded: string = localize('scaled', 'Successfully scaled Spring Cloud app "{0}".', this.parent.name);
-        window.showInformationMessage(createSucceeded);
+        window.showInformationMessage(scaled);
         this.parent.refresh();
+        return `${wizardContext.newSettings[key ?? 'capacity']}`;
     }
 
-    public async updateSettingValue(key: string, newVal: string, context: IActionContext): Promise<string> {
-        const numVal: number = Number(newVal);
-        if (isNaN(numVal)) {
-            throw new Error('Only number is acceptable!');
-        }
-        const settings: IScaleSettings = {};
-        if (key === 'vCPU') {
-            settings.cpu = numVal;
-        } else if (key === 'Memory/GB') {
-            settings.memory = numVal;
-        } else {
-            settings.capacity = numVal;
-        }
-        await this.updateSettingsValue(context, settings);
-        return newVal;
+    public async updateSettingValue(node: AppSettingTreeItem, context: IActionContext): Promise<string> {
+        return this.updateSettingsValue(context, node.key);
     }
 
-    public async deleteSettingItem(_key: string, _context: IActionContext): Promise<void> {
+    public async deleteSettingItem(_node: AppSettingTreeItem, _context: IActionContext): Promise<void> {
         throw new Error("Scale settings can not be deleted.");
     }
 }

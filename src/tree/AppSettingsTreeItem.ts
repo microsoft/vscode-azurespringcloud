@@ -36,11 +36,11 @@ export abstract class AppSettingsTreeItem extends AzureParentTreeItem {
     public async toggleVisibility(context: IActionContext): Promise<void> {
         const settings: AppSettingTreeItem[] = <AppSettingTreeItem[]>await ext.tree.getChildren(this);
         const hidden: boolean = settings.every(s => s.hidden);
-        settings.forEach(async s => {
+        for (const s of settings) {
             if (s.toggleVisibility !== undefined) {
                 await s.toggleVisibility(context, !hidden);
             }
-        });
+        }
     }
 
     public async refreshImpl(): Promise<void> {
@@ -48,9 +48,9 @@ export abstract class AppSettingsTreeItem extends AzureParentTreeItem {
         return super.refreshImpl?.();
     }
 
-    public abstract updateSettingValue(id: string, value: string, _context: IActionContext): Promise<string>;
+    public abstract updateSettingValue(node:AppSettingTreeItem, _context: IActionContext): Promise<string>;
 
-    public abstract updateSettingsValue(_context: IActionContext): Promise<void>;
+    public abstract updateSettingsValue(_context: IActionContext): Promise<any>;
 
-    public abstract async deleteSettingItem(_key: string, _context: IActionContext): Promise<void>;
+    public abstract async deleteSettingItem(node:AppSettingTreeItem, _context: IActionContext): Promise<void>;
 }

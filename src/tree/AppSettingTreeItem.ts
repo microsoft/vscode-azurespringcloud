@@ -7,8 +7,7 @@ export interface IOptions {
     hidden?: boolean;
     deletable?: boolean;
     readonly?: boolean;
-    typeLabel?: string;
-    settingType?: string;
+    contextValue?: string;
 }
 
 export class AppSettingTreeItem extends AzureTreeItem {
@@ -27,7 +26,7 @@ export class AppSettingTreeItem extends AzureTreeItem {
     }
 
     public get contextValue(): string {
-        return this._options.settingType || AppSettingTreeItem.contextValue;
+        return this._options.contextValue || AppSettingTreeItem.contextValue;
     }
 
     public get id(): string {
@@ -50,10 +49,6 @@ export class AppSettingTreeItem extends AzureTreeItem {
         return this._options.hidden ? `Click to view.` : ``;
     }
 
-    public get typeLabel(): string {
-        return this._options.typeLabel || 'setting';
-    }
-
     public get deletable(): boolean {
         return this._options.deletable ?? true;
     }
@@ -70,14 +65,14 @@ export class AppSettingTreeItem extends AzureTreeItem {
         return this._value;
     }
 
-    public async updateValue(value: string, context: IActionContext): Promise<void> {
-        this._value = await this.parent.updateSettingValue(this.id, value, context);
+    public async updateValue(context: IActionContext): Promise<void> {
+        this._value = await this.parent.updateSettingValue(this, context);
         await this.refresh();
     }
 
     public async deleteTreeItemImpl(context: IActionContext): Promise<void> {
         if (this.deletable) {
-            await this.parent.deleteSettingItem(this.id, context);
+            await this.parent.deleteSettingItem(this, context);
         }
     }
 

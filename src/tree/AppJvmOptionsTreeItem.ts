@@ -7,81 +7,89 @@ import { UpdateJvmOptionsStep } from "../commands/steps/settings/jvmoptions/Upda
 import { ext } from "../extensionVariables";
 import { localize } from "../utils";
 import { AppSettingsTreeItem } from "./AppSettingsTreeItem";
-import { IOptions } from "./AppSettingTreeItem";
+import { AppSettingTreeItem, IOptions } from "./AppSettingTreeItem";
 import { AppTreeItem } from "./AppTreeItem";
 
 export class AppJvmOptionsTreeItem extends AppSettingsTreeItem {
     public static contextValue: string = 'azureSpringCloud.app.jvmOptions';
     private static readonly _options: IOptions = {
         hidden: false,
-        settingType: 'azureSpringCloud.app.jvmOption',
-        typeLabel: "JVM option"
+        contextValue: 'azureSpringCloud.app.jvmOption',
     };
     private static readonly JVM_OPTION_PATTERN: RegExp = /^-[a-zA-Z_]+\S*$/; //TODO: @wangmi confirm
     public readonly contextValue: string = AppJvmOptionsTreeItem.contextValue;
     public readonly id: string = AppJvmOptionsTreeItem.contextValue;
     public readonly label: string = 'JVM Options';
-    private options: string[];
 
     public constructor(parent: AppTreeItem, deployment: DeploymentResource) {
         super(parent, deployment);
     }
 
-    public async loadMoreChildrenImpl(_clearCache: boolean, _context: IActionContext): Promise<AzExtTreeItem[]> {
+    public get options(): string[] {
         const optionsStr: string | undefined = this.deployment.properties?.deploymentSettings?.jvmOptions?.trim();
-        this.options = optionsStr ? optionsStr?.split(/\s+/) : [];
+        return optionsStr ? optionsStr?.split(/\s+/) : [];
+    }
+
+    public async loadMoreChildrenImpl(_clearCache: boolean, _context: IActionContext): Promise<AzExtTreeItem[]> {
         return this.options.map(option => this.toAppSettingItem('', option.trim(), Object.assign({}, AppJvmOptionsTreeItem._options)));
     }
 
     public async createChildImpl(context: ICreateChildImplContext): Promise<AzExtTreeItem> {
         const newVal: string = await ext.ui.showInputBox({
-            prompt: 'Enter new JVM option',
-            validateInput: (v: string): string | undefined => {
-                if (!AppJvmOptionsTreeItem.JVM_OPTION_PATTERN.test(v)) {
-                    return `Invalid JVM option.`;
-                } else if (this.options.includes(v)) {
-                    return `${v} is already set`;
-                }
-                return undefined;
-            }
+            prompt: 'Enter new JVM option:',
+            validateInput: this.validateJvmOption
         });
         context.showCreatingTreeItem(newVal);
-        await this.updateSettingValue(undefined, newVal, context);
+        await this.updateSettingsValue(context, [...this.options, newVal]);
         return this.toAppSettingItem('', newVal, Object.assign({}, AppJvmOptionsTreeItem._options));
     }
 
-    public async updateSettingsValue(context: IActionContext, newJvmOptions?: string): Promise<void> {
+    public async updateSettingValue(node: AppSettingTreeItem | undefined, context: IActionContext | ICreateChildImplContext): Promise<string> {
+        const newVal: string = await ext.ui.showInputBox({
+            prompt: 'Update JVM option:',
+            value: node?.value ?? '',
+            validateInput: this.validateJvmOption
+        });
+        await this.updateSettingsValue(context, [...this.options, newVal]);
+        return newVal;
+    }
+
+    public async deleteSettingItem(node: AppSettingTreeItem, context: IActionContext): Promise<void> {
+        const tempOptions: string[] = [...this.options];
+        const index: number = tempOptions.indexOf(node.value);
+        tempOptions.splice(index, 1);
+        await this.updateSettingsValue(context, tempOptions);
+    }
+
+    public async updateSettingsValue(context: IActionContext, newJvmOptions?: string[]): Promise<void> {
+        const updating: string = localize('updatingJvmOptions', 'Updating JVM options of Spring Cloud app "{0}"', this.parent.name);
+        const updated: string = localize('updatedJvmOptions', 'Successfully updated JVM options of Spring Cloud app "{0}".', this.parent.name);
+
         const wizardContext: IJvmOptionsUpdateWizardContext = Object.assign(context, this.root, {
             app: this.parent.app,
             deployment: this.deployment,
-            newJvmOptions
+            newJvmOptions: newJvmOptions?.join(' ')
         });
 
         const promptSteps: AzureWizardPromptStep<IJvmOptionsUpdateWizardContext>[] = [];
         const executeSteps: AzureWizardExecuteStep<IJvmOptionsUpdateWizardContext>[] = [];
         promptSteps.push(new InputJvmOptionsStep());
         executeSteps.push(new UpdateJvmOptionsStep());
-        const title: string = localize('updatingJvmOptions', 'Updating JVM options of Spring Cloud app "{0}"', this.parent.name);
-        const wizard: AzureWizard<IJvmOptionsUpdateWizardContext> = new AzureWizard(wizardContext, {promptSteps, executeSteps, title});
+        const wizard: AzureWizard<IJvmOptionsUpdateWizardContext> = new AzureWizard(wizardContext, { promptSteps, executeSteps, title: updating });
         await wizard.prompt();
         await wizard.execute();
-        const createSucceeded: string = localize('updatedJvmOptions', 'Successfully updated JVM options of Spring Cloud app "{0}".', this.parent.name);
-        window.showInformationMessage(createSucceeded);
+        window.showInformationMessage(updated);
         this.refresh();
     }
 
-    public async updateSettingValue(oldVal: string | undefined, newVal: string, _context: IActionContext): Promise<string> {
-        if (oldVal === undefined) {
-            this.options.push(newVal);
-        } else if (oldVal !== newVal.trim()) {
-            const index: number = this.options.indexOf(oldVal);
-            this.options.splice(index, 1, newVal);
+    public async validateJvmOption(v: string): Promise<string | undefined> {
+        if (!v.trim()) {
+            return `Enter a value.`;
+        } else if (!AppJvmOptionsTreeItem.JVM_OPTION_PATTERN.test(v)) {
+            return `Invalid JVM option.`;
+        } else if (this.options.includes(v)) {
+            return `${v} is already set`;
         }
-        await this.updateSettingsValue(_context, this.options.join(' '));
-        return newVal;
-    }
-
-    public async deleteSettingItem(oldVal: string, context: IActionContext): Promise<void> {
-        await this.updateSettingValue(oldVal, '', context);
+        return undefined;
     }
 }

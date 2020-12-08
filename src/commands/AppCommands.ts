@@ -9,6 +9,7 @@ import { localize, openUrl } from "../utils";
 
 export namespace AppCommands {
 
+
     export async function openPublicEndpoint(context: IActionContext, node?: AppTreeItem): Promise<void> {
         node = await getNode(node, context);
         const endPoint: string | undefined = await node.getPublicEndpoint();
@@ -31,7 +32,7 @@ export namespace AppCommands {
 
     export async function stopApp(context: IActionContext, node?: AppTreeItem): Promise<AppTreeItem> {
         node = await getNode(node, context);
-        await ext.ui.showWarningMessage(`Are you sure to stop Spring Cloud Service "${node.name}"?`, { modal: true }, DialogResponses.yes);
+        await ext.ui.showWarningMessage(`Are you sure to stop Spring Cloud Service "${node.name}"?`, {modal: true}, DialogResponses.yes);
         await node.runWithTemporaryDescription(localize('stopping', 'Stopping...'), async () => {
             return node!.stop();
         });
@@ -48,7 +49,7 @@ export namespace AppCommands {
 
     export async function deleteApp(context: IActionContext, node?: AppTreeItem): Promise<void> {
         node = await getNode(node, context);
-        await ext.ui.showWarningMessage(`Are you sure to delete Spring Cloud App "${node.name}"?`, { modal: true }, DialogResponses.deleteResponse);
+        await ext.ui.showWarningMessage(`Are you sure to delete Spring Cloud App "${node.name}"?`, {modal: true}, DialogResponses.deleteResponse);
         await node.deleteTreeItem(context);
     }
 
@@ -92,27 +93,17 @@ export namespace AppCommands {
     }
 
     export async function editSetting(context: IActionContext, node: AppSettingTreeItem): Promise<AppSettingTreeItem> {
-        const prompt: string = node.key ? `Enter new value of "${node.key}"` : `Update ${node.typeLabel}`;
-        const newVal: string = await ext.ui.showInputBox({ prompt, value: node.value });
-        if (newVal?.trim()) {
-            await node.runWithTemporaryDescription(localize('editing', 'Editing...'), async () => {
-                await node.updateValue(newVal, context);
-            });
-            return node;
-        } else {
-            return deleteSetting(context, node);
-        }
+        await node.runWithTemporaryDescription(localize('editing', 'Editing...'), async () => {
+            await node.updateValue(context);
+        });
+        return node;
     }
 
     export async function deleteSetting(context: IActionContext, node: AppSettingTreeItem): Promise<AppSettingTreeItem> {
-        if (node.deletable) {
-            await ext.ui.showWarningMessage(`Are you sure to delete ${node.typeLabel} "${node.id}"?`, { modal: true }, DialogResponses.deleteResponse);
-            await node.runWithTemporaryDescription(localize('deleting', 'Deleting...'), async () => {
-                await node.deleteTreeItem(context);
-            });
-        } else {
-            await ext.ui.showWarningMessage(`This ${node.typeLabel} item is not deletable!`, DialogResponses.cancel);
-        }
+        await ext.ui.showWarningMessage(`Are you sure to delete "${node.key || node.value}"?`, {modal: true}, DialogResponses.deleteResponse);
+        await node.runWithTemporaryDescription(localize('deleting', 'Deleting...'), async () => {
+            await node.deleteTreeItem(context);
+        });
         return node;
     }
 

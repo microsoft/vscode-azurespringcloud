@@ -8,6 +8,7 @@ import { localize } from "../../../utils";
 import { IAppCreationWizardContext } from "./IAppCreationWizardContext";
 
 export class InputAppNameStep extends AzureNameStep<IAppCreationWizardContext> {
+    //refer: https://dev.azure.com/msazure/AzureDMSS/_git/AzureDMSS-PortalExtension?path=%2Fsrc%2FSpringCloudPortalExt%2FClient%2FCreateApplication%2FCreateApplicationBlade.ts&version=GBdev&line=463&lineEnd=463&lineStartColumn=25&lineEndColumn=55&lineStyle=plain&_a=contents
     private static readonly VALID_NAME_REGEX: RegExp = /^[a-z][a-z0-9-]{2,30}[a-z0-9]$/;
 
     private static async validateAppName(name: string, context: IAppCreationWizardContext, client: AppPlatformManagementClient): Promise<string | undefined> {

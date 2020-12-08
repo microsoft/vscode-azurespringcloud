@@ -6,4 +6,5 @@ export interface IScaleSettingsUpdateWizardContext extends IResourceGroupWizardC
     app: AppResource;
     deployment: DeploymentResource;
     newSettings: IScaleSettings;
+    oldSettings: IScaleSettings;
 }
