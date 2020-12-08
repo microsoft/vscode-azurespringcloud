@@ -1,6 +1,8 @@
-import { AppResource } from "@azure/arm-appplatform/esm/models";
+import { AppResource, TestKeys } from "@azure/arm-appplatform/esm/models";
 import { DeploymentInstance } from "@azure/arm-appplatform/src/models/index";
 import { AzureTreeItem, TreeItemIconPath } from "vscode-azureextensionui";
+import { startStreamingLogs, stopStreamingLogs } from "../service/logstream/logStreaming";
+import { localize } from "../utils";
 import { TreeUtils } from "../utils/treeUtils";
 import { AppInstancesTreeItem } from "./AppInstancesTreeItem";
 
@@ -33,5 +35,19 @@ export class AppInstanceTreeItem extends AzureTreeItem {
 
     public get iconPath(): TreeItemIconPath {
         return TreeUtils.getIconPath('azure-springcloud-app-instance');
+    }
+
+    public async startStreamingLogs(): Promise<void> {
+        if (this.description !== 'Running') {
+            throw new Error(localize('instanceIsNotRunning', 'Selected instance is not running.'));
+        }
+        const app: string = this.parent.parent.name;
+        const testKey: TestKeys = await this.parent.parent.getTestKeys();
+        await startStreamingLogs(app, testKey, this.instance);
+    }
+
+    public async stopStreamingLogs(): Promise<void> {
+        const app: string = this.parent.parent.name;
+        await stopStreamingLogs(app, this.instance);
     }
 }

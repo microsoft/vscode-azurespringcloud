@@ -108,7 +108,7 @@ export class AppTreeItem extends AzureParentTreeItem {
         const deleting: string = localize('deletingSpringCLoudApp', 'Deleting Spring Cloud app "{0}"...', this.name);
         const deleted: string = localize('deletedSpringCLoudApp', 'Successfully deleted Spring Cloud app "{0}".', this.name);
 
-        await window.withProgress({location: ProgressLocation.Notification, title: deleting}, async (): Promise<void> => {
+        await window.withProgress({ location: ProgressLocation.Notification, title: deleting }, async (): Promise<void> => {
             ext.outputChannel.appendLog(deleting);
             await this.client.apps.deleteMethod(this.resourceGroup, this.serviceName, this.name);
             window.showInformationMessage(deleted);
@@ -138,6 +138,10 @@ export class AppTreeItem extends AzureParentTreeItem {
         return undefined;
     }
 
+    public async getTestKeys(): Promise<TestKeys> {
+        return await this.client.services.listTestKeys(this.resourceGroup, this.serviceName);
+    }
+
     public async getTestEndpoint(): Promise<string | undefined> {
         const testKeys: TestKeys | undefined = await this.client.services.listTestKeys(this.resourceGroup, this.serviceName);
         return `${testKeys.primaryTestEndpoint}/${this.name}/default`;
@@ -147,7 +151,7 @@ export class AppTreeItem extends AzureParentTreeItem {
         const isPublic: boolean = this.app.properties?.publicProperty ?? false;
         const doing: string = isPublic ? 'Unassigning public endpoint.' : 'Assigning public endpoint.';
         const done: string = isPublic ? 'Successfully unassigned public endpoint.' : 'Successfully assigned public endpoint.';
-        await window.withProgress({location: ProgressLocation.Notification, title: doing}, async (): Promise<void> => {
+        await window.withProgress({ location: ProgressLocation.Notification, title: doing }, async (): Promise<void> => {
             ext.outputChannel.appendLog(doing);
             await this.client.apps.createOrUpdate(this.resourceGroup, this.serviceName, this.name, {
                 properties: {
@@ -164,7 +168,7 @@ export class AppTreeItem extends AzureParentTreeItem {
     public async getActiveDeployment(force: boolean = false): Promise<DeploymentResource> {
         const deploymentName: string = this.app.properties?.activeDeploymentName!;
         if (force || !this.deployment) {
-            this.deployment = await this.client.deployments.get(this.resourceGroup, this.serviceName, this.name, deploymentName!);
+            this.deployment = await this.client.deployments.get(this.resourceGroup, this.serviceName, this.name, deploymentName);
         }
         return this.deployment;
     }
@@ -183,7 +187,7 @@ export class AppTreeItem extends AzureParentTreeItem {
         executeSteps.push(new UploadArtifactStep());
         executeSteps.push(new UpdateDeploymentStep());
         const title: string = localize('deployingArtifact', 'Deploying artifact to "{0}"', this.name);
-        const wizard: AzureWizard<IAppDeploymentWizardContext> = new AzureWizard(wizardContext, {executeSteps, title});
+        const wizard: AzureWizard<IAppDeploymentWizardContext> = new AzureWizard(wizardContext, { executeSteps, title });
         await wizard.execute();
     }
 

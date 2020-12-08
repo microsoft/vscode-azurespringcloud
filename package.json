@@ -446,6 +446,7 @@
         "@types/gulp": "^4.0.6",
         "@types/mocha": "^7.0.2",
         "@types/node": "^12.0.0",
+        "@types/request": "^2.48.4",
         "@types/vscode": "1.48.0",
         "glob": "^7.1.6",
         "gulp": "^4.0.2",
@@ -467,6 +468,8 @@
         "@azure/arm-appplatform": "^1.0.0",
         "@azure/storage-file-share": "^12.3.0",
         "fs-extra": "^8.1.0",
+        "ms-rest": "^2.5.3",
+        "request": "^2.83.0",
         "vscode-azureextensionui": "^0.34.0",
         "vscode-nls": "^4.1.1"
     },
