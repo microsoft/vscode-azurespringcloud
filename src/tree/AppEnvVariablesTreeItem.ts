@@ -23,7 +23,7 @@ export class AppEnvVariablesTreeItem extends AppSettingsTreeItem {
     }
 
     public async loadMoreChildrenImpl(_clearCache: boolean, _context: IActionContext): Promise<AzExtTreeItem[]> {
-        this.variables = this.deployment.properties?.deploymentSettings?.environmentVariables || {};
+        this.variables = this.deployment.properties?.deploymentSettings?.environmentVariables ?? {};
         return Object.entries(this.variables).map(e => this.toAppSettingItem(e[0], e[1] + '', Object.assign({}, AppEnvVariablesTreeItem._options)));
     }
 

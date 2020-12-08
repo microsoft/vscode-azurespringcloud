@@ -11,9 +11,9 @@ export class UpdateJvmOptionsStep extends AzureWizardExecuteStep<IJvmOptionsUpda
     public async execute(context: IJvmOptionsUpdateWizardContext, progress: Progress<{ message?: string; increment?: number }>): Promise<void> {
         const appId: SpringCloudResourceId = new SpringCloudResourceId(context.app.id!);
         const message: string = localize('updatingJvmOptions', 'Updating JVM Options of Spring Cloud app "{0}"...', appId.appName);
-        progress.report({message});
+        progress.report({ message });
 
-        const client: AppPlatformManagementClient = await createAzureClient(context, AppPlatformManagementClient);
+        const client: AppPlatformManagementClient = createAzureClient(context, AppPlatformManagementClient);
         await client.deployments.update(appId.resourceGroup, appId.serviceName, appId.appName, context.deployment.name!, {
             properties: {
                 deploymentSettings: {

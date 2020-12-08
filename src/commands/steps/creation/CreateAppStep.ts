@@ -13,10 +13,10 @@ export class CreateAppStep extends AzureWizardExecuteStep<IAppCreationWizardCont
 
         const message: string = localize('creatingNewApp', 'Creating and provisioning new app "{0}"...', context.newAppName);
         ext.outputChannel.appendLog(message);
-        progress.report({message});
+        progress.report({ message });
 
         const appName: string = nonNullProp(context, 'newAppName');
-        const client: AppPlatformManagementClient = await createAzureClient(context, AppPlatformManagementClient);
+        const client: AppPlatformManagementClient = createAzureClient(context, AppPlatformManagementClient);
         const serviceId: SpringCloudResourceId = new SpringCloudResourceId(context.service.id!);
         context.newApp = await client.apps.createOrUpdate(serviceId.resourceGroup, serviceId.serviceName, appName, {
             properties: {

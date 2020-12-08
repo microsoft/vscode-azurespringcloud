@@ -66,12 +66,12 @@
             },
             {
                 "command": "azureSpringCloud.subscription.createServiceFromPortal",
-                "title": "%azureSpringCloud.msg.subscription.createServiceFromPortal%",
+                "title": "%azureSpringCloud.menu.subscription.createServiceFromPortal%",
                 "category": "Azure Spring Cloud"
             },
             {
                 "command": "azureSpringCloud.common.refresh",
-                "title": "%azureSpringCloud.msg.common.refresh%",
+                "title": "%azureSpringCloud.menu.common.refresh%",
                 "category": "Azure Spring Cloud",
                 "icon": {
                     "light": "resources/light/refresh.svg",
@@ -80,82 +80,82 @@
             },
             {
                 "command": "azureSpringCloud.common.openInPortal",
-                "title": "%azureSpringCloud.msg.common.openInPortal%",
+                "title": "%azureSpringCloud.menu.common.openInPortal%",
                 "category": "Azure Spring Cloud"
             },
             {
                 "command": "azureSpringCloud.service.createApp",
-                "title": "%azureSpringCloud.msg.service.createApp%",
+                "title": "%azureSpringCloud.menu.service.createApp%",
                 "category": "Azure Spring Cloud"
             },
             {
                 "command": "azureSpringCloud.service.delete",
-                "title": "%azureSpringCloud.msg.common.delete%",
+                "title": "%azureSpringCloud.menu.common.delete%",
                 "category": "Azure Spring Cloud"
             },
             {
                 "command": "azureSpringCloud.common.viewProperties",
-                "title": "%azureSpringCloud.msg.common.viewProperties%",
+                "title": "%azureSpringCloud.menu.common.viewProperties%",
                 "category": "Azure Spring Cloud"
             },
             {
                 "command": "azureSpringCloud.app.openPublicEndpoint",
-                "title": "%azureSpringCloud.msg.app.openPublicEndpoint%",
+                "title": "%azureSpringCloud.menu.app.openPublicEndpoint%",
                 "category": "Azure Spring Cloud"
             },
             {
                 "command": "azureSpringCloud.app.openTestEndpoint",
-                "title": "%azureSpringCloud.msg.app.openTestEndpoint%",
+                "title": "%azureSpringCloud.menu.app.openTestEndpoint%",
                 "category": "Azure Spring Cloud"
             },
             {
                 "command": "azureSpringCloud.app.start",
-                "title": "%azureSpringCloud.msg.common.start%",
+                "title": "%azureSpringCloud.menu.common.start%",
                 "category": "Azure Spring Cloud"
             },
             {
                 "command": "azureSpringCloud.app.stop",
-                "title": "%azureSpringCloud.msg.common.stop%",
+                "title": "%azureSpringCloud.menu.common.stop%",
                 "category": "Azure Spring Cloud"
             },
             {
                 "command": "azureSpringCloud.app.restart",
-                "title": "%azureSpringCloud.msg.common.restart%",
+                "title": "%azureSpringCloud.menu.common.restart%",
                 "category": "Azure Spring Cloud"
             },
             {
                 "command": "azureSpringCloud.app.delete",
-                "title": "%azureSpringCloud.msg.common.delete%",
+                "title": "%azureSpringCloud.menu.common.delete%",
                 "category": "Azure Spring Cloud"
             },
             {
                 "command": "azureSpringCloud.app.deploy",
-                "title": "%azureSpringCloud.msg.app.deploy%",
+                "title": "%azureSpringCloud.menu.app.deploy%",
                 "category": "Azure Spring Cloud"
             },
             {
                 "command": "azureSpringCloud.app.instance.startStreamingLog",
-                "title": "%azureSpringCloud.msg.app.instance.startStreamingLog%",
+                "title": "%azureSpringCloud.menu.app.instance.startStreamingLog%",
                 "category": "Azure Spring Cloud"
             },
             {
                 "command": "azureSpringCloud.app.instance.stopStreamingLog",
-                "title": "%azureSpringCloud.msg.app.instance.stopStreamingLog%",
+                "title": "%azureSpringCloud.menu.app.instance.stopStreamingLog%",
                 "category": "Azure Spring Cloud"
             },
             {
                 "command": "azureSpringCloud.app.settings.addSetting",
-                "title": "%azureSpringCloud.msg.common.add%",
+                "title": "%azureSpringCloud.menu.common.add%",
                 "category": "Azure Spring Cloud"
             },
             {
                 "command": "azureSpringCloud.app.settings.edit",
-                "title": "%azureSpringCloud.msg.common.edit%",
+                "title": "%azureSpringCloud.menu.common.edit%",
                 "category": "Azure Spring Cloud"
             },
             {
                 "command": "azureSpringCloud.common.toggleVisibility",
-                "title": "%azureSpringCloud.msg.common.toggleVisibility%",
+                "title": "%azureSpringCloud.menu.common.toggleVisibility%",
                 "category": "Azure Spring Cloud",
                 "icon": {
                     "light": "resources/light/Visible.svg",
@@ -164,17 +164,17 @@
             },
             {
                 "command": "azureSpringCloud.app.setting.edit",
-                "title": "%azureSpringCloud.msg.common.edit%",
+                "title": "%azureSpringCloud.menu.common.edit%",
                 "category": "Azure Spring Cloud"
             },
             {
                 "command": "azureSpringCloud.app.setting.delete",
-                "title": "%azureSpringCloud.msg.common.delete%",
+                "title": "%azureSpringCloud.menu.common.delete%",
                 "category": "Azure Spring Cloud"
             },
             {
                 "command": "azureSpringCloud.common.loadMore",
-                "title": "%azureSpringCloud.msg.common.loadMore%",
+                "title": "%azureSpringCloud.menu.common.loadMore%",
                 "category": "Azure Spring Cloud"
             }
         ],

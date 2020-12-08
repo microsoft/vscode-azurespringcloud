@@ -10,7 +10,7 @@ export class UpdateScaleSettingsStep extends AzureWizardExecuteStep<IScaleSettin
     public priority: number = 145;
 
     private static toResource(context: IScaleSettingsUpdateWizardContext): DeploymentResource {
-        const resource: DeploymentResource = {properties: {deploymentSettings: {cpu: context.newSettings.cpu, memoryInGB: context.newSettings.memory}}};
+        const resource: DeploymentResource = { properties: { deploymentSettings: { cpu: context.newSettings.cpu, memoryInGB: context.newSettings.memory } } };
         if (context.newSettings.capacity !== undefined) {
             context.deployment.sku!.capacity = context.newSettings.capacity;
             resource.sku = context.deployment.sku;
@@ -21,9 +21,9 @@ export class UpdateScaleSettingsStep extends AzureWizardExecuteStep<IScaleSettin
     public async execute(context: IScaleSettingsUpdateWizardContext, progress: Progress<{ message?: string; increment?: number }>): Promise<void> {
         const appId: SpringCloudResourceId = new SpringCloudResourceId(context.app.id!);
         const message: string = localize('updatingJvmOptions', 'Updating scale settings of Spring Cloud app "{0}"...', appId.appName);
-        progress.report({message});
+        progress.report({ message });
 
-        const client: AppPlatformManagementClient = await createAzureClient(context, AppPlatformManagementClient);
+        const client: AppPlatformManagementClient = createAzureClient(context, AppPlatformManagementClient);
         const resource: DeploymentResource = UpdateScaleSettingsStep.toResource(context);
         await client.deployments.update(appId.resourceGroup, appId.serviceName, appId.appName, context.deployment.name!, resource);
         return Promise.resolve(undefined);

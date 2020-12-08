@@ -15,8 +15,8 @@ export class InputNumberStep extends AzureWizardPromptStep<IScaleSettingsUpdateW
 
     public async prompt(context: IScaleSettingsUpdateWizardContext): Promise<void> {
         const prompt: string = localize('numberInputPrompt', 'Enter new value of "{0}".', this.label);
-        const value: string = context.newSettings[this.key] + '';
-        context.newSettings[this.key] = Number((await ext.ui.showInputBox({prompt, value, validateInput: this.validateInput})).trim());
+        const value: string = `${context.newSettings[this.key]}`;
+        context.newSettings[this.key] = Number((await ext.ui.showInputBox({ prompt, value, validateInput: this.validateInput })).trim());
         return Promise.resolve(undefined);
     }
 

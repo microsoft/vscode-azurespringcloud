@@ -31,7 +31,7 @@ export namespace AppCommands {
 
     export async function stopApp(context: IActionContext, node?: AppTreeItem): Promise<AppTreeItem> {
         node = await getNode(node, context);
-        await ext.ui.showWarningMessage(`Are you sure to stop Spring Cloud Service "${node.name}"?`, {modal: true}, DialogResponses.yes);
+        await ext.ui.showWarningMessage(`Are you sure to stop Spring Cloud Service "${node.name}"?`, { modal: true }, DialogResponses.yes);
         await node.runWithTemporaryDescription(localize('stopping', 'Stopping...'), async () => {
             return node!.stop();
         });
@@ -48,8 +48,8 @@ export namespace AppCommands {
 
     export async function deleteApp(context: IActionContext, node?: AppTreeItem): Promise<void> {
         node = await getNode(node, context);
-        await ext.ui.showWarningMessage(`Are you sure to delete Spring Cloud App "${node.name}"?`, {modal: true}, DialogResponses.deleteResponse);
-        await node!.deleteTreeItem(context);
+        await ext.ui.showWarningMessage(`Are you sure to delete Spring Cloud App "${node.name}"?`, { modal: true }, DialogResponses.deleteResponse);
+        await node.deleteTreeItem(context);
     }
 
     export async function deploy(context: IActionContext, node?: AppTreeItem): Promise<AppTreeItem> {
@@ -62,11 +62,9 @@ export namespace AppCommands {
             }
         };
         const fileUri: Uri[] | undefined = await window.showOpenDialog(options);
-        if (fileUri && fileUri[0]) {
+        if (fileUri && fileUri[0] !== undefined) {
             const artifactUrl: string = fileUri[0].fsPath;
-            await node.runWithTemporaryDescription(localize('deploying', 'Deploying...'), async () => {
-                return await node!.deployArtifact(context, artifactUrl);
-            });
+            await node.runWithTemporaryDescription(localize('deploying', 'Deploying...'), async () => node!.deployArtifact(context, artifactUrl));
         }
         return node;
     }
@@ -95,20 +93,20 @@ export namespace AppCommands {
 
     export async function editSetting(context: IActionContext, node: AppSettingTreeItem): Promise<AppSettingTreeItem> {
         const prompt: string = node.key ? `Enter new value of "${node.key}"` : `Update ${node.typeLabel}`;
-        const newVal: string = await ext.ui.showInputBox({prompt, value: node.value});
+        const newVal: string = await ext.ui.showInputBox({ prompt, value: node.value });
         if (newVal?.trim()) {
             await node.runWithTemporaryDescription(localize('editing', 'Editing...'), async () => {
                 await node.updateValue(newVal, context);
             });
             return node;
         } else {
-            return AppCommands.deleteSetting(context, node);
+            return deleteSetting(context, node);
         }
     }
 
     export async function deleteSetting(context: IActionContext, node: AppSettingTreeItem): Promise<AppSettingTreeItem> {
         if (node.deletable) {
-            await ext.ui.showWarningMessage(`Are you sure to delete ${node.typeLabel} "${node.id}"?`, {modal: true}, DialogResponses.deleteResponse);
+            await ext.ui.showWarningMessage(`Are you sure to delete ${node.typeLabel} "${node.id}"?`, { modal: true }, DialogResponses.deleteResponse);
             await node.runWithTemporaryDescription(localize('deleting', 'Deleting...'), async () => {
                 await node.deleteTreeItem(context);
             });

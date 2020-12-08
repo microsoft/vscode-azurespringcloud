@@ -36,7 +36,11 @@ export abstract class AppSettingsTreeItem extends AzureParentTreeItem {
     public async toggleVisibility(context: IActionContext): Promise<void> {
         const settings: AppSettingTreeItem[] = <AppSettingTreeItem[]>await ext.tree.getChildren(this);
         const hidden: boolean = settings.every(s => s.hidden);
-        settings.forEach(s => s.toggleVisibility && s.toggleVisibility(context, !hidden));
+        settings.forEach(async s => {
+            if (s.toggleVisibility !== undefined) {
+                await s.toggleVisibility(context, !hidden);
+            }
+        });
     }
 
     public async refreshImpl(): Promise<void> {

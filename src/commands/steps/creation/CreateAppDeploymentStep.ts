@@ -8,18 +8,21 @@ import { localize, nonNullProp } from "../../../utils";
 import { IAppCreationWizardContext } from "./IAppCreationWizardContext";
 
 export class CreateAppDeploymentStep extends AzureWizardExecuteStep<IAppCreationWizardContext> {
+
+    // tslint:disable-next-line: no-unexternalized-strings
+    private static readonly DEFAULT_RUNTIME: RuntimeVersion = "Java_8";
     public priority: number = 140;
 
     public async execute(context: IAppCreationWizardContext, progress: Progress<{ message?: string; increment?: number }>): Promise<void> {
 
         const message: string = localize('creatingNewAppDeployment', 'Creating default deployment...');
         ext.outputChannel.appendLog(message);
-        progress.report({message});
+        progress.report({ message });
 
         const appRuntime: RuntimeVersion = nonNullProp(context, 'newAppRuntime');
         const deploymentName: string = 'default';
 
-        const client: AppPlatformManagementClient = await createAzureClient(context, AppPlatformManagementClient);
+        const client: AppPlatformManagementClient = createAzureClient(context, AppPlatformManagementClient);
         const appId: SpringCloudResourceId = new SpringCloudResourceId(context.newApp!.id!);
         context.newDeployment = await client.deployments.createOrUpdate(appId.resourceGroup, appId.serviceName, appId.appName, deploymentName, {
             properties: {
@@ -29,7 +32,7 @@ export class CreateAppDeploymentStep extends AzureWizardExecuteStep<IAppCreation
                 },
                 deploymentSettings: {
                     memoryInGB: 1,
-                    runtimeVersion: appRuntime || "Java_8"
+                    runtimeVersion: appRuntime ?? CreateAppDeploymentStep.DEFAULT_RUNTIME
                 },
             },
             sku: {

@@ -39,11 +39,11 @@ export function registerCommands(): void {
 }
 
 async function refreshNode(_context: IActionContext, node?: AzureTreeItem): Promise<void> {
-    return await ext.tree.refresh(node);
+    return ext.tree.refresh(node);
 }
 
 async function loadMore(context: IActionContext, node: AzureTreeItem): Promise<void> {
-    return await ext.tree.loadMore(node, context);
+    return ext.tree.loadMore(node, context);
 }
 
 async function openPortal(_context: IActionContext, node: AzureTreeItem): Promise<void> {

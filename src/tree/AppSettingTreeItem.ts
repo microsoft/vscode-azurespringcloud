@@ -19,7 +19,7 @@ export class AppSettingTreeItem extends AzureTreeItem {
 
     private readonly _options: IOptions;
 
-    public constructor(parent: AzureParentTreeItem, key: string, value: string, options: IOptions = {hidden: false, deletable: true}) {
+    public constructor(parent: AzureParentTreeItem, key: string, value: string, options: IOptions = { hidden: false, deletable: true }) {
         super(parent);
         this.key = key;
         this._value = value;
@@ -51,7 +51,7 @@ export class AppSettingTreeItem extends AzureTreeItem {
     }
 
     public get typeLabel(): string {
-        return this._options.typeLabel || 'Setting';
+        return this._options.typeLabel || 'setting';
     }
 
     public get deletable(): boolean {

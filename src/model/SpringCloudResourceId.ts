@@ -2,6 +2,7 @@ export class SpringCloudResourceId {
     private readonly parts: string[];
 
     public constructor(id: string) {
+        // tslint:disable-next-line: no-unexternalized-strings
         this.parts = id.split("/");
     }
 

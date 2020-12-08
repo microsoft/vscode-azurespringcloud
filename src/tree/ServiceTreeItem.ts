@@ -37,7 +37,7 @@ export class ServiceTreeItem extends AzureParentTreeItem {
     public service: ServiceResource;
 
     private _nextLink: string | undefined;
-    private resourceId: SpringCloudResourceId;
+    private readonly resourceId: SpringCloudResourceId;
 
     constructor(parent: AzureParentTreeItem, service: ServiceResource) {
         super(parent);
@@ -109,7 +109,7 @@ export class ServiceTreeItem extends AzureParentTreeItem {
         const deleting: string = localize('deletingSpringCLoudService', 'Deleting Spring Cloud service "{0}"...', this.name);
         const deleted: string = localize('deletedSpringCloudService', 'Successfully deleted Spring Cloud service "{0}".', this.name);
 
-        await window.withProgress({location: ProgressLocation.Notification, title: deleting}, async (): Promise<void> => {
+        await window.withProgress({ location: ProgressLocation.Notification, title: deleting }, async (): Promise<void> => {
             ext.outputChannel.appendLog(deleting);
             await this.client.services.deleteMethod(this.resourceGroup, this.name);
             window.showInformationMessage(deleted);
@@ -131,7 +131,7 @@ export class ServiceTreeItem extends AzureParentTreeItem {
         executeSteps.push(new CreateAppDeploymentStep());
         executeSteps.push(new UpdateAppStep());
         const title: string = localize('creatingSpringCouldApp', 'Creating new Spring Cloud App in Azure');
-        const wizard: AzureWizard<IAppCreationWizardContext> = new AzureWizard(wizardContext, {promptSteps, executeSteps, title});
+        const wizard: AzureWizard<IAppCreationWizardContext> = new AzureWizard(wizardContext, { promptSteps, executeSteps, title });
 
         await wizard.prompt();
         const appName: string = nonNullProp(wizardContext, 'newAppName');

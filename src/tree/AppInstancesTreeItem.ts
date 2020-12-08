@@ -18,6 +18,7 @@ export class AppInstancesTreeItem extends AzureParentTreeItem {
     public readonly id: string = AppInstancesTreeItem.contextValue;
     public readonly label: string = 'App Instances';
     public readonly parent: AppTreeItem;
+    public readonly iconPath: TreeItemIconPath = TreeUtils.getIconPath('azure-springcloud-app-instances');
     private deployment: DeploymentResource;
 
     public constructor(parent: AppTreeItem, deployment: DeploymentResource) {
@@ -27,10 +28,6 @@ export class AppInstancesTreeItem extends AzureParentTreeItem {
 
     public get client(): AppPlatformManagementClient {
         return createAzureClient(this.root, AppPlatformManagementClient);
-    }
-
-    public get iconPath(): TreeItemIconPath {
-        return TreeUtils.getIconPath('azure-springcloud-app-instances');
     }
 
     public hasMoreChildrenImpl(): boolean {

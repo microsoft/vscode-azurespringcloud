@@ -47,6 +47,7 @@
             {
                 "signatures": [
                     "localize",
+                    "registerCommand",
                     "nls.localize"
                 ],
                 "keyIndex": 0,
@@ -89,8 +90,7 @@
         "no-dynamic-delete": false,
         "trailing-comma": false,
         "no-submodule-imports": false,
-        "no-non-null-assertion": false,
-        "no-unexternalized-strings": false
+        "no-non-null-assertion": false
     },
     "linterOptions": {
         "exclude": [
