@@ -25,6 +25,7 @@ export function registerCommands(): void {
     registerCommand("azureSpringCloud.service.delete", ServiceCommands.deleteService);
     registerCommand("azureSpringCloud.app.openPublicEndpoint", AppCommands.openPublicEndpoint);
     registerCommand("azureSpringCloud.app.openTestEndpoint", AppCommands.openTestEndpoint);
+    registerCommand("azureSpringCloud.app.toggleEndpoint", AppCommands.toggleEndpoint);
     registerCommand("azureSpringCloud.app.start", AppCommands.startApp);
     registerCommand("azureSpringCloud.app.stop", AppCommands.stopApp);
     registerCommand("azureSpringCloud.app.restart", AppCommands.restartApp);

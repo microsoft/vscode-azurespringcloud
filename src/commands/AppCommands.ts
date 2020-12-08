@@ -13,6 +13,11 @@ export namespace AppCommands {
     export async function openPublicEndpoint(context: IActionContext, node?: AppTreeItem): Promise<void> {
         node = await getNode(node, context);
         const endPoint: string | undefined = await node.getPublicEndpoint();
+        if (!endPoint || endPoint.toLowerCase() === 'none') {
+            window.showWarningMessage(localize('noPublicEndpoint', "App[{0}] has not been assigned public endpoint.", node.name));
+            await ext.ui.showWarningMessage(`App[${node.name}] has not been assigned public endpoint. Do you want to set it public?`, {modal: true}, DialogResponses.yes);
+            await AppCommands.toggleEndpoint(context, node)
+        }
         await openUrl(endPoint!);
     }
 
@@ -20,6 +25,11 @@ export namespace AppCommands {
         node = await getNode(node, context);
         const endpoint: string | undefined = await node.getTestEndpoint();
         await openUrl(endpoint!);
+    }
+
+    export async function toggleEndpoint(context: IActionContext, node?: AppTreeItem): Promise<void> {
+        node = await getNode(node, context);
+        await node.toggleEndpoint(context);
     }
 
     export async function startApp(context: IActionContext, node?: AppTreeItem): Promise<AppTreeItem> {

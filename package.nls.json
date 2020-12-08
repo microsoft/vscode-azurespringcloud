@@ -16,6 +16,7 @@
     "azureSpringCloud.menu.service.createApp": "Create App",
     "azureSpringCloud.menu.app.openPublicEndpoint": "Access Public Endpoint",
     "azureSpringCloud.menu.app.openTestEndpoint": "Access Test Endpoint",
+    "azureSpringCloud.menu.app.toggleEndpoint": "Assign/Unassign Public Endpoint",
     "azureSpringCloud.menu.app.deploy": "Deploy",
     "azureSpringCloud.menu.app.scale": "Scale",
     "azureSpringCloud.menu.app.instance.startStreamingLog": "Start Streaming Logs",

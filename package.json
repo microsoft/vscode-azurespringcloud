@@ -39,6 +39,7 @@
         "onCommand:azureSpringCloud.service.delete",
         "onCommand:azureSpringCloud.app.openPublicEndpoint",
         "onCommand:azureSpringCloud.app.openTestEndpoint",
+        "onCommand:azureSpringCloud.app.toggleEndpoint",
         "onCommand:azureSpringCloud.app.start",
         "onCommand:azureSpringCloud.app.stop",
         "onCommand:azureSpringCloud.app.restart",
@@ -107,6 +108,11 @@
             {
                 "command": "azureSpringCloud.app.openTestEndpoint",
                 "title": "%azureSpringCloud.menu.app.openTestEndpoint%",
+                "category": "Azure Spring Cloud"
+            },
+            {
+                "command": "azureSpringCloud.app.toggleEndpoint",
+                "title": "%azureSpringCloud.menu.app.toggleEndpoint%",
                 "category": "Azure Spring Cloud"
             },
             {
@@ -269,6 +275,11 @@
                     "command": "azureSpringCloud.app.openTestEndpoint",
                     "when": "view == azureSpringCloud && viewItem == azureSpringCloud.app",
                     "group": "2@2"
+                },
+                {
+                    "command": "azureSpringCloud.app.toggleEndpoint",
+                    "when": "view == azureSpringCloud && viewItem == azureSpringCloud.app",
+                    "group": "3@1"
                 },
                 {
                     "command": "azureSpringCloud.app.start",

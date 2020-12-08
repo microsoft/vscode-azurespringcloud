@@ -132,12 +132,33 @@ export class AppTreeItem extends AzureParentTreeItem {
     }
 
     public async getPublicEndpoint(): Promise<string | undefined> {
-        return this.app.properties?.url;
+        if (this.app.properties?.url && this.app.properties?.url !== 'None') {
+            return this.app.properties?.url;
+        }
+        return undefined;
     }
 
     public async getTestEndpoint(): Promise<string | undefined> {
         const testKeys: TestKeys | undefined = await this.client.services.listTestKeys(this.resourceGroup, this.serviceName);
         return `${testKeys.primaryTestEndpoint}/${this.name}/default`;
+    }
+
+    public async toggleEndpoint(_context: IActionContext): Promise<void> {
+        const isPublic: boolean = this.app.properties?.publicProperty ?? false;
+        const doing: string = isPublic ? 'Unassigning public endpoint.' : 'Assigning public endpoint.';
+        const done: string = isPublic ? 'Successfully unassigned public endpoint.' : 'Successfully assigned public endpoint.';
+        await window.withProgress({location: ProgressLocation.Notification, title: doing}, async (): Promise<void> => {
+            ext.outputChannel.appendLog(doing);
+            await this.client.apps.createOrUpdate(this.resourceGroup, this.serviceName, this.name, {
+                properties: {
+                    activeDeploymentName: this.deployment?.name,
+                    publicProperty: !isPublic
+                }
+            });
+            window.showInformationMessage(done);
+            ext.outputChannel.appendLog(done);
+        });
+        this.refresh();
     }
 
     public async getActiveDeployment(force: boolean = false): Promise<DeploymentResource> {
