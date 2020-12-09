@@ -10,7 +10,7 @@ jobs:
   steps:
   - template: common/build.yml
   - template: common/lint.yml
-  - template: compliance/compliance.yml # Only works on Windows
+  # - template: compliance/compliance.yml # Only works on Windows
   - template: common/test.yml
 
 - job: Linux
