@@ -16,7 +16,7 @@ export class AppJvmOptionsTreeItem extends AppSettingsTreeItem {
         hidden: false,
         contextValue: 'azureSpringCloud.app.jvmOption',
     };
-    private static readonly JVM_OPTION_PATTERN: RegExp = /^-[a-zA-Z_]+\S*$/; //TODO: @wangmi confirm
+    private static readonly JVM_OPTION_PATTERN: RegExp = /^-[a-zA-Z_]+\S*$/;
     public readonly contextValue: string = AppJvmOptionsTreeItem.contextValue;
     public readonly id: string = AppJvmOptionsTreeItem.contextValue;
     public readonly label: string = 'JVM Options';
@@ -27,7 +27,10 @@ export class AppJvmOptionsTreeItem extends AppSettingsTreeItem {
 
     public get options(): string[] {
         const optionsStr: string | undefined = this.deployment.properties?.deploymentSettings?.jvmOptions?.trim();
-        return optionsStr ? optionsStr?.split(/\s+/) : [];
+        if (optionsStr) {
+            return ` ${optionsStr}`.split(/\s+-/).filter(s => s.trim()).map(s => `-${s}`);
+        }
+        return [];
     }
 
     public async loadMoreChildrenImpl(_clearCache: boolean, _context: IActionContext): Promise<AzExtTreeItem[]> {

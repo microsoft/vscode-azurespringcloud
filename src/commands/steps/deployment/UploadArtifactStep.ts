@@ -12,7 +12,7 @@ export class UploadArtifactStep extends AzureWizardExecuteStep<IAppDeploymentWiz
 
         const message: string = localize('uploadingArtifact', 'Uploading artifact "{0}" to Azure...', context.artifactUrl);
         ext.outputChannel.appendLog(message);
-        progress.report({message});
+        progress.report({ message });
 
         const fileClient: ShareFileClient = new ShareFileClient(context.uploadDefinition.uploadUrl!, new AnonymousCredential());
         await fileClient.uploadFile(context.artifactUrl);

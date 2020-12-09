@@ -1,11 +1,11 @@
 import { DeploymentResource } from "@azure/arm-appplatform/esm/models";
+import { ProgressLocation, window } from "vscode";
 import { AzExtTreeItem, IActionContext, ICreateChildImplContext } from "vscode-azureextensionui";
 import { ext } from "../extensionVariables";
 import { localize } from "../utils";
 import { AppSettingsTreeItem } from "./AppSettingsTreeItem";
 import { AppSettingTreeItem, IOptions } from "./AppSettingTreeItem";
 import { AppTreeItem } from "./AppTreeItem";
-import { ProgressLocation, window } from "vscode";
 
 export class AppEnvVariablesTreeItem extends AppSettingsTreeItem {
     public static contextValue: string = 'azureSpringCloud.app.envVariables';
@@ -64,7 +64,7 @@ export class AppEnvVariablesTreeItem extends AppSettingsTreeItem {
             validateInput: AppEnvVariablesTreeItem.validateVal
         });
         context.showCreatingTreeItem(newKey);
-        await this.updateSettingsValue(context, {...this.variables, [newKey]: newVal.trim()});
+        await this.updateSettingsValue(context, { ...this.variables, [newKey]: newVal.trim() });
         return this.toAppSettingItem(newKey, newVal, Object.assign({}, AppEnvVariablesTreeItem._options));
     }
 
@@ -74,12 +74,12 @@ export class AppEnvVariablesTreeItem extends AppSettingsTreeItem {
             value: node.value,
             validateInput: AppEnvVariablesTreeItem.validateVal
         });
-        await this.updateSettingsValue(context, {...this.variables, [node.key.trim()]: newVal.trim()});
+        await this.updateSettingsValue(context, { ...this.variables, [node.key.trim()]: newVal.trim() });
         return newVal;
     }
 
     public async deleteSettingItem(node: AppSettingTreeItem, context: IActionContext): Promise<void> {
-        const tempVars: { [p: string]: string } = {...this.variables};
+        const tempVars: { [p: string]: string } = { ...this.variables };
         delete tempVars[node.key.trim()];
         await this.updateSettingsValue(context, tempVars);
     }
@@ -88,7 +88,7 @@ export class AppEnvVariablesTreeItem extends AppSettingsTreeItem {
         const updating: string = localize('updatingEnvVar', 'Updating environment variables of Spring Cloud app {0}...', this.parent.name);
         const updated: string = localize('updatedEnvVar', 'Successfully updated environment variables of Spring Cloud app {0}.', this.parent.name);
 
-        await window.withProgress({location: ProgressLocation.Notification, title: updating}, async (): Promise<void> => {
+        await window.withProgress({ location: ProgressLocation.Notification, title: updating }, async (): Promise<void> => {
             ext.outputChannel.appendLog(updating);
             await this.client.deployments.update(this.parent.resourceGroup, this.parent.serviceName, this.parent.name, this.deployment.name!, {
                 properties: {

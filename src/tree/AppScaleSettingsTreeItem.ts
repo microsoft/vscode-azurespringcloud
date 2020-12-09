@@ -1,7 +1,7 @@
 import { DeploymentResource, DeploymentSettings } from "@azure/arm-appplatform/esm/models";
 import { window } from "vscode";
 import { AzExtTreeItem, AzureWizard, AzureWizardExecuteStep, AzureWizardPromptStep, IActionContext } from "vscode-azureextensionui";
-import { InputNumberStep } from "../commands/steps/settings/scalesettings/InputNumberStep";
+import { InputScaleValueStep } from "../commands/steps/settings/scalesettings/InputScaleValueStep";
 import { IScaleSettings } from "../commands/steps/settings/scalesettings/IScaleSettings";
 import { IScaleSettingsUpdateWizardContext } from "../commands/steps/settings/scalesettings/IScaleSettingsUpdateWizardContext";
 import { UpdateScaleSettingsStep } from "../commands/steps/settings/scalesettings/UpdateScaleSettingsStep";
@@ -49,9 +49,9 @@ export class AppScaleSettingsTreeItem extends AppSettingsTreeItem {
         });
 
         const steps: AzureWizardPromptStep<IScaleSettingsUpdateWizardContext>[] = [
-            new InputNumberStep("Capacity", 'capacity', { max: 500, min: 1 }),
-            new InputNumberStep("Memory/GB", 'memory', { max: 8, min: 1 }),
-            new InputNumberStep("vCPU", 'cpu', { max: 4, min: 1 })
+            new InputScaleValueStep("Capacity", 'capacity', { max: 500, min: 1 }),
+            new InputScaleValueStep("Memory/GB", 'memory', { max: 8, min: 1 }),
+            new InputScaleValueStep("vCPU", 'cpu', { max: 4, min: 1 })
         ];
         const promptSteps: AzureWizardPromptStep<IScaleSettingsUpdateWizardContext>[] = [];
         const executeSteps: AzureWizardExecuteStep<IScaleSettingsUpdateWizardContext>[] = [];
@@ -64,8 +64,8 @@ export class AppScaleSettingsTreeItem extends AppSettingsTreeItem {
         const wizard: AzureWizard<IScaleSettingsUpdateWizardContext> = new AzureWizard(wizardContext, { promptSteps, executeSteps, title: scaling });
         await wizard.prompt();
         await wizard.execute();
-        window.showInformationMessage(scaled);
         this.parent.refresh();
+        window.showInformationMessage(scaled);
         return `${wizardContext.newSettings[key ?? 'capacity']}`;
     }
 
@@ -74,6 +74,7 @@ export class AppScaleSettingsTreeItem extends AppSettingsTreeItem {
     }
 
     public async deleteSettingItem(_node: AppSettingTreeItem, _context: IActionContext): Promise<void> {
+        // tslint:disable-next-line:no-unexternalized-strings
         throw new Error("Scale settings can not be deleted.");
     }
 }

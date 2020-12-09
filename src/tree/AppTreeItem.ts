@@ -149,8 +149,8 @@ export class AppTreeItem extends AzureParentTreeItem {
 
     public async toggleEndpoint(_context: IActionContext): Promise<void> {
         const isPublic: boolean = this.app.properties?.publicProperty ?? false;
-        const doing: string = isPublic ? 'Unassigning public endpoint.' : 'Assigning public endpoint.';
-        const done: string = isPublic ? 'Successfully unassigned public endpoint.' : 'Successfully assigned public endpoint.';
+        const doing: string = isPublic ? `Unassigning public endpoint of Spring Cloud app "${this.name}".` : `Assigning public endpoint to Spring Cloud app "${this.name}".`;
+        const done: string = isPublic ? `Successfully unassigned public endpoint of Spring Cloud app "${this.name}".` : `Successfully assigned public endpoint to Spring Cloud app "${this.name}".`;
         await window.withProgress({ location: ProgressLocation.Notification, title: doing }, async (): Promise<void> => {
             ext.outputChannel.appendLog(doing);
             await this.client.apps.createOrUpdate(this.resourceGroup, this.serviceName, this.name, {
@@ -174,6 +174,9 @@ export class AppTreeItem extends AzureParentTreeItem {
     }
 
     public async deployArtifact(context: IActionContext, artifactUrl: string): Promise<void> {
+        const deploying: string = localize('deploying', 'Deploying artifact to Spring Cloud app "{0}".', this.name);
+        const deployed: string = localize('deployed', 'Successfully deployed artifact to Spring Cloud app "{0}".', this.name);
+
         const uploadDefinition: ResourceUploadDefinition = await this.client.apps.getResourceUploadUrl(this.resourceGroup, this.serviceName, this.name);
         const deployment: DeploymentResource = await this.getActiveDeployment();
         const wizardContext: IAppDeploymentWizardContext = Object.assign(context, this.root, {
@@ -186,9 +189,9 @@ export class AppTreeItem extends AzureParentTreeItem {
         const executeSteps: AzureWizardExecuteStep<IAppDeploymentWizardContext>[] = [];
         executeSteps.push(new UploadArtifactStep());
         executeSteps.push(new UpdateDeploymentStep());
-        const title: string = localize('deployingArtifact', 'Deploying artifact to "{0}"', this.name);
-        const wizard: AzureWizard<IAppDeploymentWizardContext> = new AzureWizard(wizardContext, { executeSteps, title });
+        const wizard: AzureWizard<IAppDeploymentWizardContext> = new AzureWizard(wizardContext, { executeSteps, title: deploying });
         await wizard.execute();
+        window.showInformationMessage(deployed);
     }
 
     public async scaleInstances(context: IActionContext): Promise<void> {

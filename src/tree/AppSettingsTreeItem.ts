@@ -48,9 +48,9 @@ export abstract class AppSettingsTreeItem extends AzureParentTreeItem {
         return super.refreshImpl?.();
     }
 
-    public abstract updateSettingValue(node:AppSettingTreeItem, _context: IActionContext): Promise<string>;
+    public abstract updateSettingValue(node: AppSettingTreeItem, _context: IActionContext): Promise<string>;
 
     public abstract updateSettingsValue(_context: IActionContext): Promise<any>;
 
-    public abstract async deleteSettingItem(node:AppSettingTreeItem, _context: IActionContext): Promise<void>;
+    public abstract async deleteSettingItem(node: AppSettingTreeItem, _context: IActionContext): Promise<void>;
 }

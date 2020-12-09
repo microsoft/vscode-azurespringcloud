@@ -9,16 +9,11 @@ export class InputJvmOptionsStep extends AzureWizardPromptStep<IJvmOptionsUpdate
         context.newJvmOptions = (await ext.ui.showInputBox({
             prompt,
             value: context.deployment.properties?.deploymentSettings?.jvmOptions ?? '',
-            validateInput: this.validateInput
         })).trim();
         return Promise.resolve(undefined);
     }
 
     public shouldPrompt(context: IJvmOptionsUpdateWizardContext): boolean {
         return context.newJvmOptions === undefined;
-    }
-
-    private async validateInput(_name: string): Promise<string | undefined> {
-        return undefined; //TODO: validating
     }
 }

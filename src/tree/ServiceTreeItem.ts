@@ -130,15 +130,15 @@ export class ServiceTreeItem extends AzureParentTreeItem {
         executeSteps.push(new CreateAppStep());
         executeSteps.push(new CreateAppDeploymentStep());
         executeSteps.push(new UpdateAppStep());
-        const title: string = localize('creatingSpringCouldApp', 'Creating new Spring Cloud App in Azure');
-        const wizard: AzureWizard<IAppCreationWizardContext> = new AzureWizard(wizardContext, { promptSteps, executeSteps, title });
+        const creating: string = localize('creatingSpringCouldApp', 'Creating new Spring Cloud app in Azure');
+        const wizard: AzureWizard<IAppCreationWizardContext> = new AzureWizard(wizardContext, { promptSteps, executeSteps, title: creating });
 
         await wizard.prompt();
         const appName: string = nonNullProp(wizardContext, 'newAppName');
         context.showCreatingTreeItem(appName);
         await wizard.execute();
-        const createSucceeded: string = localize('createdSpringCouldApp', 'Successfully created Spring Cloud app "{0}".', appName);
-        window.showInformationMessage(createSucceeded);
+        const created: string = localize('createdSpringCouldApp', 'Successfully created Spring Cloud app "{0}".', appName);
+        window.showInformationMessage(created);
 
         return new AppTreeItem(this, nonNullProp(wizardContext, 'newApp'));
     }

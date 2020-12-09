@@ -20,7 +20,7 @@ export class CreateAppStep extends AzureWizardExecuteStep<IAppCreationWizardCont
         const serviceId: SpringCloudResourceId = new SpringCloudResourceId(context.service.id!);
         context.newApp = await client.apps.createOrUpdate(serviceId.resourceGroup, serviceId.serviceName, appName, {
             properties: {
-                publicProperty: true
+                publicProperty: false
             }
         });
         return Promise.resolve(undefined);
