@@ -38,6 +38,7 @@ export class ServiceTreeItem extends AzureParentTreeItem {
 
     private _nextLink: string | undefined;
     private readonly resourceId: SpringCloudResourceId;
+    private deleted: boolean;
 
     constructor(parent: AzureParentTreeItem, service: ServiceResource) {
         super(parent);
@@ -102,7 +103,9 @@ export class ServiceTreeItem extends AzureParentTreeItem {
     }
 
     public async refreshImpl(): Promise<void> {
-        this.service = await this.client.services.get(this.resourceGroup, this.name);
+        if (!this.deleted) {
+            this.service = await this.client.services.get(this.resourceGroup, this.name);
+        }
     }
 
     public async deleteTreeItemImpl(): Promise<void> {
@@ -115,6 +118,7 @@ export class ServiceTreeItem extends AzureParentTreeItem {
             window.showInformationMessage(deleted);
             ext.outputChannel.appendLog(deleted);
         });
+        this.deleted = true;
     }
 
     public async createChildImpl(context: ICreateChildImplContext): Promise<AzExtTreeItem> {

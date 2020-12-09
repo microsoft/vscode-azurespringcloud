@@ -14,7 +14,7 @@ export class AppSettingTreeItem extends AzureTreeItem {
     public static contextValue: string = 'azureSpringCloud.app.setting';
     public readonly parent: AppSettingsTreeItem;
     public readonly key: string;
-    public _value: string;
+    public readonly _value: string;
 
     private readonly _options: IOptions;
 
@@ -66,8 +66,7 @@ export class AppSettingTreeItem extends AzureTreeItem {
     }
 
     public async updateValue(context: IActionContext): Promise<void> {
-        this._value = await this.parent.updateSettingValue(this, context);
-        await this.refresh();
+        await this.parent.updateSettingValue(this, context);
     }
 
     public async deleteTreeItemImpl(context: IActionContext): Promise<void> {

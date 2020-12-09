@@ -33,6 +33,7 @@ export class AppTreeItem extends AzureParentTreeItem {
     public app: AppResource;
     private deployment: DeploymentResource | undefined;
     private scaleSettingsTreeItem: AppScaleSettingsTreeItem;
+    private deleted: boolean;
 
     constructor(parent: ServiceTreeItem, resource: AppResource) {
         super(parent);
@@ -114,21 +115,22 @@ export class AppTreeItem extends AzureParentTreeItem {
             window.showInformationMessage(deleted);
             ext.outputChannel.appendLog(deleted);
         });
+        this.deleted = true;
     }
 
     public async start(): Promise<void> {
         await this.client.deployments.start(this.resourceGroup, this.serviceName, this.name, this.app.properties?.activeDeploymentName!);
-        await this.refresh();
+        this.refresh();
     }
 
     public async stop(): Promise<void> {
         await this.client.deployments.stop(this.resourceGroup, this.serviceName, this.name, this.app.properties?.activeDeploymentName!);
-        await this.refresh();
+        this.refresh();
     }
 
     public async restart(): Promise<void> {
         await this.client.deployments.restart(this.resourceGroup, this.serviceName, this.name, this.app.properties?.activeDeploymentName!);
-        await this.refresh();
+        this.refresh();
     }
 
     public async getPublicEndpoint(): Promise<string | undefined> {
@@ -199,7 +201,9 @@ export class AppTreeItem extends AzureParentTreeItem {
     }
 
     public async refreshImpl(): Promise<void> {
-        this.app = await this.client.apps.get(this.resourceGroup, this.serviceName, this.name);
-        this.deployment = await this.getActiveDeployment(true);
+        if (!this.deleted) {
+            this.app = await this.client.apps.get(this.resourceGroup, this.serviceName, this.name);
+            this.deployment = await this.getActiveDeployment(true);
+        }
     }
 }
