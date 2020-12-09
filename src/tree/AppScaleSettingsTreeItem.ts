@@ -16,6 +16,12 @@ export class AppScaleSettingsTreeItem extends AppSettingsTreeItem {
         hidden: false,
         contextValue: 'azureSpringCloud.app.scaleSetting',
     };
+    private static readonly LABELS: { [key: string]: string } = {
+        cpu: "vCPU",
+        memory: "Memory/GB",
+        capacity: "Capacity"
+    };
+
     public readonly contextValue: string = AppScaleSettingsTreeItem.contextValue;
     public readonly id: string = AppScaleSettingsTreeItem.contextValue;
     public readonly label: string = 'Scale Settings';
@@ -34,7 +40,7 @@ export class AppScaleSettingsTreeItem extends AppSettingsTreeItem {
     }
 
     public async loadMoreChildrenImpl(_clearCache: boolean, _context: IActionContext): Promise<AzExtTreeItem[]> {
-        return Object.entries(this.settings).map(e => this.toAppSettingItem(e[0], `${e[1]}`, Object.assign({}, AppScaleSettingsTreeItem._options)));
+        return Object.entries(this.settings).map(e => this.toAppSettingItem(e[0], `${e[1]}`, Object.assign({ label: AppScaleSettingsTreeItem.LABELS[e[0]] }, AppScaleSettingsTreeItem._options)));
     }
 
     public async updateSettingsValue(context: IActionContext, key?: string): Promise<string> {
@@ -49,9 +55,9 @@ export class AppScaleSettingsTreeItem extends AppSettingsTreeItem {
         });
 
         const steps: AzureWizardPromptStep<IScaleSettingsUpdateWizardContext>[] = [
-            new InputScaleValueStep("Capacity", 'capacity', { max: 500, min: 1 }),
-            new InputScaleValueStep("Memory/GB", 'memory', { max: 8, min: 1 }),
-            new InputScaleValueStep("vCPU", 'cpu', { max: 4, min: 1 })
+            new InputScaleValueStep(AppScaleSettingsTreeItem.LABELS.capacity, 'capacity', { max: 500, min: 1 }),
+            new InputScaleValueStep(AppScaleSettingsTreeItem.LABELS.memory, 'memory', { max: 8, min: 1 }),
+            new InputScaleValueStep(AppScaleSettingsTreeItem.LABELS.cpu, 'cpu', { max: 4, min: 1 })
         ];
         const promptSteps: AzureWizardPromptStep<IScaleSettingsUpdateWizardContext>[] = [];
         const executeSteps: AzureWizardExecuteStep<IScaleSettingsUpdateWizardContext>[] = [];

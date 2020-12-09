@@ -6,6 +6,7 @@ import getThemedIconPath = TreeUtils.getThemedIconPath;
 export interface IOptions {
     hidden?: boolean;
     deletable?: boolean;
+    label?: string;
     readonly?: boolean;
     contextValue?: string;
 }
@@ -34,7 +35,9 @@ export class AppSettingTreeItem extends AzureTreeItem {
     }
 
     public get label(): string {
-        if (this.key) {
+        if (this._options.label) {
+            return this._options.hidden ? `${this._options.label}=***` : `${this._options.label}=${this._value}`;
+        } else if (this.key) {
             return this._options.hidden ? `${this.key}=***` : `${this.key}=${this._value}`;
         } else {
             return this._options.hidden ? '***' : this._value;

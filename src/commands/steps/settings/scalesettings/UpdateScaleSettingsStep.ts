@@ -4,6 +4,7 @@ import { Progress } from "vscode";
 import { AzureWizardExecuteStep, createAzureClient } from "vscode-azureextensionui";
 import { SpringCloudResourceId } from "../../../../model/SpringCloudResourceId";
 import { localize } from "../../../../utils";
+import { IScaleSettings } from "./IScaleSettings";
 import { IScaleSettingsUpdateWizardContext } from "./IScaleSettingsUpdateWizardContext";
 
 export class UpdateScaleSettingsStep extends AzureWizardExecuteStep<IScaleSettingsUpdateWizardContext> {
@@ -20,7 +21,13 @@ export class UpdateScaleSettingsStep extends AzureWizardExecuteStep<IScaleSettin
 
     public async execute(context: IScaleSettingsUpdateWizardContext, progress: Progress<{ message?: string; increment?: number }>): Promise<void> {
         const appId: SpringCloudResourceId = new SpringCloudResourceId(context.app.id!);
-        const message: string = localize('updatingJvmOptions', 'Updating scale settings of Spring Cloud app "{0}"...', appId.appName);
+        const n: IScaleSettings = context.newSettings;
+        const o: IScaleSettings = context.oldSettings;
+        if (n.capacity === o.capacity && n.memory === o.memory && n.cpu === o.cpu) {
+            progress.report({ message: localize('noScaleSettingChanged', 'No setting is changed') });
+            return Promise.resolve(undefined);
+        }
+        const message: string = localize('updatingScaleSetting', 'Updating scale settings of Spring Cloud app "{0}"...', appId.appName);
         progress.report({ message });
 
         const client: AppPlatformManagementClient = createAzureClient(context, AppPlatformManagementClient);
