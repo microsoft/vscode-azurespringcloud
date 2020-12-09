@@ -87,7 +87,7 @@ export namespace AppCommands {
 
     export async function startStreamingLogs(_context: IActionContext, node?: AppInstanceTreeItem): Promise<AppInstanceTreeItem> {
         node = await getInstanceNode(node, _context);
-        await node.runWithTemporaryDescription(localize('restart', 'Restarting...'), async () => {
+        await node.runWithTemporaryDescription(localize('startStreamingLog', 'Starting streaming log...'), async () => {
             return node!.startStreamingLogs();
         });
         return node;
@@ -95,7 +95,7 @@ export namespace AppCommands {
 
     export async function stopStreamingLogs(_context: IActionContext, node?: AppInstanceTreeItem): Promise<AppInstanceTreeItem> {
         node = await getInstanceNode(node, _context);
-        await node.runWithTemporaryDescription(localize('restart', 'Restarting...'), async () => {
+        await node.runWithTemporaryDescription(localize('stopStreamingLog', 'Stopping streaming log...'), async () => {
             return node!.stopStreamingLogs();
         });
         return node;

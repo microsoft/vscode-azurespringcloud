@@ -1,7 +1,7 @@
 import { AppResource, TestKeys } from "@azure/arm-appplatform/esm/models";
 import { DeploymentInstance } from "@azure/arm-appplatform/src/models/index";
 import { AzureTreeItem, TreeItemIconPath } from "vscode-azureextensionui";
-import { startStreamingLogs, stopStreamingLogs } from "../service/logstream/logStreaming";
+import { startStreamingLogs, stopStreamingLogs } from "../service/streamlog/streamingLog";
 import { localize } from "../utils";
 import { TreeUtils } from "../utils/treeUtils";
 import { AppInstancesTreeItem } from "./AppInstancesTreeItem";
@@ -39,7 +39,7 @@ export class AppInstanceTreeItem extends AzureTreeItem {
 
     public async startStreamingLogs(): Promise<void> {
         if (this.description !== 'Running') {
-            throw new Error(localize('instanceIsNotRunning', 'Selected instance is not running.'));
+            throw new Error(localize('instanceNotRunning', 'Selected instance is not running.'));
         }
         const app: string = this.parent.parent.name;
         const testKey: TestKeys = await this.parent.parent.getTestKeys();
