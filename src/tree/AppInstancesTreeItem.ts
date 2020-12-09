@@ -7,7 +7,7 @@ import { AppPlatformManagementClient } from '@azure/arm-appplatform';
 import { DeploymentResource } from "@azure/arm-appplatform/esm/models";
 import { AzExtTreeItem, AzureParentTreeItem, createAzureClient, TreeItemIconPath } from "vscode-azureextensionui";
 import { localize } from "../utils";
-import { TreeUtils } from "../utils/treeUtils";
+import { TreeUtils } from "../utils/TreeUtils";
 import { AppInstanceTreeItem } from "./AppInstanceTreeItem";
 import { AppTreeItem } from './AppTreeItem';
 

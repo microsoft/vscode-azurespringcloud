@@ -1,5 +1,5 @@
 import { AzureParentTreeItem, AzureTreeItem, IActionContext, TreeItemIconPath } from "vscode-azureextensionui";
-import { TreeUtils } from "../utils/treeUtils";
+import { TreeUtils } from "../utils/TreeUtils";
 import { AppSettingsTreeItem } from "./AppSettingsTreeItem";
 import getThemedIconPath = TreeUtils.getThemedIconPath;
 

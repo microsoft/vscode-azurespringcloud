@@ -2,7 +2,7 @@ import { AppPlatformManagementClient } from "@azure/arm-appplatform";
 import { DeploymentResource } from "@azure/arm-appplatform/esm/models";
 import { AzureParentTreeItem, IActionContext, TreeItemIconPath } from "vscode-azureextensionui";
 import { ext } from "../extensionVariables";
-import { TreeUtils } from "../utils/treeUtils";
+import { TreeUtils } from "../utils/TreeUtils";
 import { AppSettingTreeItem, IOptions } from "./AppSettingTreeItem";
 import { AppTreeItem } from "./AppTreeItem";
 import getThemedIconPath = TreeUtils.getThemedIconPath;

@@ -3,7 +3,7 @@ import { DeploymentInstance } from "@azure/arm-appplatform/src/models/index";
 import { AzureTreeItem, TreeItemIconPath } from "vscode-azureextensionui";
 import { startStreamingLogs, stopStreamingLogs } from "../service/streamlog/streamingLog";
 import { localize } from "../utils";
-import { TreeUtils } from "../utils/treeUtils";
+import { TreeUtils } from "../utils/TreeUtils";
 import { AppInstancesTreeItem } from "./AppInstancesTreeItem";
 
 export class AppInstanceTreeItem extends AzureTreeItem {

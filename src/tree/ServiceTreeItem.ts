@@ -27,7 +27,7 @@ import { UpdateAppStep } from "../commands/steps/creation/UpdateAppStep";
 import { ext } from "../extensionVariables";
 import { SpringCloudResourceId } from "../model/SpringCloudResourceId";
 import { localize, nonNullProp } from "../utils";
-import { TreeUtils } from "../utils/treeUtils";
+import { TreeUtils } from "../utils/TreeUtils";
 import { AppTreeItem } from './AppTreeItem';
 
 export class ServiceTreeItem extends AzureParentTreeItem {

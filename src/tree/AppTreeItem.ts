@@ -20,7 +20,7 @@ import { UpdateDeploymentStep } from "../commands/steps/deployment/UpdateDeploym
 import { UploadArtifactStep } from "../commands/steps/deployment/UploadArtifactStep";
 import { ext } from "../extensionVariables";
 import { localize, nonNullProp } from "../utils";
-import { TreeUtils } from "../utils/treeUtils";
+import { TreeUtils } from "../utils/TreeUtils";
 import { AppEnvVariablesTreeItem } from "./AppEnvVariablesTreeItem";
 import { AppInstancesTreeItem } from "./AppInstancesTreeItem";
 import { AppJvmOptionsTreeItem } from "./AppJvmOptionsTreeItem";
