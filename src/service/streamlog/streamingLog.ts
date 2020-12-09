@@ -3,7 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 import { DeploymentResource, TestKeys } from '@azure/arm-appplatform/esm/models';
-import { BasicAuthenticationCredentials, WebResource } from "ms-rest";
+import { BasicAuthenticationCredentials, WebResource } from "@azure/ms-rest-js";
 import * as request from 'request';
 import * as vscode from 'vscode';
 import { parseError } from 'vscode-azureextensionui';
@@ -30,7 +30,7 @@ export async function startStreamingLogs(app: string, testKey: TestKeys, instanc
         const outputChannel: vscode.OutputChannel = logStream ? logStream.outputChannel : vscode.window.createOutputChannel(localize('logStreamLabel', '{0} - Log Stream', instance.name));
         ext.context.subscriptions.push(outputChannel);
         outputChannel.show();
-        outputChannel.appendLine(localize('connectingToLogStream', 'Connecting to log stream...'));
+        outputChannel.appendLine(localize('connectingToLogStream', 'Connecting to log-streaming service...'));
         const logsRequest: request.Request = await getLogRequest(testKey, app, instance.name ?? '');
         const newLogStream: ILogStream = createLogStream(outputChannel, logsRequest);
         logsRequest.on('data', (chunk: Buffer | string) => {
@@ -87,13 +87,5 @@ function getLogStreamId(app: string, instance: DeploymentResource): string {
 
 async function signRequest(primaryKey: string, httpRequest: WebResource): Promise<void> {
     const credential: BasicAuthenticationCredentials = new BasicAuthenticationCredentials(primaryName, primaryKey);
-    await new Promise((resolve, reject): void => {
-        credential.signRequest(httpRequest, (err: Error | undefined) => {
-            if (err) {
-                reject(err);
-            } else {
-                resolve();
-            }
-        });
-    });
+    await credential.signRequest(httpRequest);
 }
