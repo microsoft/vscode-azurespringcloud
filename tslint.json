@@ -90,7 +90,8 @@
         "no-dynamic-delete": false,
         "trailing-comma": false,
         "no-submodule-imports": false,
-        "no-non-null-assertion": false
+        "no-non-null-assertion": false,
+        "no-floating-promises": false
     },
     "linterOptions": {
         "exclude": [

@@ -74,6 +74,7 @@ export class AppTreeItem extends AzureParentTreeItem {
         return state?.toLowerCase() === 'succeeded' ? undefined : state;
     }
 
+    // tslint:disable:no-unexternalized-strings
     public get iconPath(): TreeItemIconPath {
         switch (this.deployment?.properties?.status) {
             case "Stopped":

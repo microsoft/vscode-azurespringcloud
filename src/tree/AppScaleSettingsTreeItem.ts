@@ -16,6 +16,7 @@ export class AppScaleSettingsTreeItem extends AppSettingsTreeItem {
         hidden: false,
         contextValue: 'azureSpringCloud.app.scaleSetting',
     };
+    // tslint:disable:no-unexternalized-strings
     private static readonly LABELS: { [key: string]: string } = {
         cpu: "vCPU",
         memory: "Memory/GB",

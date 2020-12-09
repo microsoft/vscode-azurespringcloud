@@ -13,6 +13,7 @@ export class InputScaleValueStep extends AzureWizardPromptStep<IScaleSettingsUpd
         this.label = label;
         this.key = key;
         this.scope = scope;
+        // tslint:disable-next-line:no-unsafe-any
         this.validateInput = this.validateInput.bind(this);
     }
 

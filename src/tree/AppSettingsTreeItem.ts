@@ -50,6 +50,7 @@ export abstract class AppSettingsTreeItem extends AzureParentTreeItem {
 
     public abstract updateSettingValue(node: AppSettingTreeItem, _context: IActionContext): Promise<string>;
 
+    // tslint:disable-next-line:no-any
     public abstract updateSettingsValue(_context: IActionContext): Promise<any>;
 
     public abstract async deleteSettingItem(node: AppSettingTreeItem, _context: IActionContext): Promise<void>;
