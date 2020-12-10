@@ -21,6 +21,18 @@ export class AppScaleSettingsTreeItem extends AppSettingsTreeItem {
         memory: "Memory/GB",
         capacity: "Capacity"
     };
+    private static readonly SCOPES: { [key: string]: { [key: string]: { max: number; min: number } } } = {
+        Standard: {
+            cpu: { max: 4, min: 1 },
+            memory: { max: 8, min: 1 },
+            capacity: { max: 500, min: 1 }
+        },
+        Basic: {
+            cpu: { max: 1, min: 1 },
+            memory: { max: 2, min: 1 },
+            capacity: { max: 25, min: 1 }
+        }
+    };
 
     public readonly contextValue: string = AppScaleSettingsTreeItem.contextValue;
     public readonly id: string = AppScaleSettingsTreeItem.contextValue;
@@ -53,11 +65,11 @@ export class AppScaleSettingsTreeItem extends AppSettingsTreeItem {
             newSettings: { ...this.settings },
             oldSettings: this.settings
         });
-
+        const tier: string = this.parent.parent.service.sku?.tier ?? 'Basic';
         const steps: AzureWizardPromptStep<IScaleSettingsUpdateWizardContext>[] = [
-            new InputScaleValueStep(AppScaleSettingsTreeItem.LABELS.capacity, 'capacity', { max: 500, min: 1 }),
-            new InputScaleValueStep(AppScaleSettingsTreeItem.LABELS.memory, 'memory', { max: 8, min: 1 }),
-            new InputScaleValueStep(AppScaleSettingsTreeItem.LABELS.cpu, 'cpu', { max: 4, min: 1 })
+            new InputScaleValueStep(AppScaleSettingsTreeItem.LABELS.capacity, 'capacity', AppScaleSettingsTreeItem.SCOPES[tier].capacity),
+            new InputScaleValueStep(AppScaleSettingsTreeItem.LABELS.memory, 'memory', AppScaleSettingsTreeItem.SCOPES[tier].memory),
+            new InputScaleValueStep(AppScaleSettingsTreeItem.LABELS.cpu, 'cpu', AppScaleSettingsTreeItem.SCOPES[tier].cpu)
         ];
         const promptSteps: AzureWizardPromptStep<IScaleSettingsUpdateWizardContext>[] = [];
         const executeSteps: AzureWizardExecuteStep<IScaleSettingsUpdateWizardContext>[] = [];

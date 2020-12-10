@@ -30,6 +30,7 @@ import { ServiceTreeItem } from "./ServiceTreeItem";
 export class AppTreeItem extends AzureParentTreeItem {
     public static contextValue: string = 'azureSpringCloud.app';
     public readonly contextValue: string = AppTreeItem.contextValue;
+    public parent: ServiceTreeItem;
     public app: AppResource;
     private deployment: DeploymentResource | undefined;
     private scaleSettingsTreeItem: AppScaleSettingsTreeItem;
@@ -50,11 +51,11 @@ export class AppTreeItem extends AzureParentTreeItem {
     }
 
     public get serviceName(): string {
-        return (<ServiceTreeItem>this.parent).serviceName;
+        return this.parent.serviceName;
     }
 
     public get resourceGroup(): string {
-        return (<ServiceTreeItem>this.parent).resourceGroup;
+        return this.parent.resourceGroup;
     }
 
     public get data(): AppResource {
