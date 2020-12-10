@@ -13,7 +13,6 @@ import { AppTreeItem } from "./AppTreeItem";
 export class AppScaleSettingsTreeItem extends AppSettingsTreeItem {
     public static contextValue: string = 'azureSpringCloud.app.scaleSettings';
     private static readonly _options: IOptions = {
-        hidden: false,
         contextValue: 'azureSpringCloud.app.scaleSetting',
     };
     // tslint:disable:no-unexternalized-strings

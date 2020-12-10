@@ -358,7 +358,7 @@
                 },
                 {
                     "command": "azureSpringCloud.common.toggleVisibility",
-                    "when": "view == azureSpringCloud && viewItem =~ /^azureSpringCloud\\.app\\.(jvmOption|scaleSetting|envVariable)(|s)$/",
+                    "when": "view == azureSpringCloud && viewItem =~ /^azureSpringCloud\\.app\\.envVariable(|s)$/",
                     "group": "inline"
                 },
                 {

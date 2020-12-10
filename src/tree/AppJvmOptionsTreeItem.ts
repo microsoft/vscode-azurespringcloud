@@ -13,7 +13,6 @@ import { AppTreeItem } from "./AppTreeItem";
 export class AppJvmOptionsTreeItem extends AppSettingsTreeItem {
     public static contextValue: string = 'azureSpringCloud.app.jvmOptions';
     private static readonly _options: IOptions = {
-        hidden: false,
         contextValue: 'azureSpringCloud.app.jvmOption',
     };
     private static readonly JVM_OPTION_PATTERN: RegExp = /^-[a-zA-Z_]+\S*$/;

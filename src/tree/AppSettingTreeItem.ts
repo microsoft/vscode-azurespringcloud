@@ -19,7 +19,7 @@ export class AppSettingTreeItem extends AzureTreeItem {
 
     private readonly _options: IOptions;
 
-    public constructor(parent: AzureParentTreeItem, key: string, value: string, options: IOptions = { hidden: false, deletable: true }) {
+    public constructor(parent: AzureParentTreeItem, key: string, value: string, options: IOptions = { deletable: true }) {
         super(parent);
         this.key = key;
         this._value = value;
@@ -60,7 +60,10 @@ export class AppSettingTreeItem extends AzureTreeItem {
         return getThemedIconPath('constant');
     }
 
-    public get commandId(): string {
+    public get commandId(): string | undefined {
+        if (this._options.hidden === undefined) {
+            return undefined;
+        }
         return 'azureSpringCloud.common.toggleVisibility';
     }
 
