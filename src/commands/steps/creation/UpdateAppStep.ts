@@ -21,7 +21,6 @@ export class UpdateAppStep extends AzureWizardExecuteStep<IAppCreationWizardCont
         context.newApp = await client.apps.createOrUpdate(serviceId.resourceGroup, serviceId.serviceName, appName, {
             properties: {
                 activeDeploymentName: UpdateAppStep.DEAFULT_DEPLOYMENT_NAME,
-                publicProperty: true
             }
         });
         return Promise.resolve(undefined);
