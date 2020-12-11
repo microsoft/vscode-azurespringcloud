@@ -11,18 +11,18 @@ export namespace AppCommands {
 
     export async function openPublicEndpoint(context: IActionContext, node?: AppTreeItem): Promise<void> {
         node = await getNode(node, context);
-        const endPoint: string | undefined = await node.getPublicEndpoint();
+        const endPoint: string | undefined = await node.app.getPublicEndpoint();
         if (!endPoint || endPoint.toLowerCase() === 'none') {
-            window.showWarningMessage(localize('noPublicEndpoint', "App[{0}] has not been assigned public endpoint.", node.name));
-            await ext.ui.showWarningMessage(`App[${node.name}] is not publicly accessible. Do you want to set it public and assign it a public endpoint?`, { modal: true }, DialogResponses.yes);
-            await AppCommands.toggleEndpoint(context, node);
+            window.showWarningMessage(localize('noPublicEndpoint', "App[{0}] has not been assigned public endpoint.", node.app.name));
+            await ext.ui.showWarningMessage(`App[${node.app.name}] is not publicly accessible. Do you want to set it public and assign it a public endpoint?`, { modal: true }, DialogResponses.yes);
+            await toggleEndpoint(context, node);
         }
         await openUrl(endPoint!);
     }
 
     export async function openTestEndpoint(context: IActionContext, node?: AppTreeItem): Promise<void> {
         node = await getNode(node, context);
-        const endpoint: string | undefined = await node.getTestEndpoint();
+        const endpoint: string | undefined = await node.app.getTestEndpoint();
         await openUrl(endpoint!);
     }
 
@@ -34,16 +34,18 @@ export namespace AppCommands {
     export async function startApp(context: IActionContext, node?: AppTreeItem): Promise<AppTreeItem> {
         node = await getNode(node, context);
         await node.runWithTemporaryDescription(localize('starting', 'Starting...'), async () => {
-            return node!.start();
+            await node!.app.start();
+            node!.refresh();
         });
         return node;
     }
 
     export async function stopApp(context: IActionContext, node?: AppTreeItem): Promise<AppTreeItem> {
         node = await getNode(node, context);
-        await ext.ui.showWarningMessage(`Are you sure to stop Spring Cloud service "${node.name}"?`, { modal: true }, DialogResponses.yes);
+        await ext.ui.showWarningMessage(`Are you sure to stop Spring Cloud service "${node.app.name}"?`, { modal: true }, DialogResponses.yes);
         await node.runWithTemporaryDescription(localize('stopping', 'Stopping...'), async () => {
-            return node!.stop();
+            await node!.app.stop();
+            node!.refresh();
         });
         return node;
     }
@@ -51,14 +53,15 @@ export namespace AppCommands {
     export async function restartApp(context: IActionContext, node?: AppTreeItem): Promise<AppTreeItem> {
         node = await getNode(node, context);
         await node.runWithTemporaryDescription(localize('restart', 'Restarting...'), async () => {
-            return node!.restart();
+            await node!.app.restart();
+            node!.refresh();
         });
         return node;
     }
 
     export async function deleteApp(context: IActionContext, node?: AppTreeItem): Promise<void> {
         node = await getNode(node, context);
-        await ext.ui.showWarningMessage(`Are you sure to delete Spring Cloud app "${node.name}"?`, { modal: true }, DialogResponses.deleteResponse);
+        await ext.ui.showWarningMessage(`Are you sure to delete Spring Cloud app "${node.app.name}"?`, { modal: true }, DialogResponses.deleteResponse);
         await node.deleteTreeItem(context);
     }
 
@@ -73,8 +76,8 @@ export namespace AppCommands {
         };
         const fileUri: Uri[] | undefined = await window.showOpenDialog(options);
         if (fileUri && fileUri[0] !== undefined) {
-            const artifactUrl: string = fileUri[0].fsPath;
-            await node.runWithTemporaryDescription(localize('deploying', 'Deploying...'), async () => node!.deployArtifact(context, artifactUrl));
+            const artifactPath: string = fileUri[0].fsPath;
+            await node.runWithTemporaryDescription(localize('deploying', 'Deploying...'), async () => node!.deployArtifact(context, artifactPath));
         }
         return node;
     }
@@ -88,7 +91,8 @@ export namespace AppCommands {
     export async function startStreamingLogs(_context: IActionContext, node?: AppInstanceTreeItem): Promise<AppInstanceTreeItem> {
         node = await getInstanceNode(node, _context);
         await node.runWithTemporaryDescription(localize('startStreamingLog', 'Starting streaming log...'), async () => {
-            return node!.startStreamingLogs();
+            const appTreeItem: AppTreeItem = node!.parent.parent;
+            return appTreeItem.app.startStreamingLogs(node?.data!, appTreeItem.data);
         });
         return node;
     }
@@ -96,7 +100,8 @@ export namespace AppCommands {
     export async function stopStreamingLogs(_context: IActionContext, node?: AppInstanceTreeItem): Promise<AppInstanceTreeItem> {
         node = await getInstanceNode(node, _context);
         await node.runWithTemporaryDescription(localize('stopStreamingLog', 'Stopping streaming log...'), async () => {
-            return node!.stopStreamingLogs();
+            const appTreeItem: AppTreeItem = node!.parent.parent;
+            return appTreeItem.app.stopStreamingLogs(node?.data!, appTreeItem.data);
         });
         return node;
     }

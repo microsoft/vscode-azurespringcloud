@@ -1,10 +1,10 @@
-import { DeploymentResource } from "@azure/arm-appplatform/esm/models";
 import { window } from "vscode";
 import { AzExtTreeItem, AzureWizard, AzureWizardExecuteStep, AzureWizardPromptStep, IActionContext, ICreateChildImplContext } from "vscode-azureextensionui";
 import { IJvmOptionsUpdateWizardContext } from "../commands/steps/settings/jvmoptions/IJvmOptionsUpdateWizardContext";
 import { InputJvmOptionsStep } from "../commands/steps/settings/jvmoptions/InputJvmOptionsStep";
 import { UpdateJvmOptionsStep } from "../commands/steps/settings/jvmoptions/UpdateJvmOptionsStep";
 import { ext } from "../extensionVariables";
+import { IDeployment } from "../model";
 import { localize } from "../utils";
 import { AppSettingsTreeItem } from "./AppSettingsTreeItem";
 import { AppSettingTreeItem, IOptions } from "./AppSettingTreeItem";
@@ -20,7 +20,7 @@ export class AppJvmOptionsTreeItem extends AppSettingsTreeItem {
     public readonly id: string = AppJvmOptionsTreeItem.contextValue;
     public readonly label: string = 'JVM Options';
 
-    public constructor(parent: AppTreeItem, deployment: DeploymentResource) {
+    public constructor(parent: AppTreeItem, deployment: IDeployment) {
         super(parent, deployment);
     }
 
@@ -64,19 +64,17 @@ export class AppJvmOptionsTreeItem extends AppSettingsTreeItem {
     }
 
     public async updateSettingsValue(context: IActionContext, newJvmOptions?: string[]): Promise<void> {
-        const updating: string = localize('updatingJvmOptions', 'Updating JVM options of Spring Cloud app "{0}"', this.parent.name);
-        const updated: string = localize('updatedJvmOptions', 'Successfully updated JVM options of Spring Cloud app "{0}".', this.parent.name);
+        const updating: string = localize('updatingJvmOptions', 'Updating JVM options of Spring Cloud app "{0}"', this.deployment.app.name);
+        const updated: string = localize('updatedJvmOptions', 'Successfully updated JVM options of Spring Cloud app "{0}".', this.deployment.app.name);
 
         const wizardContext: IJvmOptionsUpdateWizardContext = Object.assign(context, this.root, {
-            app: this.parent.app,
-            deployment: this.deployment,
             newJvmOptions: newJvmOptions?.join(' ')
         });
 
         const promptSteps: AzureWizardPromptStep<IJvmOptionsUpdateWizardContext>[] = [];
         const executeSteps: AzureWizardExecuteStep<IJvmOptionsUpdateWizardContext>[] = [];
-        promptSteps.push(new InputJvmOptionsStep());
-        executeSteps.push(new UpdateJvmOptionsStep());
+        promptSteps.push(new InputJvmOptionsStep(this.deployment));
+        executeSteps.push(new UpdateJvmOptionsStep(this.deployment));
         const wizard: AzureWizard<IJvmOptionsUpdateWizardContext> = new AzureWizard(wizardContext, { promptSteps, executeSteps, title: updating });
         await wizard.prompt();
         await wizard.execute();

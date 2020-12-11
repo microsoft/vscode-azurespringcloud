@@ -4,8 +4,9 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { AppPlatformManagementClient } from '@azure/arm-appplatform';
-import { DeploymentResource } from "@azure/arm-appplatform/esm/models";
+import { DeploymentInstance } from "@azure/arm-appplatform/esm/models";
 import { AzExtTreeItem, AzureParentTreeItem, createAzureClient, TreeItemIconPath } from "vscode-azureextensionui";
+import { IDeployment } from "../model";
 import { localize } from "../utils";
 import { TreeUtils } from "../utils/TreeUtils";
 import { AppInstanceTreeItem } from "./AppInstanceTreeItem";
@@ -19,11 +20,11 @@ export class AppInstancesTreeItem extends AzureParentTreeItem {
     public readonly label: string = 'App Instances';
     public readonly parent: AppTreeItem;
     public readonly iconPath: TreeItemIconPath = TreeUtils.getIconPath('azure-springcloud-app-instances');
-    private deployment: DeploymentResource;
+    private data: IDeployment;
 
-    public constructor(parent: AppTreeItem, deployment: DeploymentResource) {
+    public constructor(parent: AppTreeItem, deployment: IDeployment) {
         super(parent);
-        this.deployment = deployment;
+        this.data = deployment;
     }
 
     public get client(): AppPlatformManagementClient {
@@ -36,14 +37,14 @@ export class AppInstancesTreeItem extends AzureParentTreeItem {
 
     public async loadMoreChildrenImpl(_clearCache: boolean): Promise<AzExtTreeItem[]> {
         return await this.createTreeItemsWithErrorHandling(
-            this.deployment.properties?.instances,
+            this.data.properties!.instances,
             'invalidSpringCloudAppInstance',
-            instance => new AppInstanceTreeItem(this, instance),
-            instance => instance.name
+            (instance: DeploymentInstance) => new AppInstanceTreeItem(this, instance),
+            (instance: DeploymentInstance) => instance.name
         );
     }
 
     public async refreshImpl(): Promise<void> {
-        this.deployment = await this.parent.getActiveDeployment(true);
+        this.data = await this.parent.getActiveDeployment(true);
     }
 }

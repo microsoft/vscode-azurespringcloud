@@ -4,7 +4,6 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { AppPlatformManagementClient } from "@azure/arm-appplatform";
-import { AppResource, DeploymentResource, ResourceUploadDefinition, TestKeys } from '@azure/arm-appplatform/esm/models';
 import { ProgressLocation, window } from "vscode";
 import {
     AzExtTreeItem,
@@ -19,6 +18,9 @@ import { IAppDeploymentWizardContext } from "../commands/steps/deployment/IAppDe
 import { UpdateDeploymentStep } from "../commands/steps/deployment/UpdateDeploymentStep";
 import { UploadArtifactStep } from "../commands/steps/deployment/UploadArtifactStep";
 import { ext } from "../extensionVariables";
+import { EnhancedApp, EnhancedDeployment, IApp, IDeployment } from "../model";
+import { AppService } from "../service/AppService";
+import { DeploymentService } from "../service/DeploymentService";
 import { localize, nonNullProp } from "../utils";
 import { TreeUtils } from "../utils/TreeUtils";
 import { AppEnvVariablesTreeItem } from "./AppEnvVariablesTreeItem";
@@ -31,53 +33,48 @@ export class AppTreeItem extends AzureParentTreeItem {
     public static contextValue: string = 'azureSpringCloud.app';
     public readonly contextValue: string = AppTreeItem.contextValue;
     public parent: ServiceTreeItem;
-    public app: AppResource;
-    private deployment: DeploymentResource | undefined;
+    public data: IApp;
+    private deploymentData: IDeployment | undefined;
     private scaleSettingsTreeItem: AppScaleSettingsTreeItem;
     private deleted: boolean;
 
-    constructor(parent: ServiceTreeItem, resource: AppResource) {
+    constructor(parent: ServiceTreeItem, app: IApp) {
         super(parent);
-        this.app = resource;
+        this.data = app;
         this.refresh();
     }
 
-    public get client(): AppPlatformManagementClient {
-        return createAzureClient(this.root, AppPlatformManagementClient);
+    public get app(): EnhancedApp {
+        const client: AppPlatformManagementClient = createAzureClient(this.root, AppPlatformManagementClient);
+        const appService: AppService = new AppService(client, this.data);
+        return Object.assign(appService, this.data);
     }
 
-    public get name(): string {
-        return nonNullProp(this.app, 'name');
-    }
-
-    public get serviceName(): string {
-        return this.parent.serviceName;
-    }
-
-    public get resourceGroup(): string {
-        return this.parent.resourceGroup;
-    }
-
-    public get data(): AppResource {
-        return this.app;
+    public get deployment(): EnhancedDeployment | undefined {
+        if (!this.deploymentData) {
+            return undefined;
+        }
+        const client: AppPlatformManagementClient = createAzureClient(this.root, AppPlatformManagementClient);
+        const deploymentService: DeploymentService = new DeploymentService(client, this.deploymentData);
+        return Object.assign(deploymentService, this.deploymentData);
     }
 
     public get id(): string {
-        return nonNullProp(this.app, 'id');
+        return nonNullProp(this.data, 'id');
     }
 
     public get label(): string {
-        return this.name;
+        return this.data.name;
     }
 
     public get description(): string | undefined {
-        const state: string | undefined = this.app.properties?.provisioningState;
+        const state: string | undefined = this.data.properties?.provisioningState;
         return state?.toLowerCase() === 'succeeded' ? undefined : state;
     }
 
     // tslint:disable:no-unexternalized-strings
     public get iconPath(): TreeItemIconPath {
-        switch (this.deployment?.properties?.status) {
+        switch (this.deploymentData?.properties?.status) {
             case "Stopped":
                 return TreeUtils.getPngIconPath('azure-springcloud-app-stopped');
             case "Failed":
@@ -99,100 +96,58 @@ export class AppTreeItem extends AzureParentTreeItem {
     }
 
     public async loadMoreChildrenImpl(_clearCache: boolean, _context: IActionContext): Promise<AzExtTreeItem[]> {
-        this.deployment = await this.getActiveDeployment();
-        this.scaleSettingsTreeItem = new AppScaleSettingsTreeItem(this, this.deployment);
-        const appInstancesTreeItem: AppInstancesTreeItem = new AppInstancesTreeItem(this, this.deployment);
-        const envPropertiesTreeItem: AppEnvVariablesTreeItem = new AppEnvVariablesTreeItem(this, this.deployment);
-        const jvmOptionsTreeItem: AppJvmOptionsTreeItem = new AppJvmOptionsTreeItem(this, this.deployment);
+        this.deploymentData = await this.getActiveDeployment();
+        this.scaleSettingsTreeItem = new AppScaleSettingsTreeItem(this, this.deploymentData);
+        const appInstancesTreeItem: AppInstancesTreeItem = new AppInstancesTreeItem(this, this.deploymentData);
+        const envPropertiesTreeItem: AppEnvVariablesTreeItem = new AppEnvVariablesTreeItem(this, this.deploymentData);
+        const jvmOptionsTreeItem: AppJvmOptionsTreeItem = new AppJvmOptionsTreeItem(this, this.deploymentData);
         return [appInstancesTreeItem, envPropertiesTreeItem, this.scaleSettingsTreeItem, jvmOptionsTreeItem];
     }
 
     public async deleteTreeItemImpl(_context: IActionContext): Promise<void> {
-        const deleting: string = localize('deletingSpringCLoudApp', 'Deleting Spring Cloud app "{0}"...', this.name);
-        const deleted: string = localize('deletedSpringCLoudApp', 'Successfully deleted Spring Cloud app "{0}".', this.name);
+        const deleting: string = localize('deletingSpringCLoudApp', 'Deleting Spring Cloud app "{0}"...', this.data.name);
+        const deleted: string = localize('deletedSpringCLoudApp', 'Successfully deleted Spring Cloud app "{0}".', this.data.name);
 
         await window.withProgress({ location: ProgressLocation.Notification, title: deleting }, async (): Promise<void> => {
             ext.outputChannel.appendLog(deleting);
-            await this.client.apps.deleteMethod(this.resourceGroup, this.serviceName, this.name);
+            await this.app.remove();
             window.showInformationMessage(deleted);
             ext.outputChannel.appendLog(deleted);
         });
         this.deleted = true;
     }
 
-    public async start(): Promise<void> {
-        await this.client.deployments.start(this.resourceGroup, this.serviceName, this.name, this.app.properties?.activeDeploymentName!);
-        this.refresh();
-    }
-
-    public async stop(): Promise<void> {
-        await this.client.deployments.stop(this.resourceGroup, this.serviceName, this.name, this.app.properties?.activeDeploymentName!);
-        this.refresh();
-    }
-
-    public async restart(): Promise<void> {
-        await this.client.deployments.restart(this.resourceGroup, this.serviceName, this.name, this.app.properties?.activeDeploymentName!);
-        this.refresh();
-    }
-
-    public async getPublicEndpoint(): Promise<string | undefined> {
-        if (this.app.properties?.url && this.app.properties?.url !== 'None') {
-            return this.app.properties?.url;
-        }
-        return undefined;
-    }
-
-    public async getTestKeys(): Promise<TestKeys> {
-        return await this.client.services.listTestKeys(this.resourceGroup, this.serviceName);
-    }
-
-    public async getTestEndpoint(): Promise<string | undefined> {
-        const testKeys: TestKeys | undefined = await this.client.services.listTestKeys(this.resourceGroup, this.serviceName);
-        return `${testKeys.primaryTestEndpoint}/${this.name}/default`;
-    }
-
     public async toggleEndpoint(_context: IActionContext): Promise<void> {
-        const isPublic: boolean = this.app.properties?.publicProperty ?? false;
-        const doing: string = isPublic ? `Unassigning public endpoint of Spring Cloud app "${this.name}".` : `Assigning public endpoint to Spring Cloud app "${this.name}".`;
-        const done: string = isPublic ? `Successfully unassigned public endpoint of Spring Cloud app "${this.name}".` : `Successfully assigned public endpoint to Spring Cloud app "${this.name}".`;
+        const isPublic: boolean = this.data.properties?.publicProperty ?? false;
+        const doing: string = isPublic ? `Unassigning public endpoint of Spring Cloud app "${this.data.name}".` : `Assigning public endpoint to Spring Cloud app "${this.data.name}".`;
+        const done: string = isPublic ? `Successfully unassigned public endpoint of Spring Cloud app "${this.data.name}".` : `Successfully assigned public endpoint to Spring Cloud app "${this.data.name}".`;
         await window.withProgress({ location: ProgressLocation.Notification, title: doing }, async (): Promise<void> => {
             ext.outputChannel.appendLog(doing);
-            await this.client.apps.createOrUpdate(this.resourceGroup, this.serviceName, this.name, {
-                properties: {
-                    activeDeploymentName: this.deployment?.name,
-                    publicProperty: !isPublic
-                }
-            });
+            await this.app.setPublic(!isPublic);
             window.showInformationMessage(done);
             ext.outputChannel.appendLog(done);
         });
         this.refresh();
     }
 
-    public async getActiveDeployment(force: boolean = false): Promise<DeploymentResource> {
-        const deploymentName: string = this.app.properties?.activeDeploymentName!;
-        if (force || !this.deployment) {
-            this.deployment = await this.client.deployments.get(this.resourceGroup, this.serviceName, this.name, deploymentName);
+    public async getActiveDeployment(force: boolean = false): Promise<IDeployment> {
+        if (force || !this.deploymentData) {
+            this.deploymentData = await this.app.getActiveDeployment();
         }
-        return this.deployment;
+        return this.deploymentData;
     }
 
-    public async deployArtifact(context: IActionContext, artifactUrl: string): Promise<void> {
-        const deploying: string = localize('deploying', 'Deploying artifact to Spring Cloud app "{0}".', this.name);
-        const deployed: string = localize('deployed', 'Successfully deployed artifact to Spring Cloud app "{0}".', this.name);
+    public async deployArtifact(context: IActionContext, artifactPath: string): Promise<void> {
+        const deploying: string = localize('deploying', 'Deploying artifact to Spring Cloud app "{0}".', this.data.name);
+        const deployed: string = localize('deployed', 'Successfully deployed artifact to Spring Cloud app "{0}".', this.data.name);
 
-        const uploadDefinition: ResourceUploadDefinition = await this.client.apps.getResourceUploadUrl(this.resourceGroup, this.serviceName, this.name);
-        const deployment: DeploymentResource = await this.getActiveDeployment();
         const wizardContext: IAppDeploymentWizardContext = Object.assign(context, this.root, {
-            uploadDefinition,
-            artifactUrl,
-            deployment,
             app: this.app
         });
 
         const executeSteps: AzureWizardExecuteStep<IAppDeploymentWizardContext>[] = [];
-        executeSteps.push(new UploadArtifactStep());
-        executeSteps.push(new UpdateDeploymentStep());
+        executeSteps.push(new UploadArtifactStep(this.app, artifactPath));
+        executeSteps.push(new UpdateDeploymentStep(this.deployment!));
         const wizard: AzureWizard<IAppDeploymentWizardContext> = new AzureWizard(wizardContext, { executeSteps, title: deploying });
         await wizard.execute();
         window.showInformationMessage(deployed);
@@ -204,8 +159,8 @@ export class AppTreeItem extends AzureParentTreeItem {
 
     public async refreshImpl(): Promise<void> {
         if (!this.deleted) {
-            this.app = await this.client.apps.get(this.resourceGroup, this.serviceName, this.name);
-            this.deployment = await this.getActiveDeployment(true);
+            this.data = await this.app.reload();
+            this.deploymentData = await this.app.getActiveDeployment();
         }
     }
 }

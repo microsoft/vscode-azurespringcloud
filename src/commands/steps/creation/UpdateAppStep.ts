@@ -1,28 +1,27 @@
-import { AppPlatformManagementClient } from "@azure/arm-appplatform";
 import { Progress } from "vscode";
-import { AzureWizardExecuteStep, createAzureClient } from "vscode-azureextensionui";
-import { SpringCloudResourceId } from "../../../model/SpringCloudResourceId";
-import { localize, nonNullProp } from "../../../utils";
+import { AzureWizardExecuteStep } from "vscode-azureextensionui";
+import { EnhancedApp, EnhancedService } from "../../../model";
+import { AppService } from "../../../service/AppService";
+import { localize } from "../../../utils";
 import { IAppCreationWizardContext } from "./IAppCreationWizardContext";
 
 export class UpdateAppStep extends AzureWizardExecuteStep<IAppCreationWizardContext> {
 
     // tslint:disable-next-line: no-unexternalized-strings
-    private static readonly DEAFULT_DEPLOYMENT_NAME: string = "default";
     public priority: number = 145;
+    private readonly service: EnhancedService;
+
+    constructor(service: EnhancedService) {
+        super();
+        this.service = service;
+    }
 
     public async execute(context: IAppCreationWizardContext, progress: Progress<{ message?: string; increment?: number }>): Promise<void> {
-        const message: string = localize('updatingNewApp', 'Activating deployment for Spring Cloud app "{0}"...', context.newAppName);
+        const message: string = localize('updatingNewApp', 'Activating deployment for Spring Cloud app "{0}"...', context.newApp?.name);
         progress.report({ message });
 
-        const appName: string = nonNullProp(context, 'newAppName');
-        const client: AppPlatformManagementClient = createAzureClient(context, AppPlatformManagementClient);
-        const serviceId: SpringCloudResourceId = new SpringCloudResourceId(context.service.id!);
-        context.newApp = await client.apps.createOrUpdate(serviceId.resourceGroup, serviceId.serviceName, appName, {
-            properties: {
-                activeDeploymentName: UpdateAppStep.DEAFULT_DEPLOYMENT_NAME,
-            }
-        });
+        const app: EnhancedApp = this.service.enhanceApp(context.newApp!);
+        await app.setActiveDeployment(context.newDeployment?.name ?? AppService.DEFAULT_DEPLOYMENT);
         return Promise.resolve(undefined);
     }
 
