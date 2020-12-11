@@ -124,9 +124,7 @@ export namespace AppCommands {
 
     export async function deleteSetting(context: IActionContext, node: AppSettingTreeItem): Promise<AppSettingTreeItem> {
         await ext.ui.showWarningMessage(`Are you sure to delete "${node.key || node.value}"?`, { modal: true }, DialogResponses.deleteResponse);
-        await node.runWithTemporaryDescription(localize('deleting', 'Deleting...'), async () => {
-            await node.deleteTreeItem(context);
-        });
+        await node.deleteTreeItem(context);
         return node;
     }
 

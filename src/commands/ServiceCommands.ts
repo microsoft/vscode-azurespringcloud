@@ -2,7 +2,7 @@ import { DialogResponses, IActionContext } from "vscode-azureextensionui";
 import { ext } from "../extensionVariables";
 import { ServiceTreeItem } from "../tree/ServiceTreeItem";
 import { SubscriptionTreeItem } from "../tree/SubscriptionTreeItem";
-import { localize, openUrl } from "../utils";
+import { openUrl } from "../utils";
 
 export namespace ServiceCommands {
 
@@ -18,9 +18,7 @@ export namespace ServiceCommands {
     export async function deleteService(context: IActionContext, node?: ServiceTreeItem): Promise<ServiceTreeItem> {
         node = await getNode(node, context);
         await ext.ui.showWarningMessage(`Are you sure to delete Spring Cloud service "${node.name}"?`, { modal: true }, DialogResponses.deleteResponse);
-        await node.runWithTemporaryDescription(localize('deleting', 'Deleting...'), async () => {
-            return node!.deleteTreeItem(context);
-        });
+        await node!.deleteTreeItem(context);
         return node;
     }
 
