@@ -64,8 +64,8 @@ export class AppJvmOptionsTreeItem extends AppSettingsTreeItem {
     }
 
     public async updateSettingsValue(context: IActionContext, newJvmOptions?: string[]): Promise<void> {
-        const updating: string = localize('updatingJvmOptions', 'Updating JVM options of Spring Cloud app "{0}"', this.deployment.app.name);
-        const updated: string = localize('updatedJvmOptions', 'Successfully updated JVM options of Spring Cloud app "{0}".', this.deployment.app.name);
+        const updating: string = localize('updatingJvmOptions', 'Updating JVM options of "{0}"', this.deployment.app.name);
+        const updated: string = localize('updatedJvmOptions', 'Successfully updated JVM options of "{0}".', this.deployment.app.name);
 
         const wizardContext: IJvmOptionsUpdateWizardContext = Object.assign(context, this.root, {
             newJvmOptions: newJvmOptions?.join(' ')

@@ -17,7 +17,7 @@ export class UpdateAppStep extends AzureWizardExecuteStep<IAppCreationWizardCont
     }
 
     public async execute(context: IAppCreationWizardContext, progress: Progress<{ message?: string; increment?: number }>): Promise<void> {
-        const message: string = localize('updatingNewApp', 'Activating deployment for Spring Cloud app "{0}"...', context.newApp?.name);
+        const message: string = localize('updatingNewApp', 'Activating deployment of "{0}"...', context.newApp?.name);
         progress.report({ message });
 
         const app: EnhancedApp = this.service.enhanceApp(context.newApp!);

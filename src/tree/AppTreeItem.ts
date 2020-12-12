@@ -119,8 +119,8 @@ export class AppTreeItem extends AzureParentTreeItem {
 
     public async toggleEndpoint(_context: IActionContext): Promise<void> {
         const isPublic: boolean = this.data.properties?.publicProperty ?? false;
-        const doing: string = isPublic ? `Unassigning public endpoint of Spring Cloud app "${this.data.name}".` : `Assigning public endpoint to Spring Cloud app "${this.data.name}".`;
-        const done: string = isPublic ? `Successfully unassigned public endpoint of Spring Cloud app "${this.data.name}".` : `Successfully assigned public endpoint to Spring Cloud app "${this.data.name}".`;
+        const doing: string = isPublic ? `Unassigning public endpoint of "${this.data.name}".` : `Assigning public endpoint to "${this.data.name}".`;
+        const done: string = isPublic ? `Successfully unassigned public endpoint of "${this.data.name}".` : `Successfully assigned public endpoint to "${this.data.name}".`;
         await window.withProgress({ location: ProgressLocation.Notification, title: doing }, async (): Promise<void> => {
             ext.outputChannel.appendLog(doing);
             await this.app.setPublic(!isPublic);
@@ -138,8 +138,8 @@ export class AppTreeItem extends AzureParentTreeItem {
     }
 
     public async deployArtifact(context: IActionContext, artifactPath: string): Promise<void> {
-        const deploying: string = localize('deploying', 'Deploying artifact to Spring Cloud app "{0}".', this.data.name);
-        const deployed: string = localize('deployed', 'Successfully deployed artifact to Spring Cloud app "{0}".', this.data.name);
+        const deploying: string = localize('deploying', 'Deploying artifact to "{0}".', this.data.name);
+        const deployed: string = localize('deployed', 'Successfully deployed artifact to "{0}".', this.data.name);
 
         const wizardContext: IAppDeploymentWizardContext = Object.assign(context, this.root, {
             app: this.app

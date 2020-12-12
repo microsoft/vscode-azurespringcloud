@@ -62,8 +62,8 @@ export class AppEnvVariablesTreeItem extends AppSettingsTreeItem {
     }
 
     public async updateSettingsValue(_context: IActionContext, newVars?: { [p: string]: string }): Promise<void> {
-        const updating: string = localize('updatingEnvVar', 'Updating environment variables of Spring Cloud app {0}...', this.deployment.app.name);
-        const updated: string = localize('updatedEnvVar', 'Successfully updated environment variables of Spring Cloud app {0}.', this.deployment.app.name);
+        const updating: string = localize('updatingEnvVar', 'Updating environment variables of "{0}"...', this.deployment.app.name);
+        const updated: string = localize('updatedEnvVar', 'Successfully updated environment variables of {0}.', this.deployment.app.name);
 
         await window.withProgress({ location: ProgressLocation.Notification, title: updating }, async (): Promise<void> => {
             ext.outputChannel.appendLog(updating);

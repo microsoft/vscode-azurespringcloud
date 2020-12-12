@@ -33,8 +33,8 @@ export class AppScaleSettingsTreeItem extends AppSettingsTreeItem {
     }
 
     public async updateSettingsValue(context: IActionContext, key?: string): Promise<string> {
-        const scaling: string = localize('scaling', 'Scaling Spring Cloud app "{0}"', this.deployment.app.name);
-        const scaled: string = localize('scaled', 'Successfully scaled Spring Cloud app "{0}".', this.deployment.app.name);
+        const scaling: string = localize('scaling', 'Scaling "{0}"', this.deployment.app.name);
+        const scaled: string = localize('scaled', 'Successfully scaled "{0}".', this.deployment.app.name);
 
         const newSettings: IScaleSettings = { ...this.settings };
         const wizardContext: IScaleSettingsUpdateWizardContext = Object.assign(context, this.root, { newSettings });

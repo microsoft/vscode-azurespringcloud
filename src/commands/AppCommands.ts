@@ -42,7 +42,7 @@ export namespace AppCommands {
 
     export async function stopApp(context: IActionContext, node?: AppTreeItem): Promise<AppTreeItem> {
         node = await getNode(node, context);
-        await ext.ui.showWarningMessage(`Are you sure to stop Spring Cloud service "${node.app.name}"?`, { modal: true }, DialogResponses.yes);
+        await ext.ui.showWarningMessage(`Are you sure to stop "${node.app.name}"?`, { modal: true }, DialogResponses.yes);
         await node.runWithTemporaryDescription(localize('stopping', 'Stopping...'), async () => {
             await node!.app.stop();
             node!.refresh();

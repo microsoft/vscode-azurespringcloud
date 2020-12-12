@@ -20,7 +20,7 @@ export class UpdateScaleSettingsStep extends AzureWizardExecuteStep<IScaleSettin
             progress.report({ message: localize('noScaleSettingChanged', 'No setting is changed') });
             return Promise.resolve(undefined);
         }
-        const message: string = localize('updatingScaleSetting', 'Updating scale settings of Spring Cloud app "{0}"...', this.deployment.app.name);
+        const message: string = localize('updatingScaleSetting', 'Updating scale settings of "{0}"...', this.deployment.app.name);
         progress.report({ message });
         await this.deployment.updateScaleSettings(context.newSettings);
         return Promise.resolve(undefined);

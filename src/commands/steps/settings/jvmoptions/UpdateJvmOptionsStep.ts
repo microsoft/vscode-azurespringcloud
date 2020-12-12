@@ -14,7 +14,7 @@ export class UpdateJvmOptionsStep extends AzureWizardExecuteStep<IJvmOptionsUpda
     }
 
     public async execute(context: IJvmOptionsUpdateWizardContext, progress: Progress<{ message?: string; increment?: number }>): Promise<void> {
-        const message: string = localize('updatingJvmOptions', 'Updating JVM Options of Spring Cloud app "{0}"...', this.deployment.app.name);
+        const message: string = localize('updatingJvmOptions', 'Updating JVM Options of "{0}"...', this.deployment.app.name);
         progress.report({ message });
         await this.deployment.updateJvmOptions(context.newJvmOptions!);
         return Promise.resolve(undefined);
