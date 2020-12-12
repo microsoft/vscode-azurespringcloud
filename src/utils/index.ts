@@ -5,7 +5,9 @@
 
 // tslint:disable-next-line:no-require-imports no-implicit-dependencies
 import opn = require("opn");
+import { ProgressLocation, window } from "vscode";
 import * as nls from 'vscode-nls';
+import { ext } from "../extensionVariables";
 
 export const localize: nls.LocalizeFunc = nls.loadMessageBundle();
 
@@ -16,6 +18,15 @@ export async function openUrl(url: string): Promise<void> {
 
     // tslint:disable-next-line: no-unsafe-any
     opn(url);
+}
+
+export async function runInBackground(doing: string, done: string, task: () => Promise<void>): Promise<void> {
+    await window.withProgress({ location: ProgressLocation.Notification, title: doing }, async (): Promise<void> => {
+        ext.outputChannel.appendLog(doing);
+        await task();
+        window.showInformationMessage(done);
+        ext.outputChannel.appendLog(done);
+    });
 }
 
 /**

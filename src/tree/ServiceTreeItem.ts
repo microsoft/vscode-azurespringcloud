@@ -5,7 +5,7 @@
 
 import { AppPlatformManagementClient } from '@azure/arm-appplatform';
 import { ServiceResource } from '@azure/arm-appplatform/esm/models';
-import { ProgressLocation, window } from "vscode";
+import { window } from "vscode";
 import {
     AzExtTreeItem,
     AzureParentTreeItem,
@@ -23,17 +23,16 @@ import { IAppCreationWizardContext } from "../commands/steps/creation/IAppCreati
 import { InputAppNameStep } from "../commands/steps/creation/InputAppNameStep";
 import { SelectAppStackStep } from "../commands/steps/creation/SelectAppStackStep";
 import { UpdateAppStep } from "../commands/steps/creation/UpdateAppStep";
-import { ext } from "../extensionVariables";
 import { EnhancedService, IApp, IService } from "../model";
 import { ServiceService } from "../service/ServiceService";
-import { localize, nonNullProp } from "../utils";
+import * as utils from "../utils";
 import { TreeUtils } from "../utils/TreeUtils";
 import { AppTreeItem } from './AppTreeItem';
 
 export class ServiceTreeItem extends AzureParentTreeItem {
     public static contextValue: string = 'azureSpringCloud.service';
     public readonly contextValue: string = ServiceTreeItem.contextValue;
-    public readonly childTypeLabel: string = localize('app', 'App');
+    public readonly childTypeLabel: string = utils.localize('app', 'App');
     public data: IService;
 
     private _nextLink: string | undefined;
@@ -51,7 +50,7 @@ export class ServiceTreeItem extends AzureParentTreeItem {
     }
 
     public get id(): string {
-        return nonNullProp(this.data, 'id');
+        return utils.nonNullProp(this.data, 'id');
     }
 
     public get label(): string {
@@ -86,15 +85,9 @@ export class ServiceTreeItem extends AzureParentTreeItem {
     }
 
     public async deleteTreeItemImpl(): Promise<void> {
-        const deleting: string = localize('deletingSpringCLoudService', 'Deleting Spring Cloud service "{0}"...', this.data.name);
-        const deleted: string = localize('deletedSpringCloudService', 'Successfully deleted Spring Cloud service "{0}".', this.data.name);
-
-        await window.withProgress({ location: ProgressLocation.Notification, title: deleting }, async (): Promise<void> => {
-            ext.outputChannel.appendLog(deleting);
-            await this.service.remove();
-            window.showInformationMessage(deleted);
-            ext.outputChannel.appendLog(deleted);
-        });
+        const deleting: string = utils.localize('deletingSpringCLoudService', 'Deleting Spring Cloud service "{0}"...', this.data.name);
+        const deleted: string = utils.localize('deletedSpringCloudService', 'Successfully deleted Spring Cloud service "{0}".', this.data.name);
+        await utils.runInBackground(deleting, deleted, () => this.service.remove());
         this.deleted = true;
     }
 
@@ -111,17 +104,17 @@ export class ServiceTreeItem extends AzureParentTreeItem {
         executeSteps.push(new CreateAppStep(this.service));
         executeSteps.push(new CreateAppDeploymentStep(this.service));
         executeSteps.push(new UpdateAppStep(this.service));
-        const creating: string = localize('creatingSpringCouldApp', 'Creating new Spring Cloud app in Azure');
+        const creating: string = utils.localize('creatingSpringCouldApp', 'Creating new Spring Cloud app in Azure');
         const wizard: AzureWizard<IAppCreationWizardContext> = new AzureWizard(wizardContext, { promptSteps, executeSteps, title: creating });
 
         await wizard.prompt();
-        const appName: string = nonNullProp(wizardContext, 'newAppName');
+        const appName: string = utils.nonNullProp(wizardContext, 'newAppName');
         context.showCreatingTreeItem(appName);
         await wizard.execute();
-        const created: string = localize('createdSpringCouldApp', 'Successfully created Spring Cloud app "{0}".', appName);
+        const created: string = utils.localize('createdSpringCouldApp', 'Successfully created Spring Cloud app "{0}".', appName);
         window.showInformationMessage(created);
 
-        return new AppTreeItem(this, nonNullProp(wizardContext, 'newApp'));
+        return new AppTreeItem(this, utils.nonNullProp(wizardContext, 'newApp'));
     }
 
     public async refreshImpl(): Promise<void> {

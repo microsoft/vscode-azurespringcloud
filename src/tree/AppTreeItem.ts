@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { AppPlatformManagementClient } from "@azure/arm-appplatform";
-import { ProgressLocation, window } from "vscode";
+import { window } from "vscode";
 import {
     AzExtTreeItem,
     AzureParentTreeItem,
@@ -17,11 +17,10 @@ import {
 import { IAppDeploymentWizardContext } from "../commands/steps/deployment/IAppDeploymentWizardContext";
 import { UpdateDeploymentStep } from "../commands/steps/deployment/UpdateDeploymentStep";
 import { UploadArtifactStep } from "../commands/steps/deployment/UploadArtifactStep";
-import { ext } from "../extensionVariables";
 import { EnhancedApp, EnhancedDeployment, IApp, IDeployment } from "../model";
 import { AppService } from "../service/AppService";
 import { DeploymentService } from "../service/DeploymentService";
-import { localize, nonNullProp } from "../utils";
+import * as utils from "../utils";
 import { TreeUtils } from "../utils/TreeUtils";
 import { AppEnvVariablesTreeItem } from "./AppEnvVariablesTreeItem";
 import { AppInstancesTreeItem } from "./AppInstancesTreeItem";
@@ -60,7 +59,7 @@ export class AppTreeItem extends AzureParentTreeItem {
     }
 
     public get id(): string {
-        return nonNullProp(this.data, 'id');
+        return utils.nonNullProp(this.data, 'id');
     }
 
     public get label(): string {
@@ -105,15 +104,9 @@ export class AppTreeItem extends AzureParentTreeItem {
     }
 
     public async deleteTreeItemImpl(_context: IActionContext): Promise<void> {
-        const deleting: string = localize('deletingSpringCLoudApp', 'Deleting Spring Cloud app "{0}"...', this.data.name);
-        const deleted: string = localize('deletedSpringCLoudApp', 'Successfully deleted Spring Cloud app "{0}".', this.data.name);
-
-        await window.withProgress({ location: ProgressLocation.Notification, title: deleting }, async (): Promise<void> => {
-            ext.outputChannel.appendLog(deleting);
-            await this.app.remove();
-            window.showInformationMessage(deleted);
-            ext.outputChannel.appendLog(deleted);
-        });
+        const deleting: string = utils.localize('deletingSpringCLoudApp', 'Deleting Spring Cloud app "{0}"...', this.data.name);
+        const deleted: string = utils.localize('deletedSpringCLoudApp', 'Successfully deleted Spring Cloud app "{0}".', this.data.name);
+        await utils.runInBackground(deleting, deleted, () => this.app.remove());
         this.deleted = true;
     }
 
@@ -121,12 +114,7 @@ export class AppTreeItem extends AzureParentTreeItem {
         const isPublic: boolean = this.data.properties?.publicProperty ?? false;
         const doing: string = isPublic ? `Unassigning public endpoint of "${this.data.name}".` : `Assigning public endpoint to "${this.data.name}".`;
         const done: string = isPublic ? `Successfully unassigned public endpoint of "${this.data.name}".` : `Successfully assigned public endpoint to "${this.data.name}".`;
-        await window.withProgress({ location: ProgressLocation.Notification, title: doing }, async (): Promise<void> => {
-            ext.outputChannel.appendLog(doing);
-            await this.app.setPublic(!isPublic);
-            window.showInformationMessage(done);
-            ext.outputChannel.appendLog(done);
-        });
+        await utils.runInBackground(doing, done, () => this.app.setPublic(!isPublic));
         this.refresh();
     }
 
@@ -138,8 +126,8 @@ export class AppTreeItem extends AzureParentTreeItem {
     }
 
     public async deployArtifact(context: IActionContext, artifactPath: string): Promise<void> {
-        const deploying: string = localize('deploying', 'Deploying artifact to "{0}".', this.data.name);
-        const deployed: string = localize('deployed', 'Successfully deployed artifact to "{0}".', this.data.name);
+        const deploying: string = utils.localize('deploying', 'Deploying artifact to "{0}".', this.data.name);
+        const deployed: string = utils.localize('deployed', 'Successfully deployed artifact to "{0}".', this.data.name);
 
         const wizardContext: IAppDeploymentWizardContext = Object.assign(context, this.root, {
             app: this.app

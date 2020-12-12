@@ -1,9 +1,8 @@
-import { ProgressLocation, window } from "vscode";
 import { AzExtTreeItem, IActionContext, ICreateChildImplContext } from "vscode-azureextensionui";
 import { ext } from "../extensionVariables";
 import { IDeployment } from "../model";
 import { DeploymentService } from "../service/DeploymentService";
-import { localize } from "../utils";
+import * as utils from "../utils";
 import { AppSettingsTreeItem } from "./AppSettingsTreeItem";
 import { AppSettingTreeItem, IOptions } from "./AppSettingTreeItem";
 import { AppTreeItem } from "./AppTreeItem";
@@ -62,16 +61,9 @@ export class AppEnvVariablesTreeItem extends AppSettingsTreeItem {
     }
 
     public async updateSettingsValue(_context: IActionContext, newVars?: { [p: string]: string }): Promise<void> {
-        const updating: string = localize('updatingEnvVar', 'Updating environment variables of "{0}"...', this.deployment.app.name);
-        const updated: string = localize('updatedEnvVar', 'Successfully updated environment variables of {0}.', this.deployment.app.name);
-
-        await window.withProgress({ location: ProgressLocation.Notification, title: updating }, async (): Promise<void> => {
-            ext.outputChannel.appendLog(updating);
-            await this.deployment.updateEnvironmentVariables(newVars ?? {});
-            window.showInformationMessage(updated);
-            ext.outputChannel.appendLog(updated);
-        });
-
+        const updating: string = utils.localize('updatingEnvVar', 'Updating environment variables of "{0}"...', this.deployment.app.name);
+        const updated: string = utils.localize('updatedEnvVar', 'Successfully updated environment variables of {0}.', this.deployment.app.name);
+        await utils.runInBackground(updating, updated, () => this.deployment.updateEnvironmentVariables(newVars ?? {}));
         this.refresh();
     }
 }
