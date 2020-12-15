@@ -19,7 +19,7 @@ export class AppInstancesTreeItem extends AzureParentTreeItem {
     public readonly id: string = AppInstancesTreeItem.contextValue;
     public readonly label: string = 'App Instances';
     public readonly parent: AppTreeItem;
-    public readonly iconPath: TreeItemIconPath = TreeUtils.getIconPath('azure-springcloud-app-instances');
+    public readonly iconPath: TreeItemIconPath = TreeUtils.getThemedIconPath('app-instances');
     private data: IDeployment;
 
     public constructor(parent: AppTreeItem, deployment: IDeployment) {
