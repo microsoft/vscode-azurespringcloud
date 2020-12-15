@@ -27,6 +27,6 @@ export class AppInstanceTreeItem extends AzureTreeItem {
     }
 
     public get iconPath(): TreeItemIconPath {
-        return TreeUtils.getIconPath('azure-springcloud-app-instance');
+        return TreeUtils.getThemedIconPath('app-instance');
     }
 }
