@@ -1,8 +1,9 @@
-import { AzExtTreeItem, IActionContext, ICreateChildImplContext } from "vscode-azureextensionui";
+import { AzExtTreeItem, IActionContext, ICreateChildImplContext, TreeItemIconPath } from "vscode-azureextensionui";
 import { ext } from "../extensionVariables";
 import { IDeployment } from "../model";
 import { DeploymentService } from "../service/DeploymentService";
 import * as utils from "../utils";
+import { TreeUtils } from "../utils/TreeUtils";
 import { AppSettingsTreeItem } from "./AppSettingsTreeItem";
 import { AppSettingTreeItem, IOptions } from "./AppSettingTreeItem";
 import { AppTreeItem } from "./AppTreeItem";
@@ -15,6 +16,7 @@ export class AppEnvVariablesTreeItem extends AppSettingsTreeItem {
         contextValue: 'azureSpringCloud.app.envVariable',
     };
     public readonly contextValue: string = AppEnvVariablesTreeItem.contextValue;
+    public readonly iconPath: TreeItemIconPath = TreeUtils.getThemedIconPath('app-envvars');
     public readonly id: string = AppEnvVariablesTreeItem.contextValue;
     public readonly label: string = 'Environment Variables';
 

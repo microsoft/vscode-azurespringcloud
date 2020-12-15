@@ -1,11 +1,20 @@
 import { window } from "vscode";
-import { AzExtTreeItem, AzureWizard, AzureWizardExecuteStep, AzureWizardPromptStep, IActionContext, ICreateChildImplContext } from "vscode-azureextensionui";
+import {
+    AzExtTreeItem,
+    AzureWizard,
+    AzureWizardExecuteStep,
+    AzureWizardPromptStep,
+    IActionContext,
+    ICreateChildImplContext,
+    TreeItemIconPath
+} from "vscode-azureextensionui";
 import { IJvmOptionsUpdateWizardContext } from "../commands/steps/settings/jvmoptions/IJvmOptionsUpdateWizardContext";
 import { InputJvmOptionsStep } from "../commands/steps/settings/jvmoptions/InputJvmOptionsStep";
 import { UpdateJvmOptionsStep } from "../commands/steps/settings/jvmoptions/UpdateJvmOptionsStep";
 import { ext } from "../extensionVariables";
 import { IDeployment } from "../model";
 import { localize } from "../utils";
+import { TreeUtils } from "../utils/TreeUtils";
 import { AppSettingsTreeItem } from "./AppSettingsTreeItem";
 import { AppSettingTreeItem, IOptions } from "./AppSettingTreeItem";
 import { AppTreeItem } from "./AppTreeItem";
@@ -17,6 +26,7 @@ export class AppJvmOptionsTreeItem extends AppSettingsTreeItem {
     };
     private static readonly JVM_OPTION_PATTERN: RegExp = /^-[a-zA-Z_]+\S*$/;
     public readonly contextValue: string = AppJvmOptionsTreeItem.contextValue;
+    public readonly iconPath: TreeItemIconPath = TreeUtils.getThemedIconPath('app-jvmoptions');
     public readonly id: string = AppJvmOptionsTreeItem.contextValue;
     public readonly label: string = 'JVM Options';
 

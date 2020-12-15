@@ -1,0 +1,11 @@
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M11 10H9V11H11V10ZM11 12H9V13H11V12Z" fill="#C5C5C5"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M16 10H14V11H16V10ZM16 12H14V13H16V12Z" fill="#C5C5C5"/>
+<rect x="12" y="8" width="2" height="1" transform="rotate(90 12 8)" fill="#C4C4C4"/>
+<rect x="12" y="13" width="2" height="1" transform="rotate(90 12 13)" fill="#C4C4C4"/>
+<rect x="14" y="8" width="2" height="1" transform="rotate(90 14 8)" fill="#C4C4C4"/>
+<rect x="14" y="13" width="2" height="1" transform="rotate(90 14 13)" fill="#C4C4C4"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M15 9H10V14H15V9ZM14 10H11V13H14V10Z" fill="#C4C4C4"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M6 1L12 4.4641V7H9.5V8.5H8V10H6.6V6H8V5H4V6H5.4V10L4 10.006V11H8V13.7017L6 14.8564L0 11.3923V4.4641L6 1Z" fill="#89D185"/>
+<rect x="12" y="11" width="1" height="1" fill="#C4C4C4"/>
+</svg>

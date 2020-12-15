@@ -75,18 +75,18 @@ export class AppTreeItem extends AzureParentTreeItem {
     public get iconPath(): TreeItemIconPath {
         switch (this.deploymentData?.properties?.status) {
             case "Stopped":
-                return TreeUtils.getPngIconPath('azure-springcloud-app-stopped');
+                return TreeUtils.getThemedIconPath('app-status-stopped');
             case "Failed":
-                return TreeUtils.getPngIconPath('azure-springcloud-app-failed');
+                return TreeUtils.getThemedIconPath('app-status-failed');
             case "Allocating":
             case "Upgrading":
             case "Compiling":
-                return TreeUtils.getPngIconPath('azure-springcloud-app-pending');
+                return TreeUtils.getThemedIconPath('app-status-pending');
             case "Unknown":
-                return TreeUtils.getPngIconPath('azure-springcloud-app-unknown');
+                return TreeUtils.getThemedIconPath('app-status-unknown');
             case "Running":
             default:
-                return TreeUtils.getPngIconPath('azure-springcloud-app-running');
+                return TreeUtils.getThemedIconPath('app');
         }
     }
 

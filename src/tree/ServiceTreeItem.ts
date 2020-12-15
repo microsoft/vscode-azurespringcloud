@@ -63,7 +63,7 @@ export class ServiceTreeItem extends AzureParentTreeItem {
     }
 
     public get iconPath(): TreeItemIconPath {
-        return TreeUtils.getPngIconPath('azure-springcloud-small');
+        return TreeUtils.getThemedIconPath('azure-spring-cloud');
     }
 
     public hasMoreChildrenImpl(): boolean {

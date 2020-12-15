@@ -1,12 +1,10 @@
 import { AppPlatformManagementClient } from "@azure/arm-appplatform";
-import { AzureParentTreeItem, createAzureClient, IActionContext, TreeItemIconPath } from "vscode-azureextensionui";
+import { AzureParentTreeItem, createAzureClient, IActionContext } from "vscode-azureextensionui";
 import { ext } from "../extensionVariables";
 import { EnhancedDeployment, IDeployment } from "../model";
 import { DeploymentService } from "../service/DeploymentService";
-import { TreeUtils } from "../utils/TreeUtils";
 import { AppSettingTreeItem, IOptions } from "./AppSettingTreeItem";
 import { AppTreeItem } from "./AppTreeItem";
-import getThemedIconPath = TreeUtils.getThemedIconPath;
 
 export abstract class AppSettingsTreeItem extends AzureParentTreeItem {
     public readonly childTypeLabel: string = 'App Setting';
@@ -22,10 +20,6 @@ export abstract class AppSettingsTreeItem extends AzureParentTreeItem {
         const client: AppPlatformManagementClient = createAzureClient(this.root, AppPlatformManagementClient);
         const deploymentService: DeploymentService = new DeploymentService(client, this.data);
         return Object.assign(deploymentService, this.data);
-    }
-
-    public get iconPath(): TreeItemIconPath {
-        return getThemedIconPath('settings');
     }
 
     public hasMoreChildrenImpl(): boolean {
