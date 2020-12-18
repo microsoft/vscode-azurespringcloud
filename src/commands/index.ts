@@ -43,8 +43,9 @@ export function registerCommands(): void {
 
 function registerCommandWithTelemetryWrapper(commandId: string, callback: CommandCallback): void {
     // tslint:disable-next-line:no-any
-    const callbackWithTroubleshooting: CommandCallback = async (context: IActionContext, ...args: any[]) => {
-        return await instrumentOperation(commandId, async () => await callback(context, ...args))();
+    const callbackWithTroubleshooting: CommandCallback = (context: IActionContext, ...args: any[]) => {
+        // tslint:disable-next-line: no-unsafe-any
+        return instrumentOperation(commandId, () => callback(context, ...args))();
     };
     registerCommand(commandId, callbackWithTroubleshooting);
 }

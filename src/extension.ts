@@ -21,6 +21,7 @@ import { AzureAccountTreeItem } from './tree/AzureAccountTreeItem';
 
 export async function activateInternal(context: vscode.ExtensionContext, _perfStats: { loadStartTime: number; loadEndTime: number }, ignoreBundle?: boolean): Promise<AzureExtensionApiProvider> {
     await initializeFromJsonFile(context.asAbsolutePath('./package.json'), { firstParty: true });
+    // tslint:disable-next-line: no-unsafe-any
     await instrumentOperation('activation', () => activateExtension(context, ignoreBundle))();
     return createApiProvider([]);
 }
