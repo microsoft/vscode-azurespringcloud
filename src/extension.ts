@@ -19,9 +19,9 @@ import { registerCommands } from './commands';
 import { ext } from './extensionVariables';
 import { AzureAccountTreeItem } from './tree/AzureAccountTreeItem';
 
-export async function activateInternal(context: vscode.ExtensionContext, ignoreBundle?: boolean): Promise<AzureExtensionApiProvider> {
+export async function activateInternal(context: vscode.ExtensionContext, _perfStats: { loadStartTime: number; loadEndTime: number }, ignoreBundle?: boolean): Promise<AzureExtensionApiProvider> {
     await initializeFromJsonFile(context.asAbsolutePath('./package.json'), { firstParty: true });
-    await instrumentOperation('activation', activateExtension)(context, ignoreBundle);
+    await instrumentOperation('activation', () => activateExtension(context, ignoreBundle))();
     return createApiProvider([]);
 }
 
@@ -29,7 +29,7 @@ export function deactivateInternal(): void {
     ext.diagnosticWatcher?.dispose();
 }
 
-async function activateExtension(_operationId: string, context: vscode.ExtensionContext, ignoreBundle?: boolean): Promise<void> {
+async function activateExtension(context: vscode.ExtensionContext, ignoreBundle?: boolean): Promise<void> {
     ext.context = context;
     ext.ignoreBundle = ignoreBundle;
     ext.outputChannel = createAzExtOutputChannel('Azure Spring Cloud', ext.prefix);
