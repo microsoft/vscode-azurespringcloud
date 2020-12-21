@@ -5,6 +5,8 @@ import { localize } from "../../../../utils";
 import { IScaleSettingsUpdateWizardContext } from "./IScaleSettingsUpdateWizardContext";
 
 export class InputScaleValueStep extends AzureWizardPromptStep<IScaleSettingsUpdateWizardContext> {
+    // refer https://github.com/microsoft/vscode-azuretools/issues/789
+    public supportsDuplicateSteps: boolean = true;
     private readonly key: string;
     private readonly deployment: EnhancedDeployment;
 
