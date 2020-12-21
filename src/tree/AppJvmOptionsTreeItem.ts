@@ -49,6 +49,7 @@ export class AppJvmOptionsTreeItem extends AppSettingsTreeItem {
     public async createChildImpl(context: ICreateChildImplContext): Promise<AzExtTreeItem> {
         const newVal: string = await ext.ui.showInputBox({
             prompt: 'Enter new JVM option:',
+            placeHolder: 'e.g. -Xmx2048m',
             validateInput: this.validateJvmOption
         });
         context.showCreatingTreeItem(newVal);
@@ -60,6 +61,7 @@ export class AppJvmOptionsTreeItem extends AppSettingsTreeItem {
         const newVal: string = await ext.ui.showInputBox({
             prompt: 'Update JVM option:',
             value: node?.value ?? '',
+            placeHolder: 'e.g. -Xmx2048m',
             validateInput: this.validateJvmOption
         });
         await this.updateSettingsValue(context, [...this.options, newVal]);
