@@ -14,6 +14,7 @@ import {
     IActionContext,
     TreeItemIconPath
 } from "vscode-azureextensionui";
+import { AppCommands } from "../commands/AppCommands";
 import { IAppDeploymentWizardContext } from "../commands/steps/deployment/IAppDeploymentWizardContext";
 import { UpdateDeploymentStep } from "../commands/steps/deployment/UpdateDeploymentStep";
 import { UploadArtifactStep } from "../commands/steps/deployment/UploadArtifactStep";
@@ -30,6 +31,8 @@ import { ServiceTreeItem } from "./ServiceTreeItem";
 
 export class AppTreeItem extends AzureParentTreeItem {
     public static contextValue: string = 'azureSpringCloud.app';
+    private static readonly ACCESS_PUBLIC_ENDPOINT: string = 'Access public endpoint';
+    private static readonly ACCESS_TEST_ENDPOINT: string = 'Access test endpoint';
     public readonly contextValue: string = AppTreeItem.contextValue;
     public parent: ServiceTreeItem;
     public data: IApp;
@@ -138,7 +141,12 @@ export class AppTreeItem extends AzureParentTreeItem {
         executeSteps.push(new UpdateDeploymentStep(this.deployment!));
         const wizard: AzureWizard<IAppDeploymentWizardContext> = new AzureWizard(wizardContext, { executeSteps, title: deploying });
         await wizard.execute();
-        window.showInformationMessage(deployed);
+        setTimeout(async () => {
+            const action: string | undefined = await window.showInformationMessage(deployed, AppTreeItem.ACCESS_PUBLIC_ENDPOINT, AppTreeItem.ACCESS_TEST_ENDPOINT);
+            if (action) {
+                return action === AppTreeItem.ACCESS_PUBLIC_ENDPOINT ? AppCommands.openPublicEndpoint(context, this) : AppCommands.openTestEndpoint(context, this);
+            }
+        },         0);
     }
 
     public async scaleInstances(context: IActionContext): Promise<void> {
