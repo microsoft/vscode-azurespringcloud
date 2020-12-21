@@ -14,7 +14,7 @@ export namespace AppCommands {
         const endPoint: string | undefined = await node.app.getPublicEndpoint();
         if (!endPoint || endPoint.toLowerCase() === 'none') {
             window.showWarningMessage(localize('noPublicEndpoint', "App [{0}] has not been assigned public endpoint.", node.app.name));
-            await ext.ui.showWarningMessage(`App[${node.app.name}] is not publicly accessible. Do you want to set it public and assign it a public endpoint?`, { modal: true }, DialogResponses.yes);
+            await ext.ui.showWarningMessage(`App [${node.app.name}] is not publicly accessible. Do you want to set it public and assign it a public endpoint?`, { modal: true }, DialogResponses.yes);
             await toggleEndpoint(context, node);
         }
         await openUrl(endPoint!);
