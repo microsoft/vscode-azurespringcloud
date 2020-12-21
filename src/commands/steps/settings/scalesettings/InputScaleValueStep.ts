@@ -32,6 +32,9 @@ export class InputScaleValueStep extends AzureWizardPromptStep<IScaleSettingsUpd
         const numVal: number = Number(val);
         const scope: { max: number; min: number } = IScaleSettings.SCOPES[this.deployment.sku?.tier ?? 'Basic'][this.key];
         if (!Number.isInteger(numVal) || numVal > scope.max || numVal < scope.min) {
+            if (this.key === 'cpu' && this.deployment.sku?.tier === 'Basic') {
+                return localize('invalidBasicCPU', 'Each app instance can have only 1 vCPU for Basic pricing tier');
+            }
             return localize('invalidScaleSettingValue', 'The value must be integer and between {0} and {1}', scope.min, scope.max);
         }
         return undefined;
