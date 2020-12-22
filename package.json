@@ -328,17 +328,17 @@
                 },
                 {
                     "command": "azureSpringCloud.app.instance.startStreamingLog",
-                    "when": "view == azureSpringCloud && viewItem == azureSpringCloud.app.instance",
+                    "when": "view == azureSpringCloud && viewItem =~ /^azureSpringCloud\\.app\\.instance\\.status-Running$/",
                     "group": "6@1"
                 },
                 {
                     "command": "azureSpringCloud.app.instance.stopStreamingLog",
-                    "when": "view == azureSpringCloud && viewItem == azureSpringCloud.app.instance",
+                    "when": "view == azureSpringCloud && viewItem =~ /^azureSpringCloud\\.app\\.instance\\.status-Running$/",
                     "group": "6@2"
                 },
                 {
                     "command": "azureSpringCloud.common.viewProperties",
-                    "when": "view == azureSpringCloud && viewItem == azureSpringCloud.app.instance",
+                    "when": "view == azureSpringCloud && viewItem =~ /^azureSpringCloud\\.app\\.instance\\.status-.+$/",
                     "group": "9@1"
                 },
                 {
