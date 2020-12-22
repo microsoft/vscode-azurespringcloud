@@ -4,8 +4,7 @@ import { InputScaleValueStep } from "../commands/steps/settings/scalesettings/In
 import { IScaleSettingsUpdateWizardContext } from "../commands/steps/settings/scalesettings/IScaleSettingsUpdateWizardContext";
 import { UpdateScaleSettingsStep } from "../commands/steps/settings/scalesettings/UpdateScaleSettingsStep";
 import { IDeployment, IScaleSettings } from "../model";
-import { localize } from "../utils";
-import { TreeUtils } from "../utils/TreeUtils";
+import { getThemedIconPath, localize } from "../utils";
 import { AppSettingsTreeItem } from "./AppSettingsTreeItem";
 import { AppSettingTreeItem, IOptions } from "./AppSettingTreeItem";
 import { AppTreeItem } from "./AppTreeItem";
@@ -17,7 +16,7 @@ export class AppScaleSettingsTreeItem extends AppSettingsTreeItem {
     };
 
     public readonly contextValue: string = AppScaleSettingsTreeItem.contextValue;
-    public readonly iconPath: TreeItemIconPath = TreeUtils.getThemedIconPath('app-scale');
+    public readonly iconPath: TreeItemIconPath = getThemedIconPath('app-scale');
     public readonly id: string = AppScaleSettingsTreeItem.contextValue;
     public readonly label: string = 'Scale Settings';
 

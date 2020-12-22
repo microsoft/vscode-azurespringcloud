@@ -1,6 +1,6 @@
 import { DeploymentInstance } from "@azure/arm-appplatform/src/models/index";
 import { AzureTreeItem, TreeItemIconPath } from "vscode-azureextensionui";
-import { TreeUtils } from "../utils/TreeUtils";
+import { getThemedIconPath } from "../utils";
 import { AppInstancesTreeItem } from "./AppInstancesTreeItem";
 
 export class AppInstanceTreeItem extends AzureTreeItem {
@@ -27,6 +27,6 @@ export class AppInstanceTreeItem extends AzureTreeItem {
     }
 
     public get iconPath(): TreeItemIconPath {
-        return TreeUtils.getThemedIconPath('app-instance');
+        return getThemedIconPath('app-instance');
     }
 }

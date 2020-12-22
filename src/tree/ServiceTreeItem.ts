@@ -26,7 +26,6 @@ import { UpdateAppStep } from "../commands/steps/creation/UpdateAppStep";
 import { EnhancedService, IApp, IService } from "../model";
 import { ServiceService } from "../service/ServiceService";
 import * as utils from "../utils";
-import { TreeUtils } from "../utils/TreeUtils";
 import { AppTreeItem } from './AppTreeItem';
 
 export class ServiceTreeItem extends AzureParentTreeItem {
@@ -63,7 +62,7 @@ export class ServiceTreeItem extends AzureParentTreeItem {
     }
 
     public get iconPath(): TreeItemIconPath {
-        return TreeUtils.getThemedIconPath('azure-spring-cloud');
+        return utils.getThemedIconPath('azure-spring-cloud');
     }
 
     public hasMoreChildrenImpl(): boolean {

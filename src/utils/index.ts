@@ -5,7 +5,9 @@
 
 // tslint:disable-next-line:no-require-imports no-implicit-dependencies
 import opn = require("opn");
+import * as path from 'path';
 import { ProgressLocation, window } from "vscode";
+import { TreeItemIconPath } from "vscode-azureextensionui";
 import * as nls from 'vscode-nls';
 import { ext } from "../extensionVariables";
 
@@ -52,16 +54,10 @@ export function nonNullValue<T>(value: T | undefined, propertyNameOrMessage?: st
     return value;
 }
 
-/**
- * Validates that a given string is not null, undefined, nor empty
- */
-export function nonNullOrEmptyValue(value: string | undefined, propertyNameOrMessage?: string): string {
-    if (!value) {
-        throw new Error(
-            // tslint:disable-next-line:prefer-template
-            'Internal error: Expected value to be neither null, undefined, nor empty'
-            + (propertyNameOrMessage ? `: ${propertyNameOrMessage}` : ''));
-    }
-
-    return value;
+export function getThemedIconPath(iconName: string): TreeItemIconPath {
+    const resources: string = ext.context.asAbsolutePath('resources');
+    return {
+        light: path.join(resources, 'light', `${iconName}.svg`),
+        dark: path.join(resources, 'dark', `${iconName}.svg`)
+    };
 }

@@ -22,7 +22,6 @@ import { EnhancedApp, EnhancedDeployment, IApp, IDeployment } from "../model";
 import { AppService } from "../service/AppService";
 import { DeploymentService } from "../service/DeploymentService";
 import * as utils from "../utils";
-import { TreeUtils } from "../utils/TreeUtils";
 import { AppEnvVariablesTreeItem } from "./AppEnvVariablesTreeItem";
 import { AppInstancesTreeItem } from "./AppInstancesTreeItem";
 import { AppJvmOptionsTreeItem } from "./AppJvmOptionsTreeItem";
@@ -78,7 +77,7 @@ export class AppTreeItem extends AzureParentTreeItem {
     }
 
     public get iconPath(): TreeItemIconPath {
-        return TreeUtils.getThemedIconPath(`app-status-${this.status}`);
+        return utils.getThemedIconPath(`app-status-${this.status}`);
     }
 
     // tslint:disable:no-unexternalized-strings
