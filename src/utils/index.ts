@@ -62,7 +62,6 @@ export function getThemedIconPath(iconName: string): TreeItemIconPath {
     };
 }
 
-export async function generalErrorHandler(commandName: string, error: Error): Promise<void> {
-    await window.showErrorMessage(`Command "${commandName}" fails. ${error.message}`);
-    throw error;
+export function showError(commandName: string, error: Error): void {
+    window.showErrorMessage(`Command "${commandName}" fails. ${error.message}`);
 }

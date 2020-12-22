@@ -10,7 +10,7 @@ import { ext } from '../extensionVariables';
 import { AppInstanceTreeItem } from "../tree/AppInstanceTreeItem";
 import { AppTreeItem } from "../tree/AppTreeItem";
 import { ServiceTreeItem } from "../tree/ServiceTreeItem";
-import { generalErrorHandler } from '../utils';
+import { showError } from '../utils';
 import { AppCommands } from "./AppCommands";
 import { ServiceCommands } from "./ServiceCommands";
 
@@ -50,7 +50,8 @@ function registerCommandWithTelemetryWrapper(commandId: string, callback: Comman
             await callback(context, ...args);
         } catch (error) {
             // tslint:disable-next-line: no-unsafe-any
-            generalErrorHandler(commandId, error);
+            showError(commandId, error);
+            throw error;
         }
     })();
     registerCommand(commandId, callbackWithTroubleshooting);
