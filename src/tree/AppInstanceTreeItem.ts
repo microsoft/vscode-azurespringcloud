@@ -5,7 +5,6 @@ import { AppInstancesTreeItem } from "./AppInstancesTreeItem";
 
 export class AppInstanceTreeItem extends AzureTreeItem {
     public static contextValue: string = 'azureSpringCloud.app.instance';
-    public contextValue: string = AppInstanceTreeItem.contextValue;
     public readonly parent: AppInstancesTreeItem;
     public readonly data: DeploymentInstance;
 
@@ -28,5 +27,9 @@ export class AppInstanceTreeItem extends AzureTreeItem {
 
     public get iconPath(): TreeItemIconPath {
         return getThemedIconPath('app-instance');
+    }
+
+    public get contextValue(): string {
+        return `azureSpringCloud.app.instance.status-${this.data.status}`;
     }
 }
