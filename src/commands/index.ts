@@ -10,6 +10,7 @@ import { ext } from '../extensionVariables';
 import { AppInstanceTreeItem } from "../tree/AppInstanceTreeItem";
 import { AppTreeItem } from "../tree/AppTreeItem";
 import { ServiceTreeItem } from "../tree/ServiceTreeItem";
+import { generalErrorHandler } from '../utils/uiUtils';
 import { AppCommands } from "./AppCommands";
 import { ServiceCommands } from "./ServiceCommands";
 
@@ -43,10 +44,15 @@ export function registerCommands(): void {
 
 function registerCommandWithTelemetryWrapper(commandId: string, callback: CommandCallback): void {
     // tslint:disable-next-line:no-any
-    const callbackWithTroubleshooting: CommandCallback = (context: IActionContext, ...args: any[]) => {
-        // tslint:disable-next-line: no-unsafe-any
-        return instrumentOperation(commandId, () => callback(context, ...args))();
-    };
+    const callbackWithTroubleshooting: CommandCallback = (context: IActionContext, ...args: any[]) => instrumentOperation(commandId, async () => {
+        try {
+            // tslint:disable-next-line: no-unsafe-any
+            await callback(context, ...args);
+        } catch (error) {
+            // tslint:disable-next-line: no-unsafe-any
+            generalErrorHandler(commandId, error);
+        }
+    })();
     registerCommand(commandId, callbackWithTroubleshooting);
 }
 
