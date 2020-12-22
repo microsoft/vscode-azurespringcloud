@@ -61,3 +61,8 @@ export function getThemedIconPath(iconName: string): TreeItemIconPath {
         dark: path.join(resources, 'dark', `${iconName}.svg`)
     };
 }
+
+export async function generalErrorHandler(commandName: string, error: Error): Promise<void> {
+    await window.showErrorMessage(`Command "${commandName}" fails. ${error.message}`);
+    throw error;
+}
