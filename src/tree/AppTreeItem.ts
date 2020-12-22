@@ -14,6 +14,7 @@ import {
     IActionContext,
     TreeItemIconPath
 } from "vscode-azureextensionui";
+import { AppCommands } from "../commands/AppCommands";
 import { IAppDeploymentWizardContext } from "../commands/steps/deployment/IAppDeploymentWizardContext";
 import { UpdateDeploymentStep } from "../commands/steps/deployment/UpdateDeploymentStep";
 import { UploadArtifactStep } from "../commands/steps/deployment/UploadArtifactStep";
@@ -30,7 +31,8 @@ import { ServiceTreeItem } from "./ServiceTreeItem";
 
 export class AppTreeItem extends AzureParentTreeItem {
     public static contextValue: string = 'azureSpringCloud.app';
-    public readonly contextValue: string = AppTreeItem.contextValue;
+    private static readonly ACCESS_PUBLIC_ENDPOINT: string = 'Access public endpoint';
+    private static readonly ACCESS_TEST_ENDPOINT: string = 'Access test endpoint';
     public parent: ServiceTreeItem;
     public data: IApp;
     private deploymentData: IDeployment | undefined;
@@ -71,22 +73,30 @@ export class AppTreeItem extends AzureParentTreeItem {
         return state?.toLowerCase() === 'succeeded' ? undefined : state;
     }
 
-    // tslint:disable:no-unexternalized-strings
+    public get contextValue(): string {
+        return `azureSpringCloud.app.status-${this.status}`;
+    }
+
     public get iconPath(): TreeItemIconPath {
+        return TreeUtils.getThemedIconPath(`app-status-${this.status}`);
+    }
+
+    // tslint:disable:no-unexternalized-strings
+    public get status(): string {
         switch (this.deploymentData?.properties?.status) {
             case "Stopped":
-                return TreeUtils.getThemedIconPath('app-status-stopped');
+                return 'stopped';
             case "Failed":
-                return TreeUtils.getThemedIconPath('app-status-failed');
+                return 'failed';
             case "Allocating":
             case "Upgrading":
             case "Compiling":
-                return TreeUtils.getThemedIconPath('app-status-pending');
+                return 'pending';
             case "Unknown":
-                return TreeUtils.getThemedIconPath('app-status-unknown');
+                return 'unknown';
             case "Running":
             default:
-                return TreeUtils.getThemedIconPath('app');
+                return 'running';
         }
     }
 
@@ -138,7 +148,12 @@ export class AppTreeItem extends AzureParentTreeItem {
         executeSteps.push(new UpdateDeploymentStep(this.deployment!));
         const wizard: AzureWizard<IAppDeploymentWizardContext> = new AzureWizard(wizardContext, { executeSteps, title: deploying });
         await wizard.execute();
-        window.showInformationMessage(deployed);
+        setTimeout(async () => {
+            const action: string | undefined = await window.showInformationMessage(deployed, AppTreeItem.ACCESS_PUBLIC_ENDPOINT, AppTreeItem.ACCESS_TEST_ENDPOINT);
+            if (action) {
+                return action === AppTreeItem.ACCESS_PUBLIC_ENDPOINT ? AppCommands.openPublicEndpoint(context, this) : AppCommands.openTestEndpoint(context, this);
+            }
+        },         0);
     }
 
     public async scaleInstances(context: IActionContext): Promise<void> {

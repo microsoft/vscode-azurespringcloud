@@ -1,4 +1,4 @@
-import { OpenDialogOptions, Uri, window } from "vscode";
+import { OpenDialogOptions, TextEditor, Uri, window, workspace, WorkspaceFolder } from "vscode";
 import { DialogResponses, IActionContext } from "vscode-azureextensionui";
 import { ext } from "../extensionVariables";
 import { AppInstanceTreeItem } from "../tree/AppInstanceTreeItem";
@@ -13,8 +13,7 @@ export namespace AppCommands {
         node = await getNode(node, context);
         const endPoint: string | undefined = await node.app.getPublicEndpoint();
         if (!endPoint || endPoint.toLowerCase() === 'none') {
-            window.showWarningMessage(localize('noPublicEndpoint', "App[{0}] has not been assigned public endpoint.", node.app.name));
-            await ext.ui.showWarningMessage(`App[${node.app.name}] is not publicly accessible. Do you want to set it public and assign it a public endpoint?`, { modal: true }, DialogResponses.yes);
+            await ext.ui.showWarningMessage(`App [${node.app.name}] is not publicly accessible. Do you want to set it public and assign it a public endpoint?`, { modal: true }, DialogResponses.yes);
             await toggleEndpoint(context, node);
         }
         await openUrl(endPoint!);
@@ -67,7 +66,9 @@ export namespace AppCommands {
 
     export async function deploy(context: IActionContext, node?: AppTreeItem): Promise<AppTreeItem> {
         node = await getNode(node, context);
+        const defaultUri: Uri | undefined = await getTargetOrWorkspacePath();
         const options: OpenDialogOptions = {
+            defaultUri,
             canSelectMany: false,
             openLabel: 'Select',
             filters: {
@@ -139,5 +140,14 @@ export namespace AppCommands {
 
     async function getInstanceNode(node: AppInstanceTreeItem | undefined, context: IActionContext): Promise<AppInstanceTreeItem> {
         return node ?? await ext.tree.showTreeItemPicker<AppInstanceTreeItem>(AppInstanceTreeItem.contextValue, context);
+    }
+
+    async function getTargetOrWorkspacePath(): Promise<Uri | undefined> {
+        const editor: TextEditor | undefined = window.activeTextEditor;
+        let root: WorkspaceFolder | undefined = workspace.workspaceFolders?.[0];
+        if (editor && editor.document.uri.scheme === 'file') {
+            root = workspace.getWorkspaceFolder(editor.document.uri) ?? root;
+        }
+        return root ? Uri.joinPath(root.uri, 'target') : undefined;
     }
 }

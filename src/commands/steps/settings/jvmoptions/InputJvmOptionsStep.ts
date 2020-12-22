@@ -16,6 +16,7 @@ export class InputJvmOptionsStep extends AzureWizardPromptStep<IJvmOptionsUpdate
         const prompt: string = localize('jvmOptionsPrompt', 'Enter new JVM options for the Spring Cloud app.');
         context.newJvmOptions = (await ext.ui.showInputBox({
             prompt,
+            placeHolder: 'e.g. -Xms256m -Xmx2048m',
             value: this.deployment.properties?.deploymentSettings?.jvmOptions ?? '',
         })).trim();
         return Promise.resolve(undefined);

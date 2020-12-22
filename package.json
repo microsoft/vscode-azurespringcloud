@@ -263,62 +263,62 @@
                 },
                 {
                     "command": "azureSpringCloud.common.openInPortal",
-                    "when": "view == azureSpringCloud && viewItem == azureSpringCloud.app",
+                    "when": "view == azureSpringCloud && viewItem =~ /^azureSpringCloud\\.app\\.status-.+$/",
                     "group": "1@1"
                 },
                 {
                     "command": "azureSpringCloud.app.openPublicEndpoint",
-                    "when": "view == azureSpringCloud && viewItem == azureSpringCloud.app",
+                    "when": "view == azureSpringCloud && viewItem =~ /^azureSpringCloud\\.app\\.status-running$/",
                     "group": "2@1"
                 },
                 {
                     "command": "azureSpringCloud.app.openTestEndpoint",
-                    "when": "view == azureSpringCloud && viewItem == azureSpringCloud.app",
+                    "when": "view == azureSpringCloud && viewItem =~ /^azureSpringCloud\\.app\\.status-running$/",
                     "group": "2@2"
                 },
                 {
                     "command": "azureSpringCloud.app.toggleEndpoint",
-                    "when": "view == azureSpringCloud && viewItem == azureSpringCloud.app",
+                    "when": "view == azureSpringCloud && viewItem =~ /^azureSpringCloud\\.app\\.status-(running|stopped)/",
                     "group": "3@1"
                 },
                 {
                     "command": "azureSpringCloud.app.start",
-                    "when": "view == azureSpringCloud && viewItem == azureSpringCloud.app",
+                    "when": "view == azureSpringCloud && viewItem =~ /^azureSpringCloud\\.app\\.status-(stopped|failed)$/",
                     "group": "5@1"
                 },
                 {
                     "command": "azureSpringCloud.app.stop",
-                    "when": "view == azureSpringCloud && viewItem == azureSpringCloud.app",
+                    "when": "view == azureSpringCloud && viewItem =~ /^azureSpringCloud\\.app\\.status-running$/",
                     "group": "5@2"
                 },
                 {
                     "command": "azureSpringCloud.app.restart",
-                    "when": "view == azureSpringCloud && viewItem == azureSpringCloud.app",
+                    "when": "view == azureSpringCloud && viewItem =~ /^azureSpringCloud\\.app\\.status-(running|failed)$/",
                     "group": "5@3"
                 },
                 {
                     "command": "azureSpringCloud.app.delete",
-                    "when": "view == azureSpringCloud && viewItem == azureSpringCloud.app",
+                    "when": "view == azureSpringCloud && viewItem =~ /^azureSpringCloud\\.app\\.status-.+$/",
                     "group": "5@4"
                 },
                 {
                     "command": "azureSpringCloud.app.scale",
-                    "when": "view == azureSpringCloud && viewItem == azureSpringCloud.app",
+                    "when": "view == azureSpringCloud && viewItem =~ /^azureSpringCloud\\.app\\.status-(running|stopped)$/",
                     "group": "5@5"
                 },
                 {
                     "command": "azureSpringCloud.app.deploy",
-                    "when": "view == azureSpringCloud && viewItem == azureSpringCloud.app",
+                    "when": "view == azureSpringCloud && viewItem =~ /^azureSpringCloud\\.app\\.status-(running|stopped)$/",
                     "group": "6@1"
                 },
                 {
                     "command": "azureSpringCloud.common.viewProperties",
-                    "when": "view == azureSpringCloud && viewItem == azureSpringCloud.app",
+                    "when": "view == azureSpringCloud && viewItem =~ /^azureSpringCloud\\.app\\.status-.+$/",
                     "group": "9@1"
                 },
                 {
                     "command": "azureSpringCloud.common.refresh",
-                    "when": "view == azureSpringCloud && viewItem == azureSpringCloud.app",
+                    "when": "view == azureSpringCloud && viewItem =~ /^azureSpringCloud\\.app\\.status-.+$/",
                     "group": "9@2"
                 },
                 {
@@ -354,7 +354,7 @@
                 {
                     "command": "azureSpringCloud.common.refresh",
                     "when": "view == azureSpringCloud && viewItem =~ /^azureSpringCloud\\.app\\.(jvmOptions|scaleSettings|envVariables)$/",
-                    "group": "1@1"
+                    "group": "2@1"
                 },
                 {
                     "command": "azureSpringCloud.common.toggleVisibility",

@@ -104,7 +104,7 @@ export namespace IScaleSettings {
     export const LABELS: { [key: string]: string } = {
         cpu: "vCPU",
         memory: "Memory/GB",
-        capacity: "Capacity"
+        capacity: "Instance count"
     };
     export const SCOPES: { [key: string]: { [key: string]: { max: number; min: number } } } = {
         Standard: {
