@@ -3,7 +3,7 @@
     "displayName": "Azure Spring Cloud",
     "description": "%azureSpringCloud.description%",
     "version": "0.1.0-alpha",
-    "publisher": "ms-azuretools",
+    "publisher": "vscjava",
     "icon": "resources/azure-spring-cloud.png",
     "aiKey": "57cc111a-36a8-44b3-b044-25d293b8b77c",
     "engines": {
