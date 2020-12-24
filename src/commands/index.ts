@@ -4,7 +4,16 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { commands } from 'vscode';
-import { AzureTreeItem, CommandCallback, IActionContext, openInPortal, openReadOnlyJson, registerCommand } from 'vscode-azureextensionui';
+import {
+    AzureTreeItem,
+    CommandCallback,
+    IActionContext,
+    IParsedError,
+    openInPortal,
+    openReadOnlyJson,
+    parseError,
+    registerCommand
+} from 'vscode-azureextensionui';
 import { instrumentOperation } from 'vscode-extension-telemetry-wrapper';
 import { ext } from '../extensionVariables';
 import { AppInstanceTreeItem } from "../tree/AppInstanceTreeItem";
@@ -49,8 +58,11 @@ function registerCommandWithTelemetryWrapper(commandId: string, callback: Comman
             // tslint:disable-next-line: no-unsafe-any
             await callback(context, ...args);
         } catch (error) {
-            // tslint:disable-next-line: no-unsafe-any
-            showError(commandId, error);
+            const e: IParsedError = parseError(error);
+            if (!e.isUserCancelledError) {
+                // tslint:disable-next-line: no-unsafe-any
+                showError(commandId, error);
+            }
             throw error;
         }
     })();
