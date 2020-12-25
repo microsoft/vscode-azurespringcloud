@@ -63,7 +63,11 @@ export class AppJvmOptionsTreeItem extends AppSettingsTreeItem {
             placeHolder: 'e.g. -Xmx2048m',
             validateInput: this.validateJvmOption
         });
-        await this.updateSettingsValue(context, [...this.options, newVal]);
+        if (node?.value?.trim()) {
+            const index: number = this.options.indexOf(node.value.trim());
+            this.options.splice(index, 1, newVal.trim());
+        }
+        await this.updateSettingsValue(context, [...this.options]);
         return newVal;
     }
 
