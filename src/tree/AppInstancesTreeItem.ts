@@ -39,6 +39,6 @@ export class AppInstancesTreeItem extends AzureParentTreeItem {
     }
 
     public async refreshImpl(): Promise<void> {
-        this.data = await this.parent.getActiveDeployment(true);
+        this.data = (await this.parent.getActiveDeployment(true))!;
     }
 }

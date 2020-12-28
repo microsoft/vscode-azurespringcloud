@@ -51,9 +51,12 @@ export class AppService {
         return IApp.fromResource(resouce, target.service);
     }
 
-    public async getActiveDeployment(app?: IApp): Promise<IDeployment> {
+    public async getActiveDeployment(app?: IApp): Promise<IDeployment | undefined> {
         const target: IApp = this.getTarget(app);
-        const deploymentName: string = target.properties?.activeDeploymentName!;
+        const deploymentName: string | undefined = target.properties?.activeDeploymentName;
+        if (!deploymentName) {
+            return undefined;
+        }
         const deployment: DeploymentResource = await this.client.deployments.get(target.service.resourceGroup, target.service.name, target.name, deploymentName);
         return IDeployment.fromResource(deployment, target);
     }

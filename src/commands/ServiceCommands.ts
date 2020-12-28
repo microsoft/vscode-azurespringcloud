@@ -12,7 +12,12 @@ export namespace ServiceCommands {
 
     export async function createApp(context: IActionContext, node?: ServiceTreeItem): Promise<void> {
         node = await getNode(node, context);
-        await node.createChild(context);
+        try {
+            await node.createChild(context);
+        } catch (e) {
+            node.refresh();
+            throw e;
+        }
     }
 
     export async function deleteService(context: IActionContext, node?: ServiceTreeItem): Promise<ServiceTreeItem> {

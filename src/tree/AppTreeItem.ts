@@ -82,6 +82,18 @@ export class AppTreeItem extends AzureParentTreeItem {
 
     // tslint:disable:no-unexternalized-strings
     public get status(): string {
+        if (!this.data.properties?.activeDeploymentName) {
+            return "failed";
+        }
+        switch (this.data.properties?.provisioningState) {
+            case "Creating":
+            case "Updating":
+                return 'pending';
+            case "Failed":
+                return "failed";
+            case "Succeeded":
+            default:
+        }
         switch (this.deploymentData?.properties?.status) {
             case "Stopped":
                 return 'stopped';
@@ -105,6 +117,9 @@ export class AppTreeItem extends AzureParentTreeItem {
 
     public async loadMoreChildrenImpl(_clearCache: boolean, _context: IActionContext): Promise<AzExtTreeItem[]> {
         this.deploymentData = await this.getActiveDeployment();
+        if (!this.deploymentData) {
+            return [];
+        }
         this.scaleSettingsTreeItem = new AppScaleSettingsTreeItem(this, this.deploymentData);
         const appInstancesTreeItem: AppInstancesTreeItem = new AppInstancesTreeItem(this, this.deploymentData);
         const envPropertiesTreeItem: AppEnvVariablesTreeItem = new AppEnvVariablesTreeItem(this, this.deploymentData);
@@ -127,7 +142,7 @@ export class AppTreeItem extends AzureParentTreeItem {
         this.refresh();
     }
 
-    public async getActiveDeployment(force: boolean = false): Promise<IDeployment> {
+    public async getActiveDeployment(force: boolean = false): Promise<IDeployment | undefined> {
         if (force || !this.deploymentData) {
             this.deploymentData = await this.app.getActiveDeployment();
         }
