@@ -283,7 +283,7 @@
                 },
                 {
                     "command": "azureSpringCloud.app.start",
-                    "when": "view == azureSpringCloud && viewItem =~ /^azureSpringCloud\\.app\\.status-(stopped|failed)$/",
+                    "when": "view == azureSpringCloud && viewItem =~ /^azureSpringCloud\\.app\\.status-stopped$/",
                     "group": "5@1"
                 },
                 {
@@ -293,7 +293,7 @@
                 },
                 {
                     "command": "azureSpringCloud.app.restart",
-                    "when": "view == azureSpringCloud && viewItem =~ /^azureSpringCloud\\.app\\.status-(running|failed)$/",
+                    "when": "view == azureSpringCloud && viewItem =~ /^azureSpringCloud\\.app\\.status-running$/",
                     "group": "5@3"
                 },
                 {
