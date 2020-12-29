@@ -56,18 +56,17 @@ export class AppJvmOptionsTreeItem extends AppSettingsTreeItem {
         return this.toAppSettingItem('', newVal, Object.assign({}, AppJvmOptionsTreeItem._options));
     }
 
-    public async updateSettingValue(node: AppSettingTreeItem | undefined, context: IActionContext | ICreateChildImplContext): Promise<string> {
+    public async updateSettingValue(node: AppSettingTreeItem, context: IActionContext | ICreateChildImplContext): Promise<string> {
         const newVal: string = await ext.ui.showInputBox({
             prompt: 'Update JVM option:',
-            value: node?.value ?? '',
+            value: node.value ?? '',
             placeHolder: 'e.g. -Xmx2048m',
             validateInput: this.validateJvmOption
         });
-        if (node?.value?.trim()) {
-            const index: number = this.options.indexOf(node.value.trim());
-            this.options.splice(index, 1, newVal.trim());
-        }
-        await this.updateSettingsValue(context, [...this.options]);
+        const options: string[] = [...this.options];
+        const index: number = options.indexOf(node.value.trim());
+        options.splice(index, 1, newVal.trim());
+        await this.updateSettingsValue(context, options);
         return newVal;
     }
 
