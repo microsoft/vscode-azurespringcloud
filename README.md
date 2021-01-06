@@ -8,8 +8,7 @@
 
 <!-- endregion exclude-from-marketplace -->
 
-[Azure Spring Cloud](https://azure.microsoft.com/services/spring-cloud/) provides a managed service that lets you run microservices on Azure using Spring-boot with no code changes. Use the Azure Spring Cloud extension
-for VS Code to quickly create, manage and deploy apps to an Azure Spring Cloud instance.
+[Azure Spring Cloud](https://azure.microsoft.com/services/spring-cloud/) provides a managed service that lets you run microservices on Azure using Spring-boot with no code changes. Use the Azure Spring Cloud extension for VS Code to quickly create, manage and deploy apps to an Azure Spring Cloud instance.
 
 > Sign up today for your free Azure account and receive 12 months of free popular services, $200 free credit and 25+ always free services 👉 [Start Free](https://azure.microsoft.com/free/open-source).
 
