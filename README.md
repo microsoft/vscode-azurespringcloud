@@ -40,7 +40,7 @@ Java version and then press **Enter** to start creating.
 
     ![Deploy App](resources/readme/deploy-app.png)
 
-1. You can see the deployment status on the bottom right. Once done, click **Access Public Endpoint**, click **Yes** when prompted to assign public endpoint.
+1. You can see the deployment status on the bottom right. Once done, click **Access Public Endpoint** to test the app running on Azure, click **Yes** when prompted to assign public endpoint.
 
     ![Deploy App](resources/readme/access-public-endpoint.png)
 
