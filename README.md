@@ -2,11 +2,13 @@
 
 <!-- region exclude-from-marketplace -->
 
-[![Version](https://vsmarketplacebadge.apphb.com/version/ms-azuretools.vscode-azurespringcloud.svg)](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-azurespringcloud) [![Installs](https://vsmarketplacebadge.apphb.com/installs-short/ms-azuretools.vscode-azurespringcloud.svg)](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-azurespringcloud) [![Build Status](https://dev.azure.com/ms-azuretools/AzCode/_apis/build/status/vscode-azurespringcloud)](https://dev.azure.com/ms-azuretools/AzCode/_build/latest?definitionId=23)
+[![Version](https://vsmarketplacebadge.apphb.com/version/vscjava.vscode-azurespringcloud.svg)](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-azurespringcloud) 
+[![Installs](https://vsmarketplacebadge.apphb.com/installs-short/vscjava.vscode-azurespringcloud.svg)](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-azurespringcloud)
+[![Build Status](https://dev.azure.com/mseng/VSJava/_apis/build/status/microsoft.vscode-azurespringcloud?branchName=main)](https://dev.azure.com/mseng/VSJava/_build/latest?definitionId=10839&branchName=main)
 
 <!-- endregion exclude-from-marketplace -->
 
-Manage Azure Spring Cloud directly from VS Code.
+Manage Azure Spring Cloud services/apps directly from VS Code.
 
 ![explorer](resources/readme/explorer.png)
 
@@ -31,7 +33,8 @@ There are a couple of ways you can contribute to this repo:
 
 ### Legal
 
-Before we can accept your pull request you will need to sign a **Contribution License Agreement**. All you need to do is to submit a pull request, then the PR will get appropriately labelled (e.g. `cla-required`, `cla-norequired`, `cla-signed`, `cla-already-signed`). If you already signed the agreement we will continue with reviewing the PR, otherwise system will tell you how you can sign the CLA. Once you sign the CLA all future PR's will be labeled as `cla-signed`.
+You will need to sign a **Contribution License Agreement** before we can accept your pull request. 
+All you need to do is to submit a pull request, then the PR will get appropriately labelled (e.g. `cla-required`, `cla-norequired`, `cla-signed`, `cla-already-signed`). If you already signed the agreement we will continue with reviewing the PR, otherwise system will tell you how you can sign the CLA. Once you sign the CLA all future PR's will be labeled as `cla-signed`.
 
 ### Code of Conduct
 
