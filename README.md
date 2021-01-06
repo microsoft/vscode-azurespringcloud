@@ -2,8 +2,8 @@
 
 <!-- region exclude-from-marketplace -->
 
-[![Version](https://vsmarketplacebadge.apphb.com/version/ms-azuretools.vscode-azurespringcloud.svg)](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-azurespringcloud) 
-[![Installs](https://vsmarketplacebadge.apphb.com/installs-short/ms-azuretools.vscode-azurespringcloud.svg)](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-azurespringcloud)
+[![Version](https://vsmarketplacebadge.apphb.com/version/vscjava.vscode-azurespringcloud.svg)](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-azurespringcloud) 
+[![Installs](https://vsmarketplacebadge.apphb.com/installs-short/vscjava.vscode-azurespringcloud.svg)](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-azurespringcloud)
 [![Build Status](https://dev.azure.com/mseng/VSJava/_apis/build/status/microsoft.vscode-azurespringcloud?branchName=main)](https://dev.azure.com/mseng/VSJava/_build/latest?definitionId=10839&branchName=main)
 
 <!-- endregion exclude-from-marketplace -->
