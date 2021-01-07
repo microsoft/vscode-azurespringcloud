@@ -15,7 +15,7 @@
 <!-- region exclude-from-marketplace -->
 ## Installation
 
-1. Download and install the [Azure Spring Cloud extension](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-azurespringcloud) for Visual Studio Code
+1. Download and install the [Azure Spring Cloud extension](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-azurespringcloud) for Visual Studio Code
 2. Wait for the extension to finish installing then reload Visual Studio Code when prompted
 3. Once complete, you'll see an Azure icon in the Activity Bar
     > If your activity bar is hidden, you won't be able to access the extension. Show the Activity Bar by clicking View > Appearance > Show Activity Bar
@@ -32,7 +32,7 @@ Studio Code, click the Azure icon in the Activity Bar to open the Azure Explorer
 
 1. After the service instance is created, refresh the Azure Explorer and it will show up. Right-click on the service instance and click **Create App**. Type app name, select
 Java version and then press **Enter** to start creating.
-
+    
     ![Create App](resources/readme/create-app.png)
 
 1. The app will be ready in a few minutes, right click on the App and click **Deploy**, select your built Jar file when prompted.
@@ -40,25 +40,26 @@ Java version and then press **Enter** to start creating.
     ![Deploy App](resources/readme/deploy-app.png)
 
 1. You can see the deployment status on the bottom right. Once done, click **Access Public Endpoint** to test the app running on Azure, click **Yes** when prompted to assign public endpoint.
-  > Only Spring Boot fat Jar are supported, [learn more about Apps on Azure Spring Cloud](https://docs.microsoft.com/azure/spring-cloud/spring-cloud-tutorial-prepare-app-deployment?pivots=programming-language-java).
 
-    ![Deploy App](resources/readme/access-public-endpoint.png)
+  > Only Spring Boot fat Jar are supported, [learn more about apps on Azure Spring Cloud](https://docs.microsoft.com/azure/spring-cloud/spring-cloud-tutorial-prepare-app-deployment?pivots=programming-language-java).
+
+    ![Access public endpoint](resources/readme/access-public-endpoint.png)
 
 ## Scale the App
 
 1. You can easily scale the app by right click on the **Instance count** under Scale Settings and click **Edit**. Type **2** and press **Enter** to scale the app.
 
-    ![Deploy App](resources/readme/scale.png)
+    ![Scale app](resources/readme/scale.png)
 
 ## Stream Your Application Logs
 
 1. Expand the App Instances node, right click the instance you want to see logs and click **Start Streaming Logs**.
 
-    ![Deploy App](resources/readme/start-log-streaming.png)
+    ![Start log streaming](resources/readme/start-log-streaming.png)
 
 1. The Visual Studio Code output window opens with a connection to the log stream
 
-    ![Deploy App](resources/readme/log-output.png)
+    ![Log output](resources/readme/log-output.png)
 
 ## Contributing
 
