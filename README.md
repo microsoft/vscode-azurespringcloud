@@ -39,9 +39,7 @@ Java version and then press **Enter** to start creating.
 
     ![Deploy App](resources/readme/deploy-app.png)
 
-1. You can see the deployment status on the bottom right. Once done, click **Access Public Endpoint** to test the app running on Azure, click **Yes** when prompted to assign public endpoint.
-
-  > Only Spring Boot fat Jar are supported, [learn more about apps on Azure Spring Cloud](https://docs.microsoft.com/azure/spring-cloud/spring-cloud-tutorial-prepare-app-deployment?pivots=programming-language-java).
+1. You can see the deployment status on the bottom right. Once done, click **Access Public Endpoint** to test the app running on Azure, click **Yes** when prompted to assign public endpoint. Be aware that only Spring Boot fat Jar is supported, [learn more about apps on Azure Spring Cloud](https://docs.microsoft.com/azure/spring-cloud/spring-cloud-tutorial-prepare-app-deployment?pivots=programming-language-java).
 
     ![Access public endpoint](resources/readme/access-public-endpoint.png)
 
