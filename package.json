@@ -5,7 +5,7 @@
     "version": "0.1.0-alpha",
     "publisher": "vscjava",
     "icon": "resources/azure-spring-cloud.png",
-    "aiKey": "57cc111a-36a8-44b3-b044-25d293b8b77c",
+    "aiKey": "AIF-d9b70cd4-b9f9-4d70-929b-a071c400b217",
     "engines": {
         "vscode": "^1.48.0"
     },
