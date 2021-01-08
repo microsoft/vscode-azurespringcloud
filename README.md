@@ -27,36 +27,36 @@ Studio Code, click the Azure icon in the Activity Bar to open the Azure Explorer
 
 1. Right-click on your subscription and click **Create Service in Portal**. Finish the following steps on Azure Portal to create an Azure Spring Cloud service instance.
 
-    ![Create Azure Spring Cloud Service instance](resources/readme/create-service.png)
+    ![Create Azure Spring Cloud Service instance](https://raw.githubusercontent.com/microsoft/azure-maven-plugins/vscode/azure-springcloud/temp/create-service.png)
 
 1. After the service instance is created, refresh the Azure Explorer and it will show up. Right-click on the service instance and click **Create App**. Type app name, select
 Java version and then press **Enter** to start creating.
     
-    ![Create App](resources/readme/create-app.png)
+    ![Create App](https://raw.githubusercontent.com/microsoft/azure-maven-plugins/vscode/azure-springcloud/temp/create-app.png)
 
 1. The app will be ready in a few minutes, right click on the App and click **Deploy**, select your built Jar file when prompted.
 
-    ![Deploy App](resources/readme/deploy-app.png)
+    ![Deploy App](https://raw.githubusercontent.com/microsoft/azure-maven-plugins/vscode/azure-springcloud/temp/deploy-app.png)
 
 1. You can see the deployment status on the bottom right. Once done, click **Access Public Endpoint** to test the app running on Azure, click **Yes** when prompted to assign public endpoint. Be aware that only Spring Boot fat Jar is supported, [learn more about apps on Azure Spring Cloud](https://docs.microsoft.com/azure/spring-cloud/spring-cloud-tutorial-prepare-app-deployment?pivots=programming-language-java).
 
-    ![Access public endpoint](resources/readme/access-public-endpoint.png)
+    ![Access public endpoint](https://raw.githubusercontent.com/microsoft/azure-maven-plugins/vscode/azure-springcloud/temp/access-public-endpoint.png)
 
 ## Scale the App
 
 1. You can easily scale the app by right click on the **Instance count** under Scale Settings and click **Edit**. Type **2** and press **Enter** to scale the app.
 
-    ![Scale app](resources/readme/scale.png)
+    ![Scale app](https://raw.githubusercontent.com/microsoft/azure-maven-plugins/vscode/azure-springcloud/temp/scale.png)
 
 ## Stream Your Application Logs
 
 1. Expand the App Instances node, right click the instance you want to see logs and click **Start Streaming Logs**.
 
-    ![Start log streaming](resources/readme/start-log-streaming.png)
+    ![Start log streaming](https://raw.githubusercontent.com/microsoft/azure-maven-plugins/vscode/azure-springcloud/temp/start-log-streaming.png)
 
 1. The Visual Studio Code output window opens with a connection to the log stream
 
-    ![Log output](resources/readme/log-output.png)
+    ![Log output](https://raw.githubusercontent.com/microsoft/azure-maven-plugins/vscode/azure-springcloud/temp/log-output.png)
 
 ## Contributing
 

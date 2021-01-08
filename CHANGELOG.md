@@ -18,8 +18,3 @@
 - Monitoring and troubleshooting apps
     - App Status (running/updating…)
     - Start/Stop log streaming
-
-## 0.1.1 - 2020-01-08
-
-### Updated
-- Show guideline in marketplace homepage.
