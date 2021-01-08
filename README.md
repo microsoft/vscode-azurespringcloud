@@ -12,7 +12,6 @@
 
 > Sign up today for your free Azure account and receive 12 months of free popular services, $200 free credit and 25+ always free services 👉 [Start Free](https://azure.microsoft.com/free/open-source).
 
-<!-- region exclude-from-marketplace -->
 ## Installation
 
 1. Download and install the [Azure Spring Cloud extension](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-azurespringcloud) for Visual Studio Code

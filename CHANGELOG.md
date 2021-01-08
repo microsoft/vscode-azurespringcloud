@@ -1,6 +1,6 @@
 # Change Log
 
-## 0.1.0 - 2020-12-01
+## 0.1.0 - 2020-01-08
 
 ### Added
 - Manage Azure Spring Cloud service instance in Azure Explorer
@@ -18,3 +18,8 @@
 - Monitoring and troubleshooting apps
     - App Status (running/updating…)
     - Start/Stop log streaming
+
+## 0.1.1 - 2020-01-08
+
+### Updated
+- Show guideline in marketplace homepage.
