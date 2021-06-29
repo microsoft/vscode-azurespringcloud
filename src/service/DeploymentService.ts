@@ -53,7 +53,7 @@ export class DeploymentService {
 
     public async updateArtifactPath(path: string, deployment?: IDeployment): Promise<void> {
         const target: IDeployment = this.getTarget(deployment);
-        await this.client.deployments.createOrUpdate(target.app.service.resourceGroup, target.app.service.name, target.app.name, target.name || DeploymentService.DEFAULT_DEPLOYMENT_NAME, {
+        await this.client.deployments.update(target.app.service.resourceGroup, target.app.service.name, target.app.name, target.name || DeploymentService.DEFAULT_DEPLOYMENT_NAME, {
             properties: {
                 source: {
                     type: 'Jar',
