@@ -4,7 +4,7 @@ import { getThemedIconPath } from "../utils";
 import { AppInstancesTreeItem } from "./AppInstancesTreeItem";
 
 export class AppInstanceTreeItem extends AzureTreeItem {
-    public static contextValue: string = 'azureSpringCloud.app.instance';
+    public static contextValue: RegExp = /^azureSpringCloud\.app\.instance\.status-.+$/;
     public readonly parent: AppInstancesTreeItem;
     public readonly data: DeploymentInstance;
 

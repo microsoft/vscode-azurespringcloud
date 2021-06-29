@@ -5,20 +5,17 @@
 
 import { commands } from 'vscode';
 import {
-    AzureTreeItem,
     CommandCallback,
     IActionContext,
-    IParsedError,
-    openInPortal,
-    openReadOnlyJson,
-    parseError,
+    IParsedError, openInPortal, parseError,
     registerCommand
 } from 'vscode-azureextensionui';
 import { instrumentOperation } from 'vscode-extension-telemetry-wrapper';
 import { ext } from '../extensionVariables';
-import { AppInstanceTreeItem } from "../tree/AppInstanceTreeItem";
+import { AppInstanceTreeItem } from '../tree/AppInstanceTreeItem';
 import { AppTreeItem } from "../tree/AppTreeItem";
-import { ServiceTreeItem } from "../tree/ServiceTreeItem";
+import { ServiceTreeItem } from '../tree/ServiceTreeItem';
+import { SubscriptionTreeItem } from '../tree/SubscriptionTreeItem';
 import { showError } from '../utils';
 import { AppCommands } from "./AppCommands";
 import { ServiceCommands } from "./ServiceCommands";
@@ -27,13 +24,14 @@ import { ServiceCommands } from "./ServiceCommands";
 export function registerCommands(): void {
     registerCommandWithTelemetryWrapper('azureSpringCloud.common.loadMore', loadMore);
     registerCommandWithTelemetryWrapper('azureSpringCloud.common.refresh', refreshNode);
-    registerCommandWithTelemetryWrapper('azureSpringCloud.common.openInPortal', openPortal);
     registerCommandWithTelemetryWrapper('azureSpringCloud.common.toggleVisibility', AppCommands.toggleVisibility);
-    registerCommandWithTelemetryWrapper('azureSpringCloud.common.viewProperties', viewProperties);
     registerCommandWithTelemetryWrapper('azureSpringCloud.subscription.select', selectSubscription);
     registerCommandWithTelemetryWrapper('azureSpringCloud.subscription.createServiceFromPortal', ServiceCommands.createServiceInPortal);
+    registerCommandWithTelemetryWrapper('azureSpringCloud.subscription.openInPortal', openPortal);
     registerCommandWithTelemetryWrapper('azureSpringCloud.service.createApp', ServiceCommands.createApp);
     registerCommandWithTelemetryWrapper('azureSpringCloud.service.delete', ServiceCommands.deleteService);
+    registerCommandWithTelemetryWrapper('azureSpringCloud.service.openInPortal', ServiceCommands.openPortal);
+    registerCommandWithTelemetryWrapper('azureSpringCloud.service.viewProperties', ServiceCommands.viewProperties);
     registerCommandWithTelemetryWrapper('azureSpringCloud.app.openPublicEndpoint', AppCommands.openPublicEndpoint);
     registerCommandWithTelemetryWrapper('azureSpringCloud.app.openTestEndpoint', AppCommands.openTestEndpoint);
     registerCommandWithTelemetryWrapper('azureSpringCloud.app.toggleEndpoint', AppCommands.toggleEndpoint);
@@ -43,9 +41,12 @@ export function registerCommands(): void {
     registerCommandWithTelemetryWrapper('azureSpringCloud.app.delete', AppCommands.deleteApp);
     registerCommandWithTelemetryWrapper('azureSpringCloud.app.deploy', AppCommands.deploy);
     registerCommandWithTelemetryWrapper('azureSpringCloud.app.scale', AppCommands.scale);
+    registerCommandWithTelemetryWrapper('azureSpringCloud.app.openInPortal', AppCommands.openPortal);
+    registerCommandWithTelemetryWrapper('azureSpringCloud.app.viewProperties', AppCommands.viewProperties);
     registerCommandWithTelemetryWrapper('azureSpringCloud.app.instance.startStreamingLog', AppCommands.startStreamingLogs);
     registerCommandWithTelemetryWrapper('azureSpringCloud.app.instance.stopStreamingLog', AppCommands.stopStreamingLogs);
-    registerCommandWithTelemetryWrapper('azureSpringCloud.app.settings.addSetting', AppCommands.addSetting);
+    registerCommandWithTelemetryWrapper('azureSpringCloud.app.instance.viewProperties', AppCommands.viewInstanceProperties);
+    registerCommandWithTelemetryWrapper('azureSpringCloud.app.settings.add', AppCommands.addSetting);
     registerCommandWithTelemetryWrapper('azureSpringCloud.app.settings.edit', AppCommands.editSettings);
     registerCommandWithTelemetryWrapper('azureSpringCloud.app.setting.edit', AppCommands.editSetting);
     registerCommandWithTelemetryWrapper('azureSpringCloud.app.setting.delete', AppCommands.deleteSetting);
@@ -69,22 +70,21 @@ function registerCommandWithTelemetryWrapper(commandId: string, callback: Comman
     registerCommand(commandId, callbackWithTroubleshooting);
 }
 
-async function refreshNode(_context: IActionContext, node?: AzureTreeItem): Promise<void> {
+type SpringCLoudResourceTreeItem = ServiceTreeItem | AppTreeItem | AppInstanceTreeItem;
+
+async function refreshNode(_context: IActionContext, node: SpringCLoudResourceTreeItem): Promise<void> {
     return ext.tree.refresh(node);
 }
 
-async function loadMore(context: IActionContext, node: AzureTreeItem): Promise<void> {
+async function loadMore(context: IActionContext, node: SpringCLoudResourceTreeItem): Promise<void> {
     return ext.tree.loadMore(node, context);
-}
-
-async function openPortal(_context: IActionContext, node: AzureTreeItem): Promise<void> {
-    await openInPortal(node.root, node.fullId);
-}
-
-async function viewProperties(_context: IActionContext, node: ServiceTreeItem | AppTreeItem | AppInstanceTreeItem): Promise<void> {
-    await openReadOnlyJson(node, node.data);
 }
 
 async function selectSubscription(): Promise<void> {
     return commands.executeCommand('azure-account.selectSubscriptions');
+}
+
+async function openPortal(context: IActionContext, node?: SubscriptionTreeItem): Promise<void> {
+    node = node ?? await ext.tree.showTreeItemPicker<SubscriptionTreeItem>(SubscriptionTreeItem.contextValue, context);
+    return openInPortal(node, node.fullId);
 }
