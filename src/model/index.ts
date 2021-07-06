@@ -1,3 +1,8 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
 import { AppPlatformManagementClient } from "@azure/arm-appplatform";
 import { AppResource, DeploymentResource, ServiceResource } from "@azure/arm-appplatform/esm/models";
 import { createAzureClient, ISubscriptionContext } from "vscode-azureextensionui";

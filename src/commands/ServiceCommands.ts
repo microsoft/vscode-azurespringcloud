@@ -1,4 +1,9 @@
-import { DialogResponses, IActionContext } from "vscode-azureextensionui";
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+import { DialogResponses, IActionContext, openInPortal, openReadOnlyJson } from "vscode-azureextensionui";
 import { ext } from "../extensionVariables";
 import { ServiceTreeItem } from "../tree/ServiceTreeItem";
 import { SubscriptionTreeItem } from "../tree/SubscriptionTreeItem";
@@ -24,6 +29,18 @@ export namespace ServiceCommands {
         node = await getNode(node, context);
         await ext.ui.showWarningMessage(`Are you sure to delete Spring Cloud service "${node.data.name}"?`, { modal: true }, DialogResponses.deleteResponse);
         await node.deleteTreeItem(context);
+        return node;
+    }
+
+    export async function openPortal(context: IActionContext, node?: ServiceTreeItem): Promise<ServiceTreeItem> {
+        node = await getNode(node, context);
+        await openInPortal(node, node.fullId);
+        return node;
+    }
+
+    export async function viewProperties(context: IActionContext, node?: ServiceTreeItem): Promise<ServiceTreeItem> {
+        node = await getNode(node, context);
+        await openReadOnlyJson(node, node.data);
         return node;
     }
 

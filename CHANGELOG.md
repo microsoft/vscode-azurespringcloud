@@ -1,6 +1,12 @@
 # Change Log
 
-## 0.1.0 - 2020-01-08
+## 0.2.0 - 2021-06-30
+
+### Updated
+- All available commands are now accessible from Command Palette
+
+
+## 0.1.0 - 2021-01-08
 
 ### Added
 - Manage Azure Spring Cloud service instance in Azure Explorer

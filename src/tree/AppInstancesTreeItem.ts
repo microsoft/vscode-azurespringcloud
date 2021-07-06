@@ -13,7 +13,7 @@ import { AppTreeItem } from './AppTreeItem';
 export class AppInstancesTreeItem extends AzureParentTreeItem {
     public static contextValue: string = 'azureSpringCloud.app.instances';
     public readonly contextValue: string = AppInstancesTreeItem.contextValue;
-    public readonly childTypeLabel: string = localize('appInstance', 'AppInstance');
+    public readonly childTypeLabel: string = localize('appInstance', 'Spring Cloud App Instance');
     public readonly id: string = AppInstancesTreeItem.contextValue;
     public readonly label: string = 'App Instances';
     public readonly parent: AppTreeItem;

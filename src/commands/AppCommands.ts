@@ -1,5 +1,10 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
 import { OpenDialogOptions, TextEditor, Uri, window, workspace, WorkspaceFolder } from "vscode";
-import { DialogResponses, IActionContext } from "vscode-azureextensionui";
+import { DialogResponses, IActionContext, openInPortal, openReadOnlyJson } from "vscode-azureextensionui";
 import { ext } from "../extensionVariables";
 import { AppInstanceTreeItem } from "../tree/AppInstanceTreeItem";
 import { AppSettingsTreeItem } from "../tree/AppSettingsTreeItem";
@@ -89,6 +94,18 @@ export namespace AppCommands {
         return node;
     }
 
+    export async function openPortal(context: IActionContext, node?: AppTreeItem): Promise<AppTreeItem> {
+        node = await getNode(node, context);
+        await openInPortal(node, node.fullId);
+        return node;
+    }
+
+    export async function viewProperties(context: IActionContext, node?: AppTreeItem): Promise<AppTreeItem> {
+        node = await getNode(node, context);
+        await openReadOnlyJson(node, node.data);
+        return node;
+    }
+
     export async function startStreamingLogs(_context: IActionContext, node?: AppInstanceTreeItem): Promise<AppInstanceTreeItem> {
         node = await getInstanceNode(node, _context);
         await node.runWithTemporaryDescription(localize('startStreamingLog', 'Starting streaming log...'), async () => {
@@ -104,6 +121,12 @@ export namespace AppCommands {
             const appTreeItem: AppTreeItem = node!.parent.parent;
             return appTreeItem.app.stopStreamingLogs(node?.data!, appTreeItem.data);
         });
+        return node;
+    }
+
+    export async function viewInstanceProperties(context: IActionContext, node?: AppInstanceTreeItem): Promise<AppInstanceTreeItem> {
+        node = await getInstanceNode(node, context);
+        await openReadOnlyJson(node, node.data);
         return node;
     }
 
@@ -150,4 +173,5 @@ export namespace AppCommands {
         }
         return root ? Uri.joinPath(root.uri, 'target') : undefined;
     }
+
 }

@@ -31,7 +31,7 @@ import { AppTreeItem } from './AppTreeItem';
 export class ServiceTreeItem extends AzureParentTreeItem {
     public static contextValue: string = 'azureSpringCloud.service';
     public readonly contextValue: string = ServiceTreeItem.contextValue;
-    public readonly childTypeLabel: string = utils.localize('app', 'App');
+    public readonly childTypeLabel: string = utils.localize('springCloud.app', 'Spring Cloud App');
     public data: IService;
 
     private _nextLink: string | undefined;

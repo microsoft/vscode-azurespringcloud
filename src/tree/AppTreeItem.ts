@@ -24,18 +24,22 @@ import { DeploymentService } from "../service/DeploymentService";
 import * as utils from "../utils";
 import { AppEnvVariablesTreeItem } from "./AppEnvVariablesTreeItem";
 import { AppInstancesTreeItem } from "./AppInstancesTreeItem";
+import { AppInstanceTreeItem } from "./AppInstanceTreeItem";
 import { AppJvmOptionsTreeItem } from "./AppJvmOptionsTreeItem";
 import { AppScaleSettingsTreeItem } from "./AppScaleSettingsTreeItem";
 import { ServiceTreeItem } from "./ServiceTreeItem";
 
 export class AppTreeItem extends AzureParentTreeItem {
-    public static contextValue: string = 'azureSpringCloud.app';
+    public static contextValue: RegExp = /^azureSpringCloud\.app\.status-.+$/;
     private static readonly ACCESS_PUBLIC_ENDPOINT: string = 'Access public endpoint';
     private static readonly ACCESS_TEST_ENDPOINT: string = 'Access test endpoint';
     public parent: ServiceTreeItem;
     public data: IApp;
     private deploymentData: IDeployment | undefined;
+    private appInstancesTreeItem: AppInstancesTreeItem;
     private scaleSettingsTreeItem: AppScaleSettingsTreeItem;
+    private envPropertiesTreeItem: AppEnvVariablesTreeItem;
+    private jvmOptionsTreeItem: AppJvmOptionsTreeItem;
     private deleted: boolean;
 
     constructor(parent: ServiceTreeItem, app: IApp) {
@@ -121,10 +125,10 @@ export class AppTreeItem extends AzureParentTreeItem {
             return [];
         }
         this.scaleSettingsTreeItem = new AppScaleSettingsTreeItem(this, this.deploymentData);
-        const appInstancesTreeItem: AppInstancesTreeItem = new AppInstancesTreeItem(this, this.deploymentData);
-        const envPropertiesTreeItem: AppEnvVariablesTreeItem = new AppEnvVariablesTreeItem(this, this.deploymentData);
-        const jvmOptionsTreeItem: AppJvmOptionsTreeItem = new AppJvmOptionsTreeItem(this, this.deploymentData);
-        return [appInstancesTreeItem, envPropertiesTreeItem, this.scaleSettingsTreeItem, jvmOptionsTreeItem];
+        this.appInstancesTreeItem = new AppInstancesTreeItem(this, this.deploymentData);
+        this.envPropertiesTreeItem = new AppEnvVariablesTreeItem(this, this.deploymentData);
+        this.jvmOptionsTreeItem = new AppJvmOptionsTreeItem(this, this.deploymentData);
+        return [this.appInstancesTreeItem, this.envPropertiesTreeItem, this.scaleSettingsTreeItem, this.jvmOptionsTreeItem];
     }
 
     public async deleteTreeItemImpl(_context: IActionContext): Promise<void> {
@@ -179,5 +183,14 @@ export class AppTreeItem extends AzureParentTreeItem {
             this.data = await this.app.reload();
             this.deploymentData = await this.app.getActiveDeployment();
         }
+    }
+
+    public pickTreeItemImpl(expectedContextValues: (string | RegExp)[]): AzExtTreeItem | undefined | Promise<AzExtTreeItem | undefined> {
+        for (const expectedContextValue of expectedContextValues) {
+            if (expectedContextValue === AppInstanceTreeItem.contextValue) {
+                return this.appInstancesTreeItem;
+            }
+        }
+        return undefined;
     }
 }

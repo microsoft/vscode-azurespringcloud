@@ -1,3 +1,8 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
 import { AppPlatformManagementClient } from "@azure/arm-appplatform";
 import { AppResource, DeploymentResource, ResourceUploadDefinition, RuntimeVersion, TestKeys } from "@azure/arm-appplatform/esm/models";
 import { DeploymentInstance } from "@azure/arm-appplatform/src/models/index";
