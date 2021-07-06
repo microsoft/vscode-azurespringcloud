@@ -70,13 +70,13 @@ function registerCommandWithTelemetryWrapper(commandId: string, callback: Comman
     registerCommand(commandId, callbackWithTroubleshooting);
 }
 
-type SpringCLoudResourceTreeItem = ServiceTreeItem | AppTreeItem | AppInstanceTreeItem;
+type SpringCloudResourceTreeItem = ServiceTreeItem | AppTreeItem | AppInstanceTreeItem;
 
-async function refreshNode(_context: IActionContext, node: SpringCLoudResourceTreeItem): Promise<void> {
+async function refreshNode(_context: IActionContext, node: SpringCloudResourceTreeItem): Promise<void> {
     return ext.tree.refresh(node);
 }
 
-async function loadMore(context: IActionContext, node: SpringCLoudResourceTreeItem): Promise<void> {
+async function loadMore(context: IActionContext, node: SpringCloudResourceTreeItem): Promise<void> {
     return ext.tree.loadMore(node, context);
 }
 
