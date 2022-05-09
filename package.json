@@ -2,7 +2,7 @@
     "name": "vscode-azurespringcloud",
     "displayName": "Azure Spring Apps",
     "description": "%azureSpringCloud.description%",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "publisher": "vscjava",
     "icon": "resources/azure-spring-cloud.png",
     "aiKey": "AIF-d9b70cd4-b9f9-4d70-929b-a071c400b217",
