@@ -486,7 +486,7 @@
     },
     "devDependencies": {
         "@types/fs-extra": "^8.0.1",
-        "@types/gulp": "^4.0.6",
+        "@types/gulp": "^4.0.9",
         "@types/mocha": "^7.0.2",
         "@types/node": "^12.0.0",
         "@types/request": "^2.48.4",
@@ -508,8 +508,8 @@
         "webpack-cli": "^3.3.7"
     },
     "dependencies": {
-        "@azure/arm-appplatform": "^1.0.0",
-        "@azure/ms-rest-js": "^2.1.0",
+        "@azure/arm-appplatform": "^1.4.0",
+        "@azure/ms-rest-js": "^2.6.1",
         "@azure/storage-file-share": "^12.3.0",
         "fs-extra": "^8.1.0",
         "request": "^2.83.0",
