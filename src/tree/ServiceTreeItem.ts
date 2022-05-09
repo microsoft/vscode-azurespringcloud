@@ -31,7 +31,7 @@ import { AppTreeItem } from './AppTreeItem';
 export class ServiceTreeItem extends AzureParentTreeItem {
     public static contextValue: string = 'azureSpringCloud.service';
     public readonly contextValue: string = ServiceTreeItem.contextValue;
-    public readonly childTypeLabel: string = utils.localize('springCloud.app', 'Spring Cloud App');
+    public readonly childTypeLabel: string = utils.localize('springCloud.app', 'Spring App');
     public data: IService;
 
     private _nextLink: string | undefined;
@@ -84,8 +84,8 @@ export class ServiceTreeItem extends AzureParentTreeItem {
     }
 
     public async deleteTreeItemImpl(): Promise<void> {
-        const deleting: string = utils.localize('deletingSpringCLoudService', 'Deleting Spring Cloud service "{0}"...', this.data.name);
-        const deleted: string = utils.localize('deletedSpringCloudService', 'Successfully deleted Spring Cloud service "{0}".', this.data.name);
+        const deleting: string = utils.localize('deletingSpringCLoudService', 'Deleting Azure Spring Apps "{0}"...', this.data.name);
+        const deleted: string = utils.localize('deletedSpringCloudService', 'Successfully deleted Azure Spring Apps "{0}".', this.data.name);
         await utils.runInBackground(deleting, deleted, () => this.service.remove());
         this.deleted = true;
     }
@@ -103,14 +103,14 @@ export class ServiceTreeItem extends AzureParentTreeItem {
         executeSteps.push(new CreateAppStep(this.service));
         executeSteps.push(new CreateAppDeploymentStep(this.service));
         executeSteps.push(new UpdateAppStep(this.service));
-        const creating: string = utils.localize('creatingSpringCouldApp', 'Creating new Spring Cloud app in Azure');
+        const creating: string = utils.localize('creatingSpringCouldApp', 'Creating new Spring app in Azure');
         const wizard: AzureWizard<IAppCreationWizardContext> = new AzureWizard(wizardContext, { promptSteps, executeSteps, title: creating });
 
         await wizard.prompt();
         const appName: string = utils.nonNullProp(wizardContext, 'newAppName');
         context.showCreatingTreeItem(appName);
         await wizard.execute();
-        const created: string = utils.localize('createdSpringCouldApp', 'Successfully created Spring Cloud app "{0}".', appName);
+        const created: string = utils.localize('createdSpringCouldApp', 'Successfully created Spring app "{0}".', appName);
         window.showInformationMessage(created);
 
         return new AppTreeItem(this, utils.nonNullProp(wizardContext, 'newApp'));

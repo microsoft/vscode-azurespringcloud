@@ -1,6 +1,6 @@
 {
     "name": "vscode-azurespringcloud",
-    "displayName": "Azure Spring Cloud",
+    "displayName": "Azure Spring Apps",
     "description": "%azureSpringCloud.description%",
     "version": "0.2.0",
     "publisher": "vscjava",
@@ -76,7 +76,7 @@
             {
                 "command": "azureSpringCloud.common.refresh",
                 "title": "%azureSpringCloud.menu.common.refresh%",
-                "category": "Azure Spring Cloud",
+                "category": "Azure Spring Apps",
                 "icon": {
                     "light": "resources/light/refresh.svg",
                     "dark": "resources/dark/refresh.svg"
@@ -85,117 +85,117 @@
             {
                 "command": "azureSpringCloud.subscription.createServiceFromPortal",
                 "title": "%azureSpringCloud.menu.subscription.createServiceFromPortal%",
-                "category": "Azure Spring Cloud"
+                "category": "Azure Spring Apps"
             },
             {
                 "command": "azureSpringCloud.subscription.openInPortal",
                 "title": "%azureSpringCloud.menu.common.openInPortal%",
-                "category": "Azure Spring Cloud"
+                "category": "Azure Spring Apps"
             },
             {
                 "command": "azureSpringCloud.service.createApp",
                 "title": "%azureSpringCloud.menu.service.createApp%",
-                "category": "Azure Spring Cloud Service"
+                "category": "Spring Apps"
             },
             {
                 "command": "azureSpringCloud.service.delete",
                 "title": "%azureSpringCloud.menu.common.delete%",
-                "category": "Azure Spring Cloud Service"
+                "category": "Spring Apps"
             },
             {
                 "command": "azureSpringCloud.service.openInPortal",
                 "title": "%azureSpringCloud.menu.common.openInPortal%",
-                "category": "Azure Spring Cloud Service"
+                "category": "Spring Apps"
             },
             {
                 "command": "azureSpringCloud.service.viewProperties",
                 "title": "%azureSpringCloud.menu.common.viewProperties%",
-                "category": "Azure Spring Cloud Service"
+                "category": "Spring Apps"
             },
             {
                 "command": "azureSpringCloud.app.openPublicEndpoint",
                 "title": "%azureSpringCloud.menu.app.openPublicEndpoint%",
-                "category": "Azure Spring Cloud App"
+                "category": "Spring App"
             },
             {
                 "command": "azureSpringCloud.app.openTestEndpoint",
                 "title": "%azureSpringCloud.menu.app.openTestEndpoint%",
-                "category": "Azure Spring Cloud App"
+                "category": "Spring App"
             },
             {
                 "command": "azureSpringCloud.app.toggleEndpoint",
                 "title": "%azureSpringCloud.menu.app.toggleEndpoint%",
-                "category": "Azure Spring Cloud App"
+                "category": "Spring App"
             },
             {
                 "command": "azureSpringCloud.app.start",
                 "title": "%azureSpringCloud.menu.common.start%",
-                "category": "Azure Spring Cloud App"
+                "category": "Spring App"
             },
             {
                 "command": "azureSpringCloud.app.stop",
                 "title": "%azureSpringCloud.menu.common.stop%",
-                "category": "Azure Spring Cloud App"
+                "category": "Spring App"
             },
             {
                 "command": "azureSpringCloud.app.restart",
                 "title": "%azureSpringCloud.menu.common.restart%",
-                "category": "Azure Spring Cloud App"
+                "category": "Spring App"
             },
             {
                 "command": "azureSpringCloud.app.delete",
                 "title": "%azureSpringCloud.menu.common.delete%",
-                "category": "Azure Spring Cloud App"
+                "category": "Spring App"
             },
             {
                 "command": "azureSpringCloud.app.deploy",
                 "title": "%azureSpringCloud.menu.app.deploy%",
-                "category": "Azure Spring Cloud App"
+                "category": "Spring App"
             },
             {
                 "command": "azureSpringCloud.app.scale",
                 "title": "%azureSpringCloud.menu.app.scale%",
-                "category": "Azure Spring Cloud App"
+                "category": "Spring App"
             },
             {
                 "command": "azureSpringCloud.app.openInPortal",
                 "title": "%azureSpringCloud.menu.common.openInPortal%",
-                "category": "Azure Spring Cloud App"
+                "category": "Spring App"
             },
             {
                 "command": "azureSpringCloud.app.viewProperties",
                 "title": "%azureSpringCloud.menu.common.viewProperties%",
-                "category": "Azure Spring Cloud App"
+                "category": "Spring App"
             },
             {
                 "command": "azureSpringCloud.app.instance.startStreamingLog",
                 "title": "%azureSpringCloud.menu.app.instance.startStreamingLog%",
-                "category": "Azure Spring Cloud App Instance"
+                "category": "Spring App Instance"
             },
             {
                 "command": "azureSpringCloud.app.instance.stopStreamingLog",
                 "title": "%azureSpringCloud.menu.app.instance.stopStreamingLog%",
-                "category": "Azure Spring Cloud App Instance"
+                "category": "Spring App Instance"
             },
             {
                 "command": "azureSpringCloud.app.instance.viewProperties",
                 "title": "%azureSpringCloud.menu.common.viewProperties%",
-                "category": "Azure Spring Cloud App Instance"
+                "category": "Spring App Instance"
             },
             {
                 "command": "azureSpringCloud.app.settings.add",
                 "title": "%azureSpringCloud.menu.common.add%",
-                "category": "Azure Spring Cloud App Settings"
+                "category": "Spring App Settings"
             },
             {
                 "command": "azureSpringCloud.app.settings.edit",
                 "title": "%azureSpringCloud.menu.common.edit%",
-                "category": "Azure Spring Cloud App Settings"
+                "category": "Spring App Settings"
             },
             {
                 "command": "azureSpringCloud.common.toggleVisibility",
                 "title": "%azureSpringCloud.menu.common.toggleVisibility%",
-                "category": "Azure Spring Cloud",
+                "category": "Azure Spring Apps",
                 "icon": {
                     "light": "resources/light/Visible.svg",
                     "dark": "resources/dark/Visible.svg"
@@ -204,17 +204,17 @@
             {
                 "command": "azureSpringCloud.app.setting.edit",
                 "title": "%azureSpringCloud.menu.common.edit%",
-                "category": "Azure Spring Cloud App"
+                "category": "Spring App"
             },
             {
                 "command": "azureSpringCloud.app.setting.delete",
                 "title": "%azureSpringCloud.menu.common.delete%",
-                "category": "Azure Spring Cloud App"
+                "category": "Spring App"
             },
             {
                 "command": "azureSpringCloud.common.loadMore",
                 "title": "%azureSpringCloud.menu.common.loadMore%",
-                "category": "Azure Spring Cloud"
+                "category": "Azure Spring Apps"
             }
         ],
         "viewsContainers": {
@@ -230,7 +230,7 @@
             "azure": [
                 {
                     "id": "azureSpringCloud",
-                    "name": "Spring Cloud"
+                    "name": "Spring Apps"
                 }
             ]
         },
@@ -444,7 +444,7 @@
         ],
         "configuration": [
             {
-                "title": "Azure Spring Cloud",
+                "title": "Azure Spring Apps",
                 "properties": {
                     "azureSpringCloud.enableOutputTimestamps": {
                         "type": "boolean",

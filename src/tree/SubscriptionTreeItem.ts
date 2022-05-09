@@ -10,7 +10,7 @@ import { localize } from '../utils';
 import { ServiceTreeItem } from './ServiceTreeItem';
 
 export class SubscriptionTreeItem extends SubscriptionTreeItemBase {
-    public readonly childTypeLabel: string = localize('springCloud.service', 'Spring Cloud Service');
+    public readonly childTypeLabel: string = localize('springCloud.service', 'Spring Apps');
 
     private _nextLink: string | undefined;
 

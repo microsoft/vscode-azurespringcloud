@@ -132,8 +132,8 @@ export class AppTreeItem extends AzureParentTreeItem {
     }
 
     public async deleteTreeItemImpl(_context: IActionContext): Promise<void> {
-        const deleting: string = utils.localize('deletingSpringCLoudApp', 'Deleting Spring Cloud app "{0}"...', this.data.name);
-        const deleted: string = utils.localize('deletedSpringCLoudApp', 'Successfully deleted Spring Cloud app "{0}".', this.data.name);
+        const deleting: string = utils.localize('deletingSpringCLoudApp', 'Deleting Spring app "{0}"...', this.data.name);
+        const deleted: string = utils.localize('deletedSpringCLoudApp', 'Successfully deleted Spring app "{0}".', this.data.name);
         await utils.runInBackground(deleting, deleted, () => this.app.remove());
         this.deleted = true;
     }

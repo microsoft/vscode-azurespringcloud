@@ -65,7 +65,7 @@ export namespace AppCommands {
 
     export async function deleteApp(context: IActionContext, node?: AppTreeItem): Promise<void> {
         node = await getNode(node, context);
-        await ext.ui.showWarningMessage(`Are you sure to delete Spring Cloud app "${node.app.name}"?`, { modal: true }, DialogResponses.deleteResponse);
+        await ext.ui.showWarningMessage(`Are you sure to delete Spring App "${node.app.name}"?`, { modal: true }, DialogResponses.deleteResponse);
         await node.deleteTreeItem(context);
     }
 

@@ -27,7 +27,7 @@ export namespace ServiceCommands {
 
     export async function deleteService(context: IActionContext, node?: ServiceTreeItem): Promise<ServiceTreeItem> {
         node = await getNode(node, context);
-        await ext.ui.showWarningMessage(`Are you sure to delete Spring Cloud service "${node.data.name}"?`, { modal: true }, DialogResponses.deleteResponse);
+        await ext.ui.showWarningMessage(`Are you sure to delete Spring Apps "${node.data.name}"?`, { modal: true }, DialogResponses.deleteResponse);
         await node.deleteTreeItem(context);
         return node;
     }

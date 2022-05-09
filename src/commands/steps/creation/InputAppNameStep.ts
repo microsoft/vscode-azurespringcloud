@@ -23,7 +23,7 @@ export class InputAppNameStep extends AzureNameStep<IAppCreationWizardContext> {
     }
 
     public async prompt(context: IAppCreationWizardContext): Promise<void> {
-        const prompt: string = localize('appNamePrompt', 'Enter a globally unique name for the new Spring Cloud app.');
+        const prompt: string = localize('appNamePrompt', 'Enter a globally unique name for the new Spring app.');
         context.newAppName = (await ext.ui.showInputBox({ prompt, validateInput: this.validateAppName })).trim();
         return Promise.resolve(undefined);
     }

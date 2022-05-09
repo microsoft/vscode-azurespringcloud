@@ -33,7 +33,7 @@ export function deactivateInternal(): void {
 async function activateExtension(context: vscode.ExtensionContext, ignoreBundle?: boolean): Promise<void> {
     ext.context = context;
     ext.ignoreBundle = ignoreBundle;
-    ext.outputChannel = createAzExtOutputChannel('Azure Spring Cloud', ext.prefix);
+    ext.outputChannel = createAzExtOutputChannel('Azure Spring Apps', ext.prefix);
     context.subscriptions.push(ext.outputChannel);
     ext.ui = new AzureUserInput(context.globalState);
 
