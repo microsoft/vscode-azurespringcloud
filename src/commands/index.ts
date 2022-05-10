@@ -3,13 +3,14 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { commands } from 'vscode';
+import { openInPortal } from '@microsoft/vscode-azext-azureutils';
 import {
     CommandCallback,
     IActionContext,
-    IParsedError, openInPortal, parseError,
+    IParsedError, parseError,
     registerCommand
-} from 'vscode-azureextensionui';
+} from '@microsoft/vscode-azext-utils';
+import { commands } from 'vscode';
 import { instrumentOperation } from 'vscode-extension-telemetry-wrapper';
 import { ext } from '../extensionVariables';
 import { AppInstanceTreeItem } from '../tree/AppInstanceTreeItem';
@@ -72,8 +73,8 @@ function registerCommandWithTelemetryWrapper(commandId: string, callback: Comman
 
 type SpringCloudResourceTreeItem = ServiceTreeItem | AppTreeItem | AppInstanceTreeItem;
 
-async function refreshNode(_context: IActionContext, node: SpringCloudResourceTreeItem): Promise<void> {
-    return ext.tree.refresh(node);
+async function refreshNode(context: IActionContext, node: SpringCloudResourceTreeItem): Promise<void> {
+    return ext.tree.refresh(context, node);
 }
 
 async function loadMore(context: IActionContext, node: SpringCloudResourceTreeItem): Promise<void> {

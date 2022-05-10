@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { ResourceUploadDefinition } from "@azure/arm-appplatform/esm/models";
-import { IResourceGroupWizardContext } from "vscode-azureextensionui";
+import { IResourceGroupWizardContext } from '@microsoft/vscode-azext-azureutils';
 
 export interface IAppDeploymentWizardContext extends IResourceGroupWizardContext {
     uploadDefinition?: ResourceUploadDefinition;

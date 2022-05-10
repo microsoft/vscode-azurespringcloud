@@ -4,11 +4,11 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { DeploymentInstance } from "@azure/arm-appplatform/src/models/index";
-import { AzureTreeItem, TreeItemIconPath } from "vscode-azureextensionui";
+import { AzExtTreeItem, TreeItemIconPath } from "@microsoft/vscode-azext-utils";
 import { getThemedIconPath } from "../utils";
 import { AppInstancesTreeItem } from "./AppInstancesTreeItem";
 
-export class AppInstanceTreeItem extends AzureTreeItem {
+export class AppInstanceTreeItem extends AzExtTreeItem {
     public static contextValue: RegExp = /^azureSpringCloud\.app\.instance\.status-.+$/;
     public readonly parent: AppInstancesTreeItem;
     public readonly data: DeploymentInstance;

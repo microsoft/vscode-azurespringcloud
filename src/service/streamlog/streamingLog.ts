@@ -4,9 +4,10 @@
  *--------------------------------------------------------------------------------------------*/
 import { DeploymentResource, TestKeys } from '@azure/arm-appplatform/esm/models';
 import { BasicAuthenticationCredentials, WebResource } from "@azure/ms-rest-js";
+import { parseError } from '@microsoft/vscode-azext-utils';
 import * as request from 'request';
 import * as vscode from 'vscode';
-import { parseError } from 'vscode-azureextensionui';
+import { IActionContext } from '../../../extension.bundle';
 import { ext } from '../../extensionVariables';
 import { localize } from '../../utils';
 
@@ -18,13 +19,13 @@ export interface ILogStream extends vscode.Disposable {
 const primaryName: string = 'primary';
 const logStreams: Map<string, ILogStream> = new Map();
 
-export async function startStreamingLogs(app: string, testKey: TestKeys, instance: DeploymentResource): Promise<ILogStream> {
+export async function startStreamingLogs(context: IActionContext, app: string, testKey: TestKeys, instance: DeploymentResource): Promise<ILogStream> {
     const logStreamId: string = getLogStreamId(app, instance);
     const logStream: ILogStream | undefined = logStreams.get(logStreamId);
     if (logStream && logStream.isConnected) {
         logStream.outputChannel.show();
         // tslint:disable-next-line:no-floating-promises
-        ext.ui.showWarningMessage(localize('logStreamAlreadyActive', 'The log-streaming service for "{0}" is already active.', instance.name));
+        context.ui.showWarningMessage(localize('logStreamAlreadyActive', 'The log-streaming service for "{0}" is already active.', instance.name));
         return logStream;
     } else {
         const outputChannel: vscode.OutputChannel = logStream ? logStream.outputChannel : vscode.window.createOutputChannel(localize('logStreamLabel', '{0} - Log Stream', instance.name));

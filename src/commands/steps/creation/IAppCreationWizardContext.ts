@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { RuntimeVersion } from "@azure/arm-appplatform/esm/models";
-import { IResourceGroupWizardContext } from "vscode-azureextensionui";
+import { IResourceGroupWizardContext } from '@microsoft/vscode-azext-azureutils';
 import { IApp, IDeployment } from "../../../model";
 
 export interface IAppCreationWizardContext extends IResourceGroupWizardContext {

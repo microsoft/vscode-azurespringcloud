@@ -3,8 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { AzureWizardPromptStep } from "vscode-azureextensionui";
-import { ext } from "../../../../extensionVariables";
+import { AzureWizardPromptStep } from "@microsoft/vscode-azext-utils";
 import { EnhancedDeployment, IScaleSettings } from "../../../../model";
 import { localize } from "../../../../utils";
 import { IScaleSettingsUpdateWizardContext } from "./IScaleSettingsUpdateWizardContext";
@@ -27,7 +26,7 @@ export class InputScaleValueStep extends AzureWizardPromptStep<IScaleSettingsUpd
         const prompt: string = localize('numberInputPrompt', 'Enter new value of "{0}".', IScaleSettings.LABELS[this.key]);
         const settings: IScaleSettings = this.deployment.getScaleSettings();
         const value: string = `${settings[this.key]}`;
-        context.newSettings[this.key] = Number((await ext.ui.showInputBox({ prompt, value, validateInput: this.validateInput })).trim());
+        context.newSettings[this.key] = Number((await context.ui.showInputBox({ prompt, value, validateInput: this.validateInput })).trim());
         return Promise.resolve(undefined);
     }
 

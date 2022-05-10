@@ -4,8 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { AppResource } from "@azure/arm-appplatform/esm/models";
-import { AzureNameStep } from "vscode-azureextensionui";
-import { ext } from "../../../extensionVariables";
+import { AzureNameStep } from "@microsoft/vscode-azext-utils";
 import { EnhancedService, IApp } from "../../../model";
 import { localize } from "../../../utils";
 import { IAppCreationWizardContext } from "./IAppCreationWizardContext";
@@ -23,8 +22,8 @@ export class InputAppNameStep extends AzureNameStep<IAppCreationWizardContext> {
     }
 
     public async prompt(context: IAppCreationWizardContext): Promise<void> {
-        const prompt: string = localize('appNamePrompt', 'Enter a globally unique name for the new Spring Cloud app.');
-        context.newAppName = (await ext.ui.showInputBox({ prompt, validateInput: this.validateAppName })).trim();
+        const prompt: string = localize('appNamePrompt', 'Enter a globally unique name for the new Spring app.');
+        context.newAppName = (await context.ui.showInputBox({ prompt, validateInput: this.validateAppName })).trim();
         return Promise.resolve(undefined);
     }
 

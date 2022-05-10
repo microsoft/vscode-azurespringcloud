@@ -6,10 +6,10 @@
 // tslint:disable:no-console
 // tslint:disable:no-implicit-dependencies (this allows the use of dev dependencies)
 
+import { gulp_installAzureAccount, gulp_installResourceGroups, gulp_webpack } from '@microsoft/vscode-azext-dev';
 import * as fse from 'fs-extra';
 import * as gulp from 'gulp';
 import * as path from 'path';
-import { gulp_installAzureAccount, gulp_webpack } from 'vscode-azureextensiondev';
 
 declare let exports: { [key: string]: unknown };
 
@@ -54,6 +54,6 @@ async function cleanReadme(): Promise<void> {
 
 exports['webpack-dev'] = gulp.series(prepareForWebpack, () => gulp_webpack('development'));
 exports['webpack-prod'] = gulp.series(prepareForWebpack, () => gulp_webpack('production'));
-exports.preTest = gulp_installAzureAccount;
+exports.preTest = gulp.series(gulp_installAzureAccount, gulp_installResourceGroups);
 exports.listIcons = listIcons;
 exports.cleanReadme = cleanReadme;

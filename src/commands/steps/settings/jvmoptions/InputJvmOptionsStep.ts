@@ -3,8 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { AzureWizardPromptStep } from "vscode-azureextensionui";
-import { ext } from "../../../../extensionVariables";
+import { AzureWizardPromptStep } from "@microsoft/vscode-azext-utils";
 import { EnhancedDeployment } from "../../../../model";
 import { localize } from "../../../../utils";
 import { IJvmOptionsUpdateWizardContext } from "./IJvmOptionsUpdateWizardContext";
@@ -18,8 +17,8 @@ export class InputJvmOptionsStep extends AzureWizardPromptStep<IJvmOptionsUpdate
     }
 
     public async prompt(context: IJvmOptionsUpdateWizardContext): Promise<void> {
-        const prompt: string = localize('jvmOptionsPrompt', 'Enter new JVM options for the Spring Cloud app.');
-        context.newJvmOptions = (await ext.ui.showInputBox({
+        const prompt: string = localize('jvmOptionsPrompt', 'Enter new JVM options for the Spring app.');
+        context.newJvmOptions = (await context.ui.showInputBox({
             prompt,
             placeHolder: 'e.g. -Xmx2048m -Xms256m',
             value: this.deployment.properties?.deploymentSettings?.jvmOptions ?? '',

@@ -1,5 +1,10 @@
 # Change Log
 
+## 0.3.0 - 2022-05-09
+
+### Updated
+- modify all `Azure Spring Cloud` text to `Azure Spring Apps` since `Azure Spring Cloud` is to be renamed as `Azure Spring Apps`
+
 ## 0.2.0 - 2021-06-30
 
 ### Updated

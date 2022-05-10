@@ -1,5 +1,5 @@
 {
-    "azureSpringCloud.description": "An Azure Spring Cloud extension for Visual Studio Code.",
+    "azureSpringCloud.description": "An Azure Spring Apps extension for Visual Studio Code.",
     "azureSpringCloud.enableOutputTimestamps": "Prepends each line displayed in the output channel with a timestamp.",
     "azureSpringCloud.menu.common.loadMore": "Load More",
     "azureSpringCloud.menu.common.refresh": "Refresh",
@@ -12,7 +12,7 @@
     "azureSpringCloud.menu.common.viewProperties": "View Properties",
     "azureSpringCloud.menu.common.add": "Add",
     "azureSpringCloud.menu.common.edit": "Edit",
-    "azureSpringCloud.menu.subscription.createServiceFromPortal": "Create Service in Portal",
+    "azureSpringCloud.menu.subscription.createServiceFromPortal": "Create Azure Spring Apps in Portal",
     "azureSpringCloud.menu.service.createApp": "Create App",
     "azureSpringCloud.menu.app.openPublicEndpoint": "Access Public Endpoint",
     "azureSpringCloud.menu.app.openTestEndpoint": "Access Test Endpoint",

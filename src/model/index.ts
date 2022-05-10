@@ -3,9 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { AppPlatformManagementClient } from "@azure/arm-appplatform";
 import { AppResource, DeploymentResource, ServiceResource } from "@azure/arm-appplatform/esm/models";
-import { createAzureClient, ISubscriptionContext } from "vscode-azureextensionui";
 import { AppService } from "../service/AppService";
 import { DeploymentService } from "../service/DeploymentService";
 import { ServiceService } from "../service/ServiceService";
@@ -83,19 +81,9 @@ export type EnhancedApp = IApp & AppService;
 export type EnhancedService = IService & ServiceService;
 
 export namespace EnhancedApp {
-    export function enhance(app: IApp, context: ISubscriptionContext): EnhancedApp {
-        const client: AppPlatformManagementClient = createAzureClient(context, AppPlatformManagementClient);
-        const appService: AppService = new AppService(client, app);
-        return Object.assign(appService, app);
-    }
 }
 
 export namespace EnhancedDeployment {
-    export function enhance(deployment: IDeployment, context: ISubscriptionContext): EnhancedDeployment {
-        const client: AppPlatformManagementClient = createAzureClient(context, AppPlatformManagementClient);
-        const deploymentService: DeploymentService = new DeploymentService(client, deployment);
-        return Object.assign(deploymentService, deployment);
-    }
 }
 
 export interface IScaleSettings {

@@ -3,7 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { IResourceGroupWizardContext } from "vscode-azureextensionui";
+import { IResourceGroupWizardContext } from '@microsoft/vscode-azext-azureutils';
 
 export interface IJvmOptionsUpdateWizardContext extends IResourceGroupWizardContext {
     newJvmOptions?: string;

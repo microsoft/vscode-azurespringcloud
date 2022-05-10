@@ -4,8 +4,8 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { RuntimeVersion } from "@azure/arm-appplatform/esm/models";
+import { AzureWizardExecuteStep } from "@microsoft/vscode-azext-utils";
 import { Progress } from "vscode";
-import { AzureWizardExecuteStep } from "vscode-azureextensionui";
 import { ext } from "../../../extensionVariables";
 import { EnhancedApp, EnhancedService } from "../../../model";
 import { AppService } from "../../../service/AppService";

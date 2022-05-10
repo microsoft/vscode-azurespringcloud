@@ -4,14 +4,15 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { AppPlatformManagementClient } from "@azure/arm-appplatform";
-import { AzureParentTreeItem, createAzureClient, IActionContext } from "vscode-azureextensionui";
+import { createAzureClient } from "@microsoft/vscode-azext-azureutils";
+import { AzExtParentTreeItem, IActionContext } from '@microsoft/vscode-azext-utils';
 import { ext } from "../extensionVariables";
 import { EnhancedDeployment, IDeployment } from "../model";
 import { DeploymentService } from "../service/DeploymentService";
 import { AppSettingTreeItem, IOptions } from "./AppSettingTreeItem";
 import { AppTreeItem } from "./AppTreeItem";
 
-export abstract class AppSettingsTreeItem extends AzureParentTreeItem {
+export abstract class AppSettingsTreeItem extends AzExtParentTreeItem {
     public readonly childTypeLabel: string = 'App Setting';
     public parent: AppTreeItem;
     protected data: IDeployment;
@@ -21,8 +22,8 @@ export abstract class AppSettingsTreeItem extends AzureParentTreeItem {
         this.data = deployment;
     }
 
-    public get deployment(): EnhancedDeployment {
-        const client: AppPlatformManagementClient = createAzureClient(this.root, AppPlatformManagementClient);
+    public getDeployment(context: IActionContext): EnhancedDeployment {
+        const client: AppPlatformManagementClient = createAzureClient([context, this], AppPlatformManagementClient);
         const deploymentService: DeploymentService = new DeploymentService(client, this.data);
         return Object.assign(deploymentService, this.data);
     }
@@ -45,14 +46,14 @@ export abstract class AppSettingsTreeItem extends AzureParentTreeItem {
         }
     }
 
-    public async refreshImpl(): Promise<void> {
-        this.data = await this.deployment.reload();
+    public async refreshImpl(context: IActionContext): Promise<void> {
+        this.data = await this.getDeployment(context).reload();
     }
 
-    public abstract updateSettingValue(node: AppSettingTreeItem, _context: IActionContext): Promise<string>;
+    public abstract updateSettingValue(node: AppSettingTreeItem, context: IActionContext): Promise<string>;
 
     // tslint:disable-next-line:no-any
-    public abstract updateSettingsValue(_context: IActionContext): Promise<any>;
+    public abstract updateSettingsValue(context: IActionContext): Promise<any>;
 
-    public abstract async deleteSettingItem(node: AppSettingTreeItem, _context: IActionContext): Promise<void>;
+    public abstract deleteSettingItem(node: AppSettingTreeItem, context: IActionContext): Promise<void>;
 }
