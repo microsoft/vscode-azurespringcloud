@@ -7,6 +7,7 @@ import { AppPlatformManagementClient } from "@azure/arm-appplatform";
 import { AppResource, DeploymentResource, ResourceUploadDefinition, RuntimeVersion, TestKeys } from "@azure/arm-appplatform/esm/models";
 import { DeploymentInstance } from "@azure/arm-appplatform/src/models/index";
 import { AnonymousCredential, ShareFileClient } from "@azure/storage-file-share";
+import { IActionContext } from "../../extension.bundle";
 import { EnhancedApp, IApp, IDeployment } from "../model";
 import { localize } from "../utils";
 import { startStreamingLogs, stopStreamingLogs } from "./streamlog/streamingLog";
@@ -148,13 +149,13 @@ export class AppService {
         return uploadDefinition;
     }
 
-    public async startStreamingLogs(instance: DeploymentInstance, app?: IApp): Promise<void> {
+    public async startStreamingLogs(context: IActionContext, instance: DeploymentInstance, app?: IApp): Promise<void> {
         const target: IApp = this.getTarget(app);
         if (instance.status !== 'Running') {
             throw new Error(localize('instanceNotRunning', 'Selected instance is not running.'));
         }
         const testKey: TestKeys = await this.getTestKeys(target);
-        await startStreamingLogs(target.name, testKey, instance);
+        await startStreamingLogs(context, target.name, testKey, instance);
     }
 
     public async stopStreamingLogs(instance: DeploymentInstance, app?: IApp): Promise<void> {

@@ -10,7 +10,7 @@
 // See https://github.com/Microsoft/vscode-azuretools/wiki/webpack for guidance
 
 const process = require('process');
-const dev = require("vscode-azureextensiondev");
+const dev = require("@microsoft/vscode-azext-dev");
 
 let DEBUG_WEBPACK = !/^(false|0)?$/i.test(process.env.DEBUG_WEBPACK || '');
 
@@ -26,7 +26,7 @@ let config = dev.getDefaultWebpackConfig({
         '../build/default/validation': 'commonjs ../build/default/validation',
         '../build/Release/bufferutil': 'commonjs ../build/Release/bufferutil',
         '../build/default/bufferutil': 'commonjs ../build/default/bufferutil',
-    }
+    },
 });
 
 if (DEBUG_WEBPACK) {

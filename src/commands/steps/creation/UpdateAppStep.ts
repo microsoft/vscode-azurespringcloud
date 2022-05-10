@@ -3,8 +3,8 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
+import { AzureWizardExecuteStep } from "@microsoft/vscode-azext-utils";
 import { Progress } from "vscode";
-import { AzureWizardExecuteStep } from "vscode-azureextensionui";
 import { EnhancedApp, EnhancedService } from "../../../model";
 import { AppService } from "../../../service/AppService";
 import { localize } from "../../../utils";

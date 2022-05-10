@@ -4,16 +4,9 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { AppPlatformManagementClient } from "@azure/arm-appplatform";
+import { createAzureClient } from "@microsoft/vscode-azext-azureutils";
+import { AzExtParentTreeItem, AzExtTreeItem, AzureWizard, AzureWizardExecuteStep, IActionContext, TreeItemIconPath } from '@microsoft/vscode-azext-utils';
 import { window } from "vscode";
-import {
-    AzExtTreeItem,
-    AzureParentTreeItem,
-    AzureWizard,
-    AzureWizardExecuteStep,
-    createAzureClient,
-    IActionContext,
-    TreeItemIconPath
-} from "vscode-azureextensionui";
 import { AppCommands } from "../commands/AppCommands";
 import { IAppDeploymentWizardContext } from "../commands/steps/deployment/IAppDeploymentWizardContext";
 import { UpdateDeploymentStep } from "../commands/steps/deployment/UpdateDeploymentStep";
@@ -29,7 +22,7 @@ import { AppJvmOptionsTreeItem } from "./AppJvmOptionsTreeItem";
 import { AppScaleSettingsTreeItem } from "./AppScaleSettingsTreeItem";
 import { ServiceTreeItem } from "./ServiceTreeItem";
 
-export class AppTreeItem extends AzureParentTreeItem {
+export class AppTreeItem extends AzExtParentTreeItem {
     public static contextValue: RegExp = /^azureSpringCloud\.app\.status-.+$/;
     private static readonly ACCESS_PUBLIC_ENDPOINT: string = 'Access public endpoint';
     private static readonly ACCESS_TEST_ENDPOINT: string = 'Access test endpoint';
@@ -45,22 +38,6 @@ export class AppTreeItem extends AzureParentTreeItem {
     constructor(parent: ServiceTreeItem, app: IApp) {
         super(parent);
         this.data = app;
-        this.refresh();
-    }
-
-    public get app(): EnhancedApp {
-        const client: AppPlatformManagementClient = createAzureClient(this.root, AppPlatformManagementClient);
-        const appService: AppService = new AppService(client, this.data);
-        return Object.assign(appService, this.data);
-    }
-
-    public get deployment(): EnhancedDeployment | undefined {
-        if (!this.deploymentData) {
-            return undefined;
-        }
-        const client: AppPlatformManagementClient = createAzureClient(this.root, AppPlatformManagementClient);
-        const deploymentService: DeploymentService = new DeploymentService(client, this.deploymentData);
-        return Object.assign(deploymentService, this.deploymentData);
     }
 
     public get id(): string {
@@ -115,12 +92,27 @@ export class AppTreeItem extends AzureParentTreeItem {
         }
     }
 
+    public getApp(context: IActionContext): EnhancedApp {
+        const client: AppPlatformManagementClient = createAzureClient([context, this], AppPlatformManagementClient);
+        const appService: AppService = new AppService(client, this.data);
+        return Object.assign(appService, this.data);
+    }
+
+    public getDeployment(context: IActionContext): EnhancedDeployment | undefined {
+        if (!this.deploymentData) {
+            return undefined;
+        }
+        const client: AppPlatformManagementClient = createAzureClient([context, this], AppPlatformManagementClient);
+        const deploymentService: DeploymentService = new DeploymentService(client, this.deploymentData);
+        return Object.assign(deploymentService, this.deploymentData);
+    }
+
     public hasMoreChildrenImpl(): boolean {
         return false;
     }
 
-    public async loadMoreChildrenImpl(_clearCache: boolean, _context: IActionContext): Promise<AzExtTreeItem[]> {
-        this.deploymentData = await this.getActiveDeployment();
+    public async loadMoreChildrenImpl(_clearCache: boolean, context: IActionContext): Promise<AzExtTreeItem[]> {
+        this.deploymentData = await this.getActiveDeployment(context);
         if (!this.deploymentData) {
             return [];
         }
@@ -131,57 +123,62 @@ export class AppTreeItem extends AzureParentTreeItem {
         return [this.appInstancesTreeItem, this.envPropertiesTreeItem, this.scaleSettingsTreeItem, this.jvmOptionsTreeItem];
     }
 
-    public async deleteTreeItemImpl(_context: IActionContext): Promise<void> {
+    public async deleteTreeItemImpl(context: IActionContext): Promise<void> {
+        const app: EnhancedApp = this.getApp(context);
         const deleting: string = utils.localize('deletingSpringCLoudApp', 'Deleting Spring app "{0}"...', this.data.name);
         const deleted: string = utils.localize('deletedSpringCLoudApp', 'Successfully deleted Spring app "{0}".', this.data.name);
-        await utils.runInBackground(deleting, deleted, () => this.app.remove());
+        await utils.runInBackground(deleting, deleted, () => app.remove());
         this.deleted = true;
     }
 
-    public async toggleEndpoint(_context: IActionContext): Promise<void> {
+    public async toggleEndpoint(context: IActionContext): Promise<void> {
+        const app: EnhancedApp = this.getApp(context);
         const isPublic: boolean = this.data.properties?.publicProperty ?? false;
         const doing: string = isPublic ? `Unassigning public endpoint of "${this.data.name}".` : `Assigning public endpoint to "${this.data.name}".`;
         const done: string = isPublic ? `Successfully unassigned public endpoint of "${this.data.name}".` : `Successfully assigned public endpoint to "${this.data.name}".`;
-        await utils.runInBackground(doing, done, () => this.app.setPublic(!isPublic));
-        this.refresh();
+        await utils.runInBackground(doing, done, () => app.setPublic(!isPublic));
+        this.refresh(context);
     }
 
-    public async getActiveDeployment(force: boolean = false): Promise<IDeployment | undefined> {
+    public async getActiveDeployment(context: IActionContext, force: boolean = false): Promise<IDeployment | undefined> {
         if (force || !this.deploymentData) {
-            this.deploymentData = await this.app.getActiveDeployment();
+            const app: EnhancedApp = this.getApp(context);
+            this.deploymentData = await app.getActiveDeployment();
         }
         return this.deploymentData;
     }
 
     public async deployArtifact(context: IActionContext, artifactPath: string): Promise<void> {
+        const app: EnhancedApp = this.getApp(context);
+        const deployment: EnhancedDeployment | undefined = this.getDeployment(context);
         const deploying: string = utils.localize('deploying', 'Deploying artifact to "{0}".', this.data.name);
         const deployed: string = utils.localize('deployed', 'Successfully deployed artifact to "{0}".', this.data.name);
 
-        const wizardContext: IAppDeploymentWizardContext = Object.assign(context, this.root, {
-            app: this.app
-        });
+        const wizardContext: IAppDeploymentWizardContext = Object.assign(context, this.subscription, { app });
 
         const executeSteps: AzureWizardExecuteStep<IAppDeploymentWizardContext>[] = [];
-        executeSteps.push(new UploadArtifactStep(this.app, artifactPath));
-        executeSteps.push(new UpdateDeploymentStep(this.deployment!));
+        executeSteps.push(new UploadArtifactStep(app, artifactPath));
+        executeSteps.push(new UpdateDeploymentStep(deployment!));
         const wizard: AzureWizard<IAppDeploymentWizardContext> = new AzureWizard(wizardContext, { executeSteps, title: deploying });
         await wizard.execute();
-        setTimeout(async () => {
+        const task: () => void = async () => {
             const action: string | undefined = await window.showInformationMessage(deployed, AppTreeItem.ACCESS_PUBLIC_ENDPOINT, AppTreeItem.ACCESS_TEST_ENDPOINT);
             if (action) {
                 return action === AppTreeItem.ACCESS_PUBLIC_ENDPOINT ? AppCommands.openPublicEndpoint(context, this) : AppCommands.openTestEndpoint(context, this);
             }
-        },         0);
+        };
+        setTimeout(task, 0);
     }
 
     public async scaleInstances(context: IActionContext): Promise<void> {
         await this.scaleSettingsTreeItem.updateSettingsValue(context);
     }
 
-    public async refreshImpl(): Promise<void> {
+    public async refreshImpl(context: IActionContext): Promise<void> {
         if (!this.deleted) {
-            this.data = await this.app.reload();
-            this.deploymentData = await this.app.getActiveDeployment();
+            const app: EnhancedApp = this.getApp(context);
+            this.data = await app.reload();
+            this.deploymentData = await app.getActiveDeployment();
         }
     }
 

@@ -3,7 +3,8 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { DialogResponses, IActionContext, openInPortal, openReadOnlyJson } from "vscode-azureextensionui";
+import { openInPortal } from "@microsoft/vscode-azext-azureutils";
+import { DialogResponses, IActionContext, openReadOnlyJson } from "@microsoft/vscode-azext-utils";
 import { ext } from "../extensionVariables";
 import { ServiceTreeItem } from "../tree/ServiceTreeItem";
 import { SubscriptionTreeItem } from "../tree/SubscriptionTreeItem";
@@ -20,14 +21,14 @@ export namespace ServiceCommands {
         try {
             await node.createChild(context);
         } catch (e) {
-            node.refresh();
+            node.refresh(context);
             throw e;
         }
     }
 
     export async function deleteService(context: IActionContext, node?: ServiceTreeItem): Promise<ServiceTreeItem> {
         node = await getNode(node, context);
-        await ext.ui.showWarningMessage(`Are you sure to delete Spring Apps "${node.data.name}"?`, { modal: true }, DialogResponses.deleteResponse);
+        await context.ui.showWarningMessage(`Are you sure to delete Spring Apps "${node.data.name}"?`, { modal: true }, DialogResponses.deleteResponse);
         await node.deleteTreeItem(context);
         return node;
     }

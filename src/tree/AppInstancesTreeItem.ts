@@ -4,20 +4,18 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { DeploymentInstance } from "@azure/arm-appplatform/esm/models";
-import { AzExtTreeItem, AzureParentTreeItem, TreeItemIconPath } from "vscode-azureextensionui";
+import { AzExtParentTreeItem, AzExtTreeItem, IActionContext, TreeItemIconPath } from "@microsoft/vscode-azext-utils";
 import { IDeployment } from "../model";
 import { getThemedIconPath, localize } from "../utils";
 import { AppInstanceTreeItem } from "./AppInstanceTreeItem";
 import { AppTreeItem } from './AppTreeItem';
 
-export class AppInstancesTreeItem extends AzureParentTreeItem {
+export class AppInstancesTreeItem extends AzExtParentTreeItem {
     public static contextValue: string = 'azureSpringCloud.app.instances';
     public readonly contextValue: string = AppInstancesTreeItem.contextValue;
     public readonly childTypeLabel: string = localize('appInstance', 'Spring App Instance');
-    public readonly id: string = AppInstancesTreeItem.contextValue;
     public readonly label: string = 'App Instances';
     public readonly parent: AppTreeItem;
-    public readonly iconPath: TreeItemIconPath = getThemedIconPath('app-instances');
     private data: IDeployment;
 
     public constructor(parent: AppTreeItem, deployment: IDeployment) {
@@ -25,11 +23,14 @@ export class AppInstancesTreeItem extends AzureParentTreeItem {
         this.data = deployment;
     }
 
+    public get id(): string { return AppInstancesTreeItem.contextValue; }
+    public get iconPath(): TreeItemIconPath { return getThemedIconPath('app-instances'); }
+
     public hasMoreChildrenImpl(): boolean {
         return false;
     }
 
-    public async loadMoreChildrenImpl(_clearCache: boolean): Promise<AzExtTreeItem[]> {
+    public async loadMoreChildrenImpl(_clearCache: boolean, _context: IActionContext): Promise<AzExtTreeItem[]> {
         return await this.createTreeItemsWithErrorHandling(
             this.data.properties!.instances,
             'invalidSpringCloudAppInstance',
@@ -38,7 +39,7 @@ export class AppInstancesTreeItem extends AzureParentTreeItem {
         );
     }
 
-    public async refreshImpl(): Promise<void> {
-        this.data = (await this.parent.getActiveDeployment(true))!;
+    public async refreshImpl(context: IActionContext): Promise<void> {
+        this.data = (await this.parent.getActiveDeployment(context, true))!;
     }
 }

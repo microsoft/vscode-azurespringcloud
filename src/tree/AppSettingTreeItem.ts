@@ -3,7 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { AzureParentTreeItem, AzureTreeItem, IActionContext, TreeItemIconPath } from "vscode-azureextensionui";
+import { AzExtParentTreeItem, AzExtTreeItem, IActionContext, TreeItemIconPath } from '@microsoft/vscode-azext-utils';
 import { getThemedIconPath } from "../utils";
 import { AppSettingsTreeItem } from "./AppSettingsTreeItem";
 
@@ -15,7 +15,7 @@ export interface IOptions {
     contextValue?: string;
 }
 
-export class AppSettingTreeItem extends AzureTreeItem {
+export class AppSettingTreeItem extends AzExtTreeItem {
     public static contextValue: string = 'azureSpringCloud.app.setting';
     public readonly parent: AppSettingsTreeItem;
     public readonly key: string;
@@ -23,7 +23,7 @@ export class AppSettingTreeItem extends AzureTreeItem {
 
     private readonly _options: IOptions;
 
-    public constructor(parent: AzureParentTreeItem, key: string, value: string, options: IOptions = { deletable: true }) {
+    public constructor(parent: AzExtParentTreeItem, key: string, value: string, options: IOptions = { deletable: true }) {
         super(parent);
         this.key = key;
         this._value = value;
@@ -85,8 +85,8 @@ export class AppSettingTreeItem extends AzureTreeItem {
         }
     }
 
-    public async toggleVisibility(_context: IActionContext, hidden?: boolean): Promise<void> {
+    public async toggleVisibility(context: IActionContext, hidden?: boolean): Promise<void> {
         this._options.hidden = hidden ?? !this._options.hidden;
-        await this.refresh();
+        await this.refresh(context);
     }
 }

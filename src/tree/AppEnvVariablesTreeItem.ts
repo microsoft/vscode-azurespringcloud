@@ -3,9 +3,8 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { AzExtTreeItem, IActionContext, ICreateChildImplContext, TreeItemIconPath } from "vscode-azureextensionui";
-import { ext } from "../extensionVariables";
-import { IDeployment } from "../model";
+import { AzExtTreeItem, IActionContext, ICreateChildImplContext, TreeItemIconPath } from "@microsoft/vscode-azext-utils";
+import { EnhancedDeployment, IDeployment } from "../model";
 import { DeploymentService } from "../service/DeploymentService";
 import * as utils from "../utils";
 import { AppSettingsTreeItem } from "./AppSettingsTreeItem";
@@ -20,16 +19,17 @@ export class AppEnvVariablesTreeItem extends AppSettingsTreeItem {
         contextValue: 'azureSpringCloud.app.envVariable',
     };
     public readonly contextValue: string = AppEnvVariablesTreeItem.contextValue;
-    public readonly iconPath: TreeItemIconPath = utils.getThemedIconPath('app-envvars');
-    public readonly id: string = AppEnvVariablesTreeItem.contextValue;
     public readonly label: string = 'Environment Variables';
 
     public constructor(parent: AppTreeItem, deployment: IDeployment) {
         super(parent, deployment);
     }
 
+    public get id(): string { return AppEnvVariablesTreeItem.contextValue; }
+    public get iconPath(): TreeItemIconPath { return utils.getThemedIconPath('app-envvars'); }
+
     public get variables(): { [p: string]: string } {
-        return this.deployment.properties?.deploymentSettings?.environmentVariables ?? {};
+        return this.data.properties?.deploymentSettings?.environmentVariables ?? {};
     }
 
     public async loadMoreChildrenImpl(_clearCache: boolean, _context: IActionContext): Promise<AzExtTreeItem[]> {
@@ -37,11 +37,11 @@ export class AppEnvVariablesTreeItem extends AppSettingsTreeItem {
     }
 
     public async createChildImpl(context: ICreateChildImplContext): Promise<AzExtTreeItem> {
-        const newKey: string = await ext.ui.showInputBox({
+        const newKey: string = await context.ui.showInputBox({
             prompt: 'Enter new environment variable key',
             validateInput: DeploymentService.validateKey
         });
-        const newVal: string = await ext.ui.showInputBox({
+        const newVal: string = await context.ui.showInputBox({
             prompt: `Enter value for "${newKey}"`,
             validateInput: DeploymentService.validateVal
         });
@@ -51,7 +51,7 @@ export class AppEnvVariablesTreeItem extends AppSettingsTreeItem {
     }
 
     public async updateSettingValue(node: AppSettingTreeItem, context: IActionContext): Promise<string> {
-        const newVal: string = await ext.ui.showInputBox({
+        const newVal: string = await context.ui.showInputBox({
             prompt: `Enter value for "${node.key}"`,
             value: node.value,
             validateInput: DeploymentService.validateVal
@@ -66,10 +66,11 @@ export class AppEnvVariablesTreeItem extends AppSettingsTreeItem {
         await this.updateSettingsValue(context, tempVars);
     }
 
-    public async updateSettingsValue(_context: IActionContext, newVars?: { [p: string]: string }): Promise<void> {
-        const updating: string = utils.localize('updatingEnvVar', 'Updating environment variables of "{0}"...', this.deployment.app.name);
-        const updated: string = utils.localize('updatedEnvVar', 'Successfully updated environment variables of {0}.', this.deployment.app.name);
-        await utils.runInBackground(updating, updated, () => this.deployment.updateEnvironmentVariables(newVars ?? {}));
-        this.refresh();
+    public async updateSettingsValue(context: IActionContext, newVars?: { [p: string]: string }): Promise<void> {
+        const deployment: EnhancedDeployment = this.getDeployment(context);
+        const updating: string = utils.localize('updatingEnvVar', 'Updating environment variables of "{0}"...', deployment.app.name);
+        const updated: string = utils.localize('updatedEnvVar', 'Successfully updated environment variables of {0}.', deployment.app.name);
+        await utils.runInBackground(updating, updated, () => deployment.updateEnvironmentVariables(newVars ?? {}));
+        this.refresh(context);
     }
 }

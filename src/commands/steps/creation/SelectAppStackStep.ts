@@ -4,8 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { RuntimeVersion } from "@azure/arm-appplatform/esm/models";
-import { AzureWizardPromptStep, IAzureQuickPickItem } from "vscode-azureextensionui";
-import { ext } from "../../../extensionVariables";
+import { AzureWizardPromptStep, IAzureQuickPickItem } from "@microsoft/vscode-azext-utils";
 import { localize } from "../../../utils";
 import { IAppCreationWizardContext } from "./IAppCreationWizardContext";
 
@@ -21,7 +20,7 @@ export class SelectAppStackStep extends AzureWizardPromptStep<IAppCreationWizard
             { label: 'Java 11', description: 'Java 11', data: SelectAppStackStep.JAVA11 }
         ];
         const placeHolder: string = localize('selectRuntime', 'Select a Java runtime version');
-        context.newAppRuntime = (await ext.ui.showQuickPick(picks, { placeHolder })).data;
+        context.newAppRuntime = (await context.ui.showQuickPick(picks, { placeHolder })).data;
         return Promise.resolve(undefined);
     }
 

@@ -5,18 +5,16 @@
 
 import { AppPlatformManagementClient } from '@azure/arm-appplatform';
 import { ServiceResource } from '@azure/arm-appplatform/esm/models';
-import { window } from "vscode";
+import { createAzureClient, VerifyProvidersStep } from "@microsoft/vscode-azext-azureutils";
 import {
+    AzExtParentTreeItem,
     AzExtTreeItem,
-    AzureParentTreeItem,
     AzureWizard,
     AzureWizardExecuteStep,
-    AzureWizardPromptStep,
-    createAzureClient,
-    ICreateChildImplContext,
-    TreeItemIconPath,
-    VerifyProvidersStep
-} from "vscode-azureextensionui";
+    AzureWizardPromptStep, IActionContext, ICreateChildImplContext,
+    TreeItemIconPath
+} from '@microsoft/vscode-azext-utils';
+import { window } from "vscode";
 import { CreateAppDeploymentStep } from "../commands/steps/creation/CreateAppDeploymentStep";
 import { CreateAppStep } from "../commands/steps/creation/CreateAppStep";
 import { IAppCreationWizardContext } from "../commands/steps/creation/IAppCreationWizardContext";
@@ -28,7 +26,7 @@ import { ServiceService } from "../service/ServiceService";
 import * as utils from "../utils";
 import { AppTreeItem } from './AppTreeItem';
 
-export class ServiceTreeItem extends AzureParentTreeItem {
+export class ServiceTreeItem extends AzExtParentTreeItem {
     public static contextValue: string = 'azureSpringCloud.service';
     public readonly contextValue: string = ServiceTreeItem.contextValue;
     public readonly childTypeLabel: string = utils.localize('springCloud.app', 'Spring App');
@@ -37,15 +35,9 @@ export class ServiceTreeItem extends AzureParentTreeItem {
     private _nextLink: string | undefined;
     private deleted: boolean;
 
-    constructor(parent: AzureParentTreeItem, service: ServiceResource) {
+    constructor(parent: AzExtParentTreeItem, service: ServiceResource) {
         super(parent);
         this.data = IService.fromResource(service);
-    }
-
-    public get service(): EnhancedService {
-        const client: AppPlatformManagementClient = createAzureClient(this.root, AppPlatformManagementClient);
-        const serviceService: ServiceService = new ServiceService(client, this.data);
-        return Object.assign(serviceService, this.data);
     }
 
     public get id(): string {
@@ -65,44 +57,56 @@ export class ServiceTreeItem extends AzureParentTreeItem {
         return utils.getThemedIconPath('azure-spring-cloud');
     }
 
+    public getService(context: IActionContext): EnhancedService {
+        const client: AppPlatformManagementClient = createAzureClient([context, this], AppPlatformManagementClient);
+        const serviceService: ServiceService = new ServiceService(client, this.data);
+        return Object.assign(serviceService, this.data);
+    }
+
     public hasMoreChildrenImpl(): boolean {
         return !!this._nextLink;
     }
 
-    public async loadMoreChildrenImpl(clearCache: boolean): Promise<AzExtTreeItem[]> {
+    public async loadMoreChildrenImpl(clearCache: boolean, context: IActionContext): Promise<AzExtTreeItem[]> {
         if (clearCache) {
             this._nextLink = undefined;
         }
-        const result: { nextLink?: string; apps: IApp[] } = await this.service.getApps(this._nextLink);
+        const result: { nextLink?: string; apps: IApp[] } = await this.getService(context).getApps(this._nextLink);
         this._nextLink = result.nextLink;
         return await this.createTreeItemsWithErrorHandling(
             result.apps,
             'invalidSpringCloudApp',
-            app => new AppTreeItem(this, app),
+            app => {
+                const item: AppTreeItem = new AppTreeItem(this, app);
+                item.refresh(context);
+                return item;
+            },
             app => app.name
         );
     }
 
-    public async deleteTreeItemImpl(): Promise<void> {
+    public async deleteTreeItemImpl(context: IActionContext): Promise<void> {
+        const service: EnhancedService = this.getService(context);
         const deleting: string = utils.localize('deletingSpringCLoudService', 'Deleting Azure Spring Apps "{0}"...', this.data.name);
         const deleted: string = utils.localize('deletedSpringCloudService', 'Successfully deleted Azure Spring Apps "{0}".', this.data.name);
-        await utils.runInBackground(deleting, deleted, () => this.service.remove());
+        await utils.runInBackground(deleting, deleted, () => service.remove());
         this.deleted = true;
     }
 
     public async createChildImpl(context: ICreateChildImplContext): Promise<AzExtTreeItem> {
-        const wizardContext: IAppCreationWizardContext = Object.assign(context, this.root, {
+        const service: EnhancedService = this.getService(context);
+        const wizardContext: IAppCreationWizardContext = Object.assign(context, this.subscription, {
             service: this.data
         });
 
         const promptSteps: AzureWizardPromptStep<IAppCreationWizardContext>[] = [];
         const executeSteps: AzureWizardExecuteStep<IAppCreationWizardContext>[] = [];
-        promptSteps.push(new InputAppNameStep(this.service));
+        promptSteps.push(new InputAppNameStep(service));
         promptSteps.push(new SelectAppStackStep());
         executeSteps.push(new VerifyProvidersStep(['Microsoft.AppPlatform']));
-        executeSteps.push(new CreateAppStep(this.service));
-        executeSteps.push(new CreateAppDeploymentStep(this.service));
-        executeSteps.push(new UpdateAppStep(this.service));
+        executeSteps.push(new CreateAppStep(service));
+        executeSteps.push(new CreateAppDeploymentStep(service));
+        executeSteps.push(new UpdateAppStep(service));
         const creating: string = utils.localize('creatingSpringCouldApp', 'Creating new Spring app in Azure');
         const wizard: AzureWizard<IAppCreationWizardContext> = new AzureWizard(wizardContext, { promptSteps, executeSteps, title: creating });
 
@@ -112,13 +116,15 @@ export class ServiceTreeItem extends AzureParentTreeItem {
         await wizard.execute();
         const created: string = utils.localize('createdSpringCouldApp', 'Successfully created Spring app "{0}".', appName);
         window.showInformationMessage(created);
-
-        return new AppTreeItem(this, utils.nonNullProp(wizardContext, 'newApp'));
+        const item: AppTreeItem = new AppTreeItem(this, utils.nonNullProp(wizardContext, 'newApp'));
+        item.refresh(context);
+        return item;
     }
 
-    public async refreshImpl(): Promise<void> {
+    public async refreshImpl(context: IActionContext): Promise<void> {
+        const service: EnhancedService = this.getService(context);
         if (!this.deleted) {
-            this.data = await this.service.reload();
+            this.data = await service.reload();
         }
     }
 }

@@ -3,12 +3,12 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
+import { AzExtTreeItem, AzureWizard, AzureWizardExecuteStep, AzureWizardPromptStep, IActionContext, TreeItemIconPath } from "@microsoft/vscode-azext-utils";
 import { window } from "vscode";
-import { AzExtTreeItem, AzureWizard, AzureWizardExecuteStep, AzureWizardPromptStep, IActionContext, TreeItemIconPath } from "vscode-azureextensionui";
 import { InputScaleValueStep } from "../commands/steps/settings/scalesettings/InputScaleValueStep";
 import { IScaleSettingsUpdateWizardContext } from "../commands/steps/settings/scalesettings/IScaleSettingsUpdateWizardContext";
 import { UpdateScaleSettingsStep } from "../commands/steps/settings/scalesettings/UpdateScaleSettingsStep";
-import { IDeployment, IScaleSettings } from "../model";
+import { EnhancedDeployment, IDeployment, IScaleSettings } from "../model";
 import { getThemedIconPath, localize } from "../utils";
 import { AppSettingsTreeItem } from "./AppSettingsTreeItem";
 import { AppSettingTreeItem, IOptions } from "./AppSettingTreeItem";
@@ -21,33 +21,35 @@ export class AppScaleSettingsTreeItem extends AppSettingsTreeItem {
     };
 
     public readonly contextValue: string = AppScaleSettingsTreeItem.contextValue;
-    public readonly iconPath: TreeItemIconPath = getThemedIconPath('app-scale');
-    public readonly id: string = AppScaleSettingsTreeItem.contextValue;
     public readonly label: string = 'Scale Settings';
 
     public constructor(parent: AppTreeItem, deployment: IDeployment) {
         super(parent, deployment);
     }
 
-    public get settings(): IScaleSettings {
-        return this.deployment.getScaleSettings();
+    public get iconPath(): TreeItemIconPath { return getThemedIconPath('app-scale'); }
+    public get id(): string { return AppScaleSettingsTreeItem.contextValue; }
+
+    public getSettings(context: IActionContext): IScaleSettings {
+        return this.getDeployment(context).getScaleSettings();
     }
 
     public async loadMoreChildrenImpl(_clearCache: boolean, _context: IActionContext): Promise<AzExtTreeItem[]> {
-        return Object.entries(this.settings)
+        return Object.entries(this.getSettings(_context))
             .map(e => this.toAppSettingItem(e[0], `${e[1]}`, Object.assign({ label: IScaleSettings.LABELS[e[0]] }, AppScaleSettingsTreeItem._options)));
     }
 
     public async updateSettingsValue(context: IActionContext, key?: string): Promise<string> {
-        const scaling: string = localize('scaling', 'Scaling "{0}"', this.deployment.app.name);
-        const scaled: string = localize('scaled', 'Successfully scaled "{0}".', this.deployment.app.name);
+        const deployment: EnhancedDeployment = this.getDeployment(context);
+        const scaling: string = localize('scaling', 'Scaling "{0}"', deployment.app.name);
+        const scaled: string = localize('scaled', 'Successfully scaled "{0}".', deployment.app.name);
 
-        const newSettings: IScaleSettings = { ...this.settings };
-        const wizardContext: IScaleSettingsUpdateWizardContext = Object.assign(context, this.root, { newSettings });
+        const newSettings: IScaleSettings = { ...deployment.getScaleSettings() };
+        const wizardContext: IScaleSettingsUpdateWizardContext = Object.assign(context, this.subscription, { newSettings });
         const steps: AzureWizardPromptStep<IScaleSettingsUpdateWizardContext>[] = [
-            new InputScaleValueStep(this.deployment, 'capacity'),
-            new InputScaleValueStep(this.deployment, 'memory'),
-            new InputScaleValueStep(this.deployment, 'cpu')
+            new InputScaleValueStep(deployment, 'capacity'),
+            new InputScaleValueStep(deployment, 'memory'),
+            new InputScaleValueStep(deployment, 'cpu')
         ];
         const promptSteps: AzureWizardPromptStep<IScaleSettingsUpdateWizardContext>[] = [];
         const executeSteps: AzureWizardExecuteStep<IScaleSettingsUpdateWizardContext>[] = [];
@@ -56,11 +58,11 @@ export class AppScaleSettingsTreeItem extends AppSettingsTreeItem {
         } else {
             promptSteps.push(steps[['capacity', 'memory', 'cpu'].indexOf(key)]);
         }
-        executeSteps.push(new UpdateScaleSettingsStep(this.deployment));
+        executeSteps.push(new UpdateScaleSettingsStep(deployment));
         const wizard: AzureWizard<IScaleSettingsUpdateWizardContext> = new AzureWizard(wizardContext, { promptSteps, executeSteps, title: scaling });
         await wizard.prompt();
         await wizard.execute();
-        this.parent.refresh();
+        this.parent.refresh(context);
         window.showInformationMessage(scaled);
         return `${wizardContext.newSettings[key ?? 'capacity']}`;
     }

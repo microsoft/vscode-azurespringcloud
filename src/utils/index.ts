@@ -4,10 +4,10 @@
  *--------------------------------------------------------------------------------------------*/
 
 // tslint:disable-next-line:no-require-imports no-implicit-dependencies
-import opn = require("opn");
+import { TreeItemIconPath } from "@microsoft/vscode-azext-utils";
+import * as open from 'open';
 import * as path from 'path';
 import { ProgressLocation, window } from "vscode";
-import { TreeItemIconPath } from "vscode-azureextensionui";
 import * as nls from 'vscode-nls';
 import { ext } from "../extensionVariables";
 
@@ -19,7 +19,7 @@ export async function openUrl(url: string): Promise<void> {
     // await vscode.env.openExternal(vscode.Uri.parse(url));
 
     // tslint:disable-next-line: no-unsafe-any
-    opn(url);
+    open(url);
 }
 
 export async function runInBackground(doing: string, done: string, task: () => Promise<void>): Promise<void> {
