@@ -3,7 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { AppResource, DeploymentResource, ServiceResource } from "@azure/arm-appplatform/esm/models";
+import { AppResource, DeploymentResource, ServiceResource } from "@azure/arm-appplatform";
 import { AppService } from "../service/AppService";
 import { DeploymentService } from "../service/DeploymentService";
 import { ServiceService } from "../service/ServiceService";
@@ -100,14 +100,19 @@ export namespace IScaleSettings {
         capacity: "Instance count"
     };
     export const SCOPES: { [key: string]: { [key: string]: { max: number; min: number } } } = {
+        Enterprise: {
+            cpu: { max: 4, min: 0.5 },
+            memory: { max: 8, min: 0.5 },
+            capacity: { max: 500, min: 1 }
+        },
         Standard: {
-            cpu: { max: 4, min: 1 },
-            memory: { max: 8, min: 1 },
+            cpu: { max: 4, min: 0.5 },
+            memory: { max: 8, min: 0.5 },
             capacity: { max: 500, min: 1 }
         },
         Basic: {
-            cpu: { max: 1, min: 1 },
-            memory: { max: 2, min: 1 },
+            cpu: { max: 1, min: 0.5 },
+            memory: { max: 2, min: 0.5 },
             capacity: { max: 25, min: 1 }
         }
     };

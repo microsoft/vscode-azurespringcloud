@@ -3,7 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { AppResource } from "@azure/arm-appplatform/esm/models";
+import { AppResource } from "@azure/arm-appplatform";
 import { AzureNameStep } from "@microsoft/vscode-azext-utils";
 import { EnhancedService, IApp } from "../../../model";
 import { localize } from "../../../utils";
@@ -48,8 +48,8 @@ export class InputAppNameStep extends AzureNameStep<IAppCreationWizardContext> {
                     The value must be between 4 and 32 characters long.
                 `);
         } else {
-            const result: { nextLink?: string; apps: IApp[] } = await this.service.getApps();
-            if (!result.apps.every((app: AppResource) => app.name !== name)) {
+            const apps: IApp[] = await this.service.getApps();
+            if (!apps.every((app: AppResource) => app.name !== name)) {
                 return localize('existAppName', "App with this name already exists.");
             }
         }

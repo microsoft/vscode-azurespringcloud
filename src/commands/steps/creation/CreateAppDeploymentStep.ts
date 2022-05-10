@@ -3,7 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { RuntimeVersion } from "@azure/arm-appplatform/esm/models";
+import { KnownSupportedRuntimeValue } from "@azure/arm-appplatform";
 import { AzureWizardExecuteStep } from "@microsoft/vscode-azext-utils";
 import { Progress } from "vscode";
 import { ext } from "../../../extensionVariables";
@@ -29,7 +29,7 @@ export class CreateAppDeploymentStep extends AzureWizardExecuteStep<IAppCreation
         ext.outputChannel.appendLog(message);
         progress.report({ message });
 
-        const appRuntime: RuntimeVersion = nonNullProp(context, 'newAppRuntime');
+        const appRuntime: KnownSupportedRuntimeValue = nonNullProp(context, 'newAppRuntime');
 
         const app: EnhancedApp = this.service.enhanceApp(context.newApp!);
         context.newDeployment = await app.createDeployment(AppService.DEFAULT_DEPLOYMENT, appRuntime);

@@ -3,8 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { AppPlatformManagementClient } from "@azure/arm-appplatform";
-import { AppResource, DeploymentResource, ResourceUploadDefinition, RuntimeVersion, TestKeys } from "@azure/arm-appplatform/esm/models";
+import { AppPlatformManagementClient, AppResource, DeploymentResource, KnownSupportedRuntimeValue, ResourceUploadDefinition, TestKeys } from "@azure/arm-appplatform";
 import { DeploymentInstance } from "@azure/arm-appplatform/src/models/index";
 import { AnonymousCredential, ShareFileClient } from "@azure/storage-file-share";
 import { IActionContext } from "../../extension.bundle";
@@ -14,7 +13,7 @@ import { startStreamingLogs, stopStreamingLogs } from "./streamlog/streamingLog"
 
 export class AppService {
     // tslint:disable-next-line:no-unexternalized-strings
-    public static readonly DEFAULT_RUNTIME: RuntimeVersion = "Java_8";
+    public static readonly DEFAULT_RUNTIME: KnownSupportedRuntimeValue = KnownSupportedRuntimeValue.Java8;
     // tslint:disable-next-line:no-unexternalized-strings
     public static readonly DEFAULT_DEPLOYMENT: string = "default";
 
@@ -33,22 +32,25 @@ export class AppService {
 
     public async start(app?: IApp): Promise<void> {
         const target: IApp = this.getTarget(app);
-        await this.client.deployments.start(target.service.resourceGroup, target.service.name, target.name, target.properties?.activeDeploymentName!);
+        const activeDeploymentName = (await this.getActiveDeployment(app))?.name;
+        await this.client.deployments.beginStartAndWait(target.service.resourceGroup, target.service.name, target.name, activeDeploymentName!);
     }
 
     public async stop(app?: IApp): Promise<void> {
         const target: IApp = this.getTarget(app);
-        await this.client.deployments.stop(target.service.resourceGroup, target.service.name, target.name, target.properties?.activeDeploymentName!);
+        const activeDeploymentName = (await this.getActiveDeployment(app))?.name;
+        await this.client.deployments.beginStopAndWait(target.service.resourceGroup, target.service.name, target.name, activeDeploymentName!);
     }
 
     public async restart(app?: IApp): Promise<void> {
         const target: IApp = this.getTarget(app);
-        await this.client.deployments.restart(target.service.resourceGroup, target.service.name, target.name, target.properties?.activeDeploymentName!);
+        const activeDeploymentName = (await this.getActiveDeployment(app))?.name;
+        await this.client.deployments.beginRestartAndWait(target.service.resourceGroup, target.service.name, target.name, activeDeploymentName!);
     }
 
     public async remove(app?: IApp): Promise<void> {
         const target: IApp = this.getTarget(app);
-        await this.client.apps.deleteMethod(target.service.resourceGroup, target.service.name, target.name);
+        await this.client.apps.beginDeleteAndWait(target.service.resourceGroup, target.service.name, target.name);
     }
 
     public async reload(app?: IApp): Promise<IApp> {
@@ -57,37 +59,41 @@ export class AppService {
         return IApp.fromResource(resouce, target.service);
     }
 
-    public async getActiveDeployment(app?: IApp): Promise<IDeployment | undefined> {
+    public async getDeployments(app?: IApp): Promise<IDeployment[]> {
         const target: IApp = this.getTarget(app);
-        const deploymentName: string | undefined = target.properties?.activeDeploymentName;
-        if (!deploymentName) {
-            return undefined;
+        const deployments: DeploymentResource[] = [];
+        for await (let deployment of this.client.deployments.list(target.service.resourceGroup, target.service.name, target.name)) {
+            deployments.push(deployment);
         }
-        const deployment: DeploymentResource = await this.client.deployments.get(target.service.resourceGroup, target.service.name, target.name, deploymentName);
-        return IDeployment.fromResource(deployment, target);
+        return deployments.map(app => IDeployment.fromResource(app, target));
+    }
+
+    public async getActiveDeployment(app?: IApp): Promise<IDeployment | undefined> {
+        return (await this.getDeployments(app)).find(d => d.properties?.active)
     }
 
     public async setActiveDeployment(deploymentName: string, app?: IApp): Promise<void> {
         const target: IApp = this.getTarget(app);
-        await this.client.apps.createOrUpdate(target.service.resourceGroup, target.service.name, target.name, {
-            properties: {
-                activeDeploymentName: deploymentName,
-            }
+        await this.client.apps.beginSetActiveDeploymentsAndWait(target.service.resourceGroup, target.service.name, target.name, {
+            activeDeploymentNames: [deploymentName]
         });
     }
 
-    public async createDeployment(name: string, runtime: RuntimeVersion, app?: IApp): Promise<IDeployment> {
+    public async createDeployment(name: string, runtime: KnownSupportedRuntimeValue, app?: IApp): Promise<IDeployment> {
         const target: IApp = this.getTarget(app);
         // refer: https://dev.azure.com/msazure/AzureDMSS/_git/AzureDMSS-PortalExtension?path=%2Fsrc%2FSpringCloudPortalExt%2FClient%2FShared%2FAppsApi.ts&version=GBdev&_a=contents
-        const resource: DeploymentResource = await this.client.deployments.createOrUpdate(target.service.resourceGroup, target.service.name, target.name, name, {
+        const resource: DeploymentResource = await this.client.deployments.beginCreateOrUpdateAndWait(target.service.resourceGroup, target.service.name, target.name, name, {
             properties: {
                 source: {
                     type: 'Jar',
-                    relativePath: '<default>'
+                    relativePath: '<default>',
+                    runtimeVersion: runtime ?? AppService.DEFAULT_RUNTIME
                 },
                 deploymentSettings: {
-                    memoryInGB: 1,
-                    runtimeVersion: runtime ?? AppService.DEFAULT_RUNTIME
+                    resourceRequests: {
+                        memory: "1Gi",
+                        cpu: "1"
+                    }
                 },
             },
             sku: {
@@ -104,7 +110,7 @@ export class AppService {
 
     public async startDeployment(name: string, app?: IApp): Promise<void> {
         const target: IApp = this.getTarget(app);
-        await this.client.deployments.start(target.service.resourceGroup, target.service.name, target.name, name);
+        await this.client.deployments.beginStartAndWait(target.service.resourceGroup, target.service.name, target.name, name);
     }
 
     public async getTestKeys(app?: IApp): Promise<TestKeys> {
@@ -128,11 +134,8 @@ export class AppService {
 
     public async setPublic(isPublic: boolean, app?: IApp): Promise<void> {
         const target: IApp = this.getTarget(app);
-        await this.client.apps.createOrUpdate(target.service.resourceGroup, target.service.name, target.name, {
-            properties: {
-                activeDeploymentName: this.target?.properties?.activeDeploymentName,
-                publicProperty: isPublic
-            }
+        await this.client.apps.beginCreateOrUpdateAndWait(target.service.resourceGroup, target.service.name, target.name, {
+            properties: { public: isPublic }
         });
     }
 

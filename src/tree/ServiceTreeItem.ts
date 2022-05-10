@@ -3,8 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { AppPlatformManagementClient } from '@azure/arm-appplatform';
-import { ServiceResource } from '@azure/arm-appplatform/esm/models';
+import { AppPlatformManagementClient, ServiceResource } from '@azure/arm-appplatform';
 import { createAzureClient, VerifyProvidersStep } from "@microsoft/vscode-azext-azureutils";
 import {
     AzExtParentTreeItem,
@@ -71,10 +70,9 @@ export class ServiceTreeItem extends AzExtParentTreeItem {
         if (clearCache) {
             this._nextLink = undefined;
         }
-        const result: { nextLink?: string; apps: IApp[] } = await this.getService(context).getApps(this._nextLink);
-        this._nextLink = result.nextLink;
+        const apps: IApp[] = await this.getService(context).getApps();
         return await this.createTreeItemsWithErrorHandling(
-            result.apps,
+            apps,
             'invalidSpringCloudApp',
             app => {
                 const item: AppTreeItem = new AppTreeItem(this, app);

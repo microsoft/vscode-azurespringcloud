@@ -29,7 +29,11 @@ export class AppEnvVariablesTreeItem extends AppSettingsTreeItem {
     public get iconPath(): TreeItemIconPath { return utils.getThemedIconPath('app-envvars'); }
 
     public get variables(): { [p: string]: string } {
-        return this.data.properties?.deploymentSettings?.environmentVariables ?? {};
+        const rawEnvVars: { [p: string]: string } = this.data.properties?.deploymentSettings?.environmentVariables ?? {};
+        if (!rawEnvVars['JAVA_OPTS']) {
+            delete rawEnvVars['JAVA_OPTS']
+        }
+        return rawEnvVars;
     }
 
     public async loadMoreChildrenImpl(_clearCache: boolean, _context: IActionContext): Promise<AzExtTreeItem[]> {
@@ -71,6 +75,6 @@ export class AppEnvVariablesTreeItem extends AppSettingsTreeItem {
         const updating: string = utils.localize('updatingEnvVar', 'Updating environment variables of "{0}"...', deployment.app.name);
         const updated: string = utils.localize('updatedEnvVar', 'Successfully updated environment variables of {0}.', deployment.app.name);
         await utils.runInBackground(updating, updated, () => deployment.updateEnvironmentVariables(newVars ?? {}));
-        this.refresh(context);
+        this.parent.refresh(context);
     }
 }

@@ -39,7 +39,9 @@ export class AppJvmOptionsTreeItem extends AppSettingsTreeItem {
     public get id(): string { return AppJvmOptionsTreeItem.contextValue; }
 
     public get options(): string[] {
-        const optionsStr: string | undefined = this.data.properties?.deploymentSettings?.jvmOptions?.trim();
+        const enterpriseOptionsStr: string | undefined = this.data.properties?.deploymentSettings?.environmentVariables?.["JAVA_OPTS"];
+        // @ts-ignore
+        const optionsStr: string | undefined = enterpriseOptionsStr ?? this.data.properties?.source?.jvmOptions?.trim();
         if (optionsStr) {
             return ` ${optionsStr}`.split(/\s+-/).filter(s => s.trim()).map(s => `-${s}`);
         }
@@ -99,7 +101,7 @@ export class AppJvmOptionsTreeItem extends AppSettingsTreeItem {
         await wizard.prompt();
         await wizard.execute();
         window.showInformationMessage(updated);
-        this.refresh(context);
+        this.parent.refresh(context);
     }
 
     public async validateJvmOption(v: string): Promise<string | undefined> {

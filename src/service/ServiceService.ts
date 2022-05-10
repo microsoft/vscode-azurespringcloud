@@ -3,9 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { AppPlatformManagementClient } from "@azure/arm-appplatform";
-import { AppResource, ServiceResource } from "@azure/arm-appplatform/esm/models";
-import * as Models from "@azure/arm-appplatform/src/models/index";
+import { AppPlatformManagementClient, AppResource, ServiceResource } from "@azure/arm-appplatform";
 import { EnhancedApp, EnhancedDeployment, IApp, IDeployment, IService } from "../model";
 import { AppService } from "./AppService";
 import { DeploymentService } from "./DeploymentService";
@@ -31,21 +29,21 @@ export class ServiceService {
 
     public async createApp(name: string, service?: IService): Promise<IApp> {
         const target: IService = this.getTarget(service);
-        const app: AppResource = await this.client.apps.createOrUpdate(target.resourceGroup, target.name, name, {
+        const app: AppResource = await this.client.apps.beginCreateOrUpdateAndWait(target.resourceGroup, target.name, name, {
             properties: {
-                publicProperty: false
+                public: false
             }
         });
         return IApp.fromResource(app, target);
     }
 
-    public async getApps(nextLink?: string, service?: IService): Promise<{ nextLink?: string; apps: IApp[] }> {
+    public async getApps(service?: IService): Promise<IApp[]> {
         const target: IService = this.getTarget(service);
-        const response: Models.AppsListNextResponse = nextLink ? await this.client.apps.listNext(nextLink) : await this.client.apps.list(target.resourceGroup, target.name);
-        return {
-            nextLink: response.nextLink,
-            apps: response.map(app => IApp.fromResource(app, target))
-        };
+        const apps: AppResource[] = [];
+        for await (let app of this.client.apps.list(target.resourceGroup, target.name)) {
+            apps.push(app);
+        }
+        return apps.map(app => IApp.fromResource(app, target));
     }
 
     public async reload(service?: IService): Promise<IService> {
@@ -56,7 +54,12 @@ export class ServiceService {
 
     public async remove(service?: IService): Promise<void> {
         const target: IService = this.getTarget(service);
-        await this.client.services.deleteMethod(target.resourceGroup, target.name);
+        await this.client.services.beginDeleteAndWait(target.resourceGroup, target.name);
+    }
+
+    public isEnterpriseTier(service?: IService): boolean {
+        const target: IService = this.getTarget(service);
+        return target.sku?.name?.toLowerCase().startsWith("e") ?? false;
     }
 
     private getTarget(service?: IService): IService {

@@ -3,8 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { AppPlatformManagementClient } from "@azure/arm-appplatform";
-import { DeploymentResource, DeploymentSettings, Sku } from "@azure/arm-appplatform/esm/models";
+import { AppPlatformManagementClient, DeploymentResource, DeploymentSettings, ResourceRequests } from "@azure/arm-appplatform";
 import { IDeployment, IScaleSettings } from "../model";
 import { localize } from "../utils";
 
@@ -42,14 +41,6 @@ export class DeploymentService {
         return undefined;
     }
 
-    public static toResource(settings: IScaleSettings, sku: Sku): DeploymentResource {
-        const resource: DeploymentResource = { properties: { deploymentSettings: { cpu: settings.cpu, memoryInGB: settings.memory } } };
-        if (settings.capacity !== undefined) {
-            resource.sku = { ...sku, capacity: settings.capacity };
-        }
-        return resource;
-    }
-
     public async reload(deployment?: IDeployment): Promise<IDeployment> {
         const target: IDeployment = this.getTarget(deployment);
         const resource: DeploymentResource = await this.client.deployments.get(target.app.service.resourceGroup, target.app.service.name, target.app.name, target.name);
@@ -58,7 +49,7 @@ export class DeploymentService {
 
     public async updateArtifactPath(path: string, deployment?: IDeployment): Promise<void> {
         const target: IDeployment = this.getTarget(deployment);
-        await this.client.deployments.update(target.app.service.resourceGroup, target.app.service.name, target.app.name, target.name || DeploymentService.DEFAULT_DEPLOYMENT_NAME, {
+        await this.client.deployments.beginUpdateAndWait(target.app.service.resourceGroup, target.app.service.name, target.app.name, target.name || DeploymentService.DEFAULT_DEPLOYMENT_NAME, {
             properties: {
                 source: {
                     type: 'Jar',
@@ -68,34 +59,72 @@ export class DeploymentService {
         });
     }
 
-    public async updateScaleSettings(scaleSettings: IScaleSettings, deployment?: IDeployment): Promise<void> {
+    public async updateScaleSettings(settings: IScaleSettings, deployment?: IDeployment): Promise<void> {
         const target: IDeployment = this.getTarget(deployment);
-        const resource: DeploymentResource = DeploymentService.toResource(scaleSettings, target.sku!);
-        await this.client.deployments.update(target.app.service.resourceGroup, target.app.service.name, target.app.name, target.name, resource);
+        const rawMem = settings.memory ?? 1;
+        const rawCpu = settings.cpu ?? 1;
+        const sku = target.sku;
+        const cpu = rawCpu < 1 ? (rawCpu * 1000 + "m") : Math.floor(rawCpu) + "";
+        const memory = rawMem < 1 ? (rawMem * 1024 + "Mi") : (Math.floor(rawMem) + "Gi");
+        const resource: DeploymentResource = {
+            properties: {
+                deploymentSettings: {
+                    resourceRequests: { cpu, memory }
+                }
+            },
+            sku: {
+                ...sku, capacity: settings.capacity ?? sku?.capacity
+            }
+        };
+        await this.client.deployments.beginUpdateAndWait(target.app.service.resourceGroup, target.app.service.name, target.app.name, target.name, resource);
     }
 
     public async updateEnvironmentVariables(environmentVariables: { [p: string]: string }, deployment?: IDeployment): Promise<void> {
         const target: IDeployment = this.getTarget(deployment);
-        await this.client.deployments.update(target.app.service.resourceGroup, target.app.service.name, target.app.name, target.name, {
+        await this.client.deployments.beginUpdateAndWait(target.app.service.resourceGroup, target.app.service.name, target.app.name, target.name, {
             properties: { deploymentSettings: { environmentVariables } }
         });
     }
 
+    public getJvmOptions(deployment?: IDeployment): string {
+        const target: IDeployment = this.getTarget(deployment);
+        const enterpriseOptionsStr: string | undefined = target.properties?.deploymentSettings?.environmentVariables?.["JAVA_OPTS"];
+        // @ts-ignore
+        return enterpriseOptionsStr ?? target.properties?.source?.jvmOptions?.trim();
+    }
+
     public async updateJvmOptions(jvmOptions: string, deployment?: IDeployment): Promise<void> {
         const target: IDeployment = this.getTarget(deployment);
-        await this.client.deployments.update(target.app.service.resourceGroup, target.app.service.name, target.app.name, target.name, {
-            properties: { deploymentSettings: { jvmOptions } }
-        });
+        if (target?.sku?.name?.toLowerCase().startsWith('e')) {
+            const environmentVariables = target.properties?.deploymentSettings?.environmentVariables ?? {};
+            environmentVariables["JAVA_OPTS"] = jvmOptions;
+            await this.client.deployments.beginUpdateAndWait(target.app.service.resourceGroup, target.app.service.name, target.app.name, target.name, {
+                properties: { deploymentSettings: { environmentVariables } }
+            });
+        } else {
+            await this.client.deployments.beginUpdateAndWait(target.app.service.resourceGroup, target.app.service.name, target.app.name, target.name, {
+                //@ts-ignore
+                properties: {
+                    source: {
+                        type: 'Jar',
+                        jvmOptions
+                    }
+                }
+            });
+        }
     }
 
     public getScaleSettings(deployment?: IDeployment): IScaleSettings {
         const target: IDeployment = this.getTarget(deployment);
         const settings: DeploymentSettings | undefined = target.properties?.deploymentSettings;
-        return {
-            cpu: settings?.cpu ?? 0,
-            memory: settings?.memoryInGB ?? 0,
-            capacity: target.sku?.capacity ?? 0
-        };
+        const resourceRequests: ResourceRequests | undefined = settings?.resourceRequests;
+        const cpu = resourceRequests?.cpu ? (resourceRequests?.cpu?.endsWith("m") ?
+            parseInt(resourceRequests?.cpu) * 1.0 / 1000 :
+            parseInt(resourceRequests?.cpu)) : 1;
+        const memory = resourceRequests?.memory ? (resourceRequests?.memory?.endsWith("Mi") ?
+            parseInt(resourceRequests?.memory) * 1.0 / 1024 :
+            parseInt(resourceRequests?.memory)) : 1;
+        return { cpu, memory, capacity: target.sku?.capacity ?? 0 };
     }
 
     private getTarget(deployment: IDeployment | undefined): IDeployment {

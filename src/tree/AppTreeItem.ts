@@ -63,9 +63,9 @@ export class AppTreeItem extends AzExtParentTreeItem {
 
     // tslint:disable:no-unexternalized-strings
     public get status(): string {
-        if (!this.data.properties?.activeDeploymentName) {
-            return "failed";
-        }
+        // if (!this.data.properties?.activeDeploymentName) {
+        //     return "failed";
+        // }
         switch (this.data.properties?.provisioningState) {
             case "Creating":
             case "Updating":
@@ -125,7 +125,7 @@ export class AppTreeItem extends AzExtParentTreeItem {
 
     public async toggleEndpoint(context: IActionContext): Promise<void> {
         const app: EnhancedApp = this.getApp(context);
-        const isPublic: boolean = this.data.properties?.publicProperty ?? false;
+        const isPublic: boolean = this.data.properties?.public ?? false;
         const doing: string = isPublic ? `Unassigning public endpoint of "${this.data.name}".` : `Assigning public endpoint to "${this.data.name}".`;
         const done: string = isPublic ? `Successfully unassigned public endpoint of "${this.data.name}".` : `Successfully assigned public endpoint to "${this.data.name}".`;
         await utils.runInBackground(doing, done, () => app.setPublic(!isPublic));

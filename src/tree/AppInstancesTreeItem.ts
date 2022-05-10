@@ -3,7 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { DeploymentInstance } from "@azure/arm-appplatform/esm/models";
+import { DeploymentInstance } from "@azure/arm-appplatform";
 import { AzExtParentTreeItem, AzExtTreeItem, IActionContext, TreeItemIconPath } from "@microsoft/vscode-azext-utils";
 import { IDeployment } from "../model";
 import { getThemedIconPath, localize } from "../utils";

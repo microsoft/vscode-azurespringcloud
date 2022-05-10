@@ -30,12 +30,10 @@ export class AppScaleSettingsTreeItem extends AppSettingsTreeItem {
     public get iconPath(): TreeItemIconPath { return getThemedIconPath('app-scale'); }
     public get id(): string { return AppScaleSettingsTreeItem.contextValue; }
 
-    public getSettings(context: IActionContext): IScaleSettings {
-        return this.getDeployment(context).getScaleSettings();
-    }
-
-    public async loadMoreChildrenImpl(_clearCache: boolean, _context: IActionContext): Promise<AzExtTreeItem[]> {
-        return Object.entries(this.getSettings(_context))
+    public async loadMoreChildrenImpl(_clearCache: boolean, context: IActionContext): Promise<AzExtTreeItem[]> {
+        const deployment: EnhancedDeployment = this.getDeployment(context);
+        const settings: IScaleSettings = deployment.getScaleSettings();
+        return Object.entries(settings)
             .map(e => this.toAppSettingItem(e[0], `${e[1]}`, Object.assign({ label: IScaleSettings.LABELS[e[0]] }, AppScaleSettingsTreeItem._options)));
     }
 
