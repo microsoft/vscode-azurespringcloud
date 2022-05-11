@@ -3,7 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { AppPlatformManagementClient, DeploymentResource, DeploymentSettings, JarUploadedUserSourceInfo, ResourceRequests, Sku } from "@azure/arm-appplatform";
+import { AppPlatformManagementClient, DeploymentResource, DeploymentResourceProperties, DeploymentSettings, JarUploadedUserSourceInfo, ResourceRequests, Sku } from "@azure/arm-appplatform";
 import { IDeployment, IScaleSettings } from "../model";
 import { localize } from "../utils";
 
@@ -47,16 +47,20 @@ export class DeploymentService {
         return IDeployment.fromResource(resource, target.app);
     }
 
-    public async updateArtifactPath(path: string, deployment?: IDeployment): Promise<void> {
+    public async updateArtifactPath(relativePathOrBuildId: string, deployment?: IDeployment): Promise<void> {
         const target: IDeployment = this.getTarget(deployment);
-        await this.client.deployments.beginUpdateAndWait(target.app.service.resourceGroup, target.app.service.name, target.app.name, target.name || DeploymentService.DEFAULT_DEPLOYMENT_NAME, {
-            properties: {
-                source: {
-                    type: 'Jar',
-                    relativePath: path
-                },
-            }
-        });
+        let properties: DeploymentResourceProperties | undefined;
+        if (target?.sku?.name?.toLowerCase().startsWith('e')) {
+            properties = {
+                source: { type: 'BuildResult', buildResultId: relativePathOrBuildId }
+            };
+        } else {
+            properties = {
+                source: { type: 'Jar', relativePath: relativePathOrBuildId }
+            };
+        }
+        await this.client.deployments.beginUpdateAndWait(target.app.service.resourceGroup, target.app.service.name, target.app.name,
+                                                         target.name || DeploymentService.DEFAULT_DEPLOYMENT_NAME, { properties });
     }
 
     public async updateScaleSettings(settings: IScaleSettings, deployment?: IDeployment): Promise<void> {

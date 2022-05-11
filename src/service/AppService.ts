@@ -3,7 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { AppPlatformManagementClient, AppResource, DeploymentResource, KnownSupportedRuntimeValue, ResourceUploadDefinition, TestKeys } from "@azure/arm-appplatform";
+import { AppPlatformManagementClient, AppResource, Build, BuildResult, BuildResultProvisioningState, DeploymentResource, KnownSupportedRuntimeValue, ResourceUploadDefinition, TestKeys, UserSourceInfoUnion } from "@azure/arm-appplatform";
 import { DeploymentInstance } from "@azure/arm-appplatform/src/models/index";
 import { AnonymousCredential, ShareFileClient } from "@azure/storage-file-share";
 import { IActionContext } from "../../extension.bundle";
@@ -12,10 +12,9 @@ import { localize } from "../utils";
 import { startStreamingLogs, stopStreamingLogs } from "./streamlog/streamingLog";
 
 export class AppService {
-    // tslint:disable-next-line:no-unexternalized-strings
     public static readonly DEFAULT_RUNTIME: KnownSupportedRuntimeValue = KnownSupportedRuntimeValue.Java8;
-    // tslint:disable-next-line:no-unexternalized-strings
-    public static readonly DEFAULT_DEPLOYMENT: string = "default";
+    public static readonly DEFAULT_DEPLOYMENT: string = 'default';
+    public static readonly DEFAULT_TANZU_COMPONENT_NAME: string = 'default';
 
     private readonly client: AppPlatformManagementClient;
     private readonly target: IApp | undefined;
@@ -82,14 +81,16 @@ export class AppService {
 
     public async createDeployment(name: string, runtime: KnownSupportedRuntimeValue, app?: IApp): Promise<IDeployment> {
         const target: IApp = this.getTarget(app);
+        let source: UserSourceInfoUnion | undefined;
+        if (target.service.sku?.name?.toLowerCase().startsWith('e')) {
+            source = { type: 'BuildResult', buildResultId: '<default>' };
+        } else {
+            source = { type: 'Jar', relativePath: '<default>', runtimeVersion: runtime ?? AppService.DEFAULT_RUNTIME };
+        }
         // refer: https://dev.azure.com/msazure/AzureDMSS/_git/AzureDMSS-PortalExtension?path=%2Fsrc%2FSpringCloudPortalExt%2FClient%2FShared%2FAppsApi.ts&version=GBdev&_a=contents
         await this.client.deployments.beginCreateOrUpdateAndWait(target.service.resourceGroup, target.service.name, target.name, name, {
             properties: {
-                source: {
-                    type: 'Jar',
-                    relativePath: '<default>',
-                    runtimeVersion: runtime ?? AppService.DEFAULT_RUNTIME
-                },
+                source,
                 deploymentSettings: {
                     resourceRequests: {
                         memory: '1Gi',
@@ -146,12 +147,42 @@ export class AppService {
         return this.client.apps.getResourceUploadUrl(target.service.resourceGroup, target.service.name, target.name);
     }
 
-    public async uploadArtifact(path: string, app?: IApp): Promise<ResourceUploadDefinition> {
+    public async uploadArtifact(path: string, app?: IApp): Promise<string | undefined> {
         const target: IApp = this.getTarget(app);
         const uploadDefinition: ResourceUploadDefinition = await this.getUploadDefinition(target);
         const fileClient: ShareFileClient = new ShareFileClient(uploadDefinition.uploadUrl!, new AnonymousCredential());
         await fileClient.uploadFile(path);
-        return uploadDefinition;
+        return uploadDefinition.relativePath;
+    }
+
+    public async enqueueBuild(relativePath: string, app?: IApp): Promise<string | undefined> {
+        const target: IApp = this.getTarget(app);
+        const build: Build = await this.client.buildServiceOperations.createOrUpdateBuild(target.service.resourceGroup, target.service.name, AppService.DEFAULT_TANZU_COMPONENT_NAME, target.name, {
+            properties: {
+                builder: `${target.service.id}/buildservices/${AppService.DEFAULT_TANZU_COMPONENT_NAME}/builders/${AppService.DEFAULT_TANZU_COMPONENT_NAME}`,
+                agentPool: `${target.service.id}/buildservices/${AppService.DEFAULT_TANZU_COMPONENT_NAME}/agentPools/${AppService.DEFAULT_TANZU_COMPONENT_NAME}`,
+                relativePath
+            }
+        });
+        const buildResultId: string | undefined = build.properties?.triggeredBuildResult?.id;
+        const buildResultName: string | undefined = build.properties?.triggeredBuildResult?.id?.split('/').pop()!;
+        let status: BuildResultProvisioningState | undefined;
+        const start: number = Date.now();
+        while (status !== 'Succeeded') {
+            const result: BuildResult = await this.client.buildServiceOperations.getBuildResult(target.service.resourceGroup, target.service.name, AppService.DEFAULT_TANZU_COMPONENT_NAME, target.name, buildResultName);
+            status = result.properties?.provisioningState;
+            if (status === 'Queuing' || status === 'Building') {
+                if (Date.now() - start > 60000 * 60) {
+                    throw new Error(`Build timeout for buildId: ${buildResultId}`);
+                }
+                // tslint:disable-next-line no-string-based-set-timeout
+                await new Promise(r => setTimeout(r, 10000)); // wait for 10 seconds
+                continue;
+            } else {
+                throw new Error(`Build failed for buildId: ${buildResultId}`);
+            }
+        }
+        return build.properties?.triggeredBuildResult?.id;
     }
 
     public async startStreamingLogs(context: IActionContext, instance: DeploymentInstance, app?: IApp): Promise<void> {

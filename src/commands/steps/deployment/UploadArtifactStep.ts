@@ -25,9 +25,11 @@ export class UploadArtifactStep extends AzureWizardExecuteStep<IAppDeploymentWiz
         const message: string = localize('uploadingArtifact', 'Uploading artifact "{0}" to Azure...', this.artifactPath);
         ext.outputChannel.appendLog(message);
         progress.report({ message });
-        context.uploadDefinition = await this.app.uploadArtifact(this.artifactPath);
+        context.relativePathOrBuildResultId = await this.app.uploadArtifact(this.artifactPath);
+        if (this.app?.service.sku?.name?.toLowerCase().startsWith('e')) {
+            context.relativePathOrBuildResultId = await this.app.enqueueBuild(context.relativePathOrBuildResultId!);
+        }
         ext.outputChannel.appendLog(localize('uploadingArtifactSuccess', 'Artifact "{0}" is successfully uploaded.', this.artifactPath));
-        return Promise.resolve(undefined);
     }
 
     public shouldExecute(_context: IAppDeploymentWizardContext): boolean {

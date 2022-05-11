@@ -61,7 +61,7 @@ export class ServiceService {
 
     public isEnterpriseTier(service?: IService): boolean {
         const target: IService = this.getTarget(service);
-        return target.sku?.name === 'Enterprise';
+        return target.sku?.tier === 'Enterprise';
     }
 
     private getTarget(service?: IService): IService {
