@@ -16,7 +16,7 @@ export interface IOptions {
 }
 
 export class AppSettingTreeItem extends AzExtTreeItem {
-    public static contextValue: string = 'azureSpringCloud.app.setting';
+    public static contextValue: string = 'azureSpringApps.app.setting';
     public readonly parent: AppSettingsTreeItem;
     public readonly key: string;
     public readonly _value: string;
@@ -68,7 +68,7 @@ export class AppSettingTreeItem extends AzExtTreeItem {
         if (this._options.hidden === undefined) {
             return undefined;
         }
-        return 'azureSpringCloud.common.toggleVisibility';
+        return 'azureSpringApps.common.toggleVisibility';
     }
 
     public get value(): string {

@@ -23,7 +23,7 @@ import { AppScaleSettingsTreeItem } from "./AppScaleSettingsTreeItem";
 import { ServiceTreeItem } from "./ServiceTreeItem";
 
 export class AppTreeItem extends AzExtParentTreeItem {
-    public static contextValue: RegExp = /^azureSpringCloud\.app\.status-.+$/;
+    public static contextValue: RegExp = /^azureSpringApps\.app\.status-.+$/;
     private static readonly ACCESS_PUBLIC_ENDPOINT: string = 'Access public endpoint';
     private static readonly ACCESS_TEST_ENDPOINT: string = 'Access test endpoint';
     public parent: ServiceTreeItem;
@@ -54,7 +54,7 @@ export class AppTreeItem extends AzExtParentTreeItem {
     }
 
     public get contextValue(): string {
-        return `azureSpringCloud.app.status-${this.status}`;
+        return `azureSpringApps.app.status-${this.status}`;
     }
 
     public get iconPath(): TreeItemIconPath {

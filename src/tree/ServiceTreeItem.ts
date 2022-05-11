@@ -27,7 +27,7 @@ import * as utils from "../utils";
 import { AppTreeItem } from './AppTreeItem';
 
 export class ServiceTreeItem extends AzExtParentTreeItem {
-    public static contextValue: string = 'azureSpringCloud.service';
+    public static contextValue: string = 'azureSpringApps.apps';
     public readonly contextValue: string = ServiceTreeItem.contextValue;
     public readonly childTypeLabel: string = utils.localize('springCloud.app', 'Spring App');
     public data: IService;
@@ -54,7 +54,7 @@ export class ServiceTreeItem extends AzExtParentTreeItem {
     }
 
     public get iconPath(): TreeItemIconPath {
-        return utils.getThemedIconPath('azure-spring-cloud');
+        return utils.getThemedIconPath('azure-spring-apps');
     }
 
     public getService(context: IActionContext): EnhancedService {

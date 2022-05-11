@@ -11,7 +11,7 @@ import { AppInstanceTreeItem } from "./AppInstanceTreeItem";
 import { AppTreeItem } from './AppTreeItem';
 
 export class AppInstancesTreeItem extends AzExtParentTreeItem {
-    public static contextValue: string = 'azureSpringCloud.app.instances';
+    public static contextValue: string = 'azureSpringApps.app.instances';
     public readonly contextValue: string = AppInstancesTreeItem.contextValue;
     public readonly childTypeLabel: string = localize('appInstance', 'Spring App Instance');
     public readonly label: string = 'App Instances';
