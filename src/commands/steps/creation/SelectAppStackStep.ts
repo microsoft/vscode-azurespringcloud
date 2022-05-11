@@ -21,6 +21,6 @@ export class SelectAppStackStep extends AzureWizardPromptStep<IAppCreationWizard
     }
 
     public shouldPrompt(context: IAppCreationWizardContext): boolean {
-        return !context.newAppRuntime;
+        return !(<string>context.newAppRuntime);
     }
 }

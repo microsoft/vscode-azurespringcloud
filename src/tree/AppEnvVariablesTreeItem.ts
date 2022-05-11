@@ -30,8 +30,8 @@ export class AppEnvVariablesTreeItem extends AppSettingsTreeItem {
 
     public get variables(): { [p: string]: string } {
         const rawEnvVars: { [p: string]: string } = this.data.properties?.deploymentSettings?.environmentVariables ?? {};
-        if (!rawEnvVars['JAVA_OPTS']) {
-            delete rawEnvVars['JAVA_OPTS']
+        if (!rawEnvVars.JAVA_OPTS) {
+            delete rawEnvVars.JAVA_OPTS;
         }
         return rawEnvVars;
     }

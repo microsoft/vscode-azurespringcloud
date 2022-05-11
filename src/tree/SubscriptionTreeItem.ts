@@ -25,7 +25,8 @@ export class SubscriptionTreeItem extends SubscriptionTreeItemBase {
 
         const client: AppPlatformManagementClient = createAzureClient([context, this], AppPlatformManagementClient);
         const services: ServiceResource[] = [];
-        for await (let service of client.services.listBySubscription()) {
+        const pagedServices: AsyncIterable<ServiceResource> = client.services.listBySubscription();
+        for await (const service of pagedServices) {
             services.push(service);
         }
         return await this.createTreeItemsWithErrorHandling(

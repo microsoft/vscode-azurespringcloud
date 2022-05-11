@@ -3,6 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
+import { JarUploadedUserSourceInfo } from "@azure/arm-appplatform";
 import {
     AzExtTreeItem,
     AzureWizard,
@@ -39,9 +40,10 @@ export class AppJvmOptionsTreeItem extends AppSettingsTreeItem {
     public get id(): string { return AppJvmOptionsTreeItem.contextValue; }
 
     public get options(): string[] {
-        const enterpriseOptionsStr: string | undefined = this.data.properties?.deploymentSettings?.environmentVariables?.["JAVA_OPTS"];
-        // @ts-ignore
-        const optionsStr: string | undefined = enterpriseOptionsStr ?? this.data.properties?.source?.jvmOptions?.trim();
+        const enterpriseOptionsStr: string | undefined = this.data.properties?.deploymentSettings?.environmentVariables?.JAVA_OPTS;
+        const source: JarUploadedUserSourceInfo = <JarUploadedUserSourceInfo>this.data.properties?.source;
+        const oldOptionsStr: string | undefined = source?.jvmOptions?.trim();
+        const optionsStr: string | undefined = enterpriseOptionsStr ?? oldOptionsStr;
         if (optionsStr) {
             return ` ${optionsStr}`.split(/\s+-/).filter(s => s.trim()).map(s => `-${s}`);
         }

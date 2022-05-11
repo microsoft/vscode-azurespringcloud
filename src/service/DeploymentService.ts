@@ -3,7 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { AppPlatformManagementClient, DeploymentResource, DeploymentSettings, ResourceRequests } from "@azure/arm-appplatform";
+import { AppPlatformManagementClient, DeploymentResource, DeploymentSettings, JarUploadedUserSourceInfo, ResourceRequests, Sku } from "@azure/arm-appplatform";
 import { IDeployment, IScaleSettings } from "../model";
 import { localize } from "../utils";
 
@@ -61,11 +61,11 @@ export class DeploymentService {
 
     public async updateScaleSettings(settings: IScaleSettings, deployment?: IDeployment): Promise<void> {
         const target: IDeployment = this.getTarget(deployment);
-        const rawMem = settings.memory ?? 1;
-        const rawCpu = settings.cpu ?? 1;
-        const sku = target.sku;
-        const cpu = rawCpu < 1 ? (rawCpu * 1000 + "m") : Math.floor(rawCpu) + "";
-        const memory = rawMem < 1 ? (rawMem * 1024 + "Mi") : (Math.floor(rawMem) + "Gi");
+        const rawMem: number = settings.memory ?? 1;
+        const rawCpu: number = settings.cpu ?? 1;
+        const sku: Sku | undefined = target.sku;
+        const cpu: string = rawCpu < 1 ? `${rawCpu * 1000}m` : `${Math.floor(rawCpu)}`;
+        const memory: string = rawMem < 1 ? `${rawMem * 1024}Mi` : `${Math.floor(rawMem)}Gi`;
         const resource: DeploymentResource = {
             properties: {
                 deploymentSettings: {
@@ -88,16 +88,16 @@ export class DeploymentService {
 
     public getJvmOptions(deployment?: IDeployment): string {
         const target: IDeployment = this.getTarget(deployment);
-        const enterpriseOptionsStr: string | undefined = target.properties?.deploymentSettings?.environmentVariables?.["JAVA_OPTS"];
-        // @ts-ignore
-        return enterpriseOptionsStr ?? target.properties?.source?.jvmOptions?.trim();
+        const enterpriseOptionsStr: string | undefined = target.properties?.deploymentSettings?.environmentVariables?.JAVA_OPTS;
+        const oldOptionsStr: string | undefined = (<JarUploadedUserSourceInfo>target.properties?.source)?.jvmOptions;
+        return enterpriseOptionsStr ?? oldOptionsStr?.trim() ?? '';
     }
 
     public async updateJvmOptions(jvmOptions: string, deployment?: IDeployment): Promise<void> {
         const target: IDeployment = this.getTarget(deployment);
         if (target?.sku?.name?.toLowerCase().startsWith('e')) {
-            const environmentVariables = target.properties?.deploymentSettings?.environmentVariables ?? {};
-            environmentVariables["JAVA_OPTS"] = jvmOptions;
+            const environmentVariables: { [p: string]: string } = target.properties?.deploymentSettings?.environmentVariables ?? {};
+            environmentVariables.JAVA_OPTS = jvmOptions;
             await this.client.deployments.beginUpdateAndWait(target.app.service.resourceGroup, target.app.service.name, target.app.name, target.name, {
                 properties: { deploymentSettings: { environmentVariables } }
             });
@@ -118,11 +118,11 @@ export class DeploymentService {
         const target: IDeployment = this.getTarget(deployment);
         const settings: DeploymentSettings | undefined = target.properties?.deploymentSettings;
         const resourceRequests: ResourceRequests | undefined = settings?.resourceRequests;
-        const cpu = resourceRequests?.cpu ? (resourceRequests?.cpu?.endsWith("m") ?
-            parseInt(resourceRequests?.cpu) * 1.0 / 1000 :
+        const cpu: number = resourceRequests?.cpu ? (resourceRequests?.cpu?.endsWith('m') ?
+            parseInt(resourceRequests?.cpu) / 1000 :
             parseInt(resourceRequests?.cpu)) : 1;
-        const memory = resourceRequests?.memory ? (resourceRequests?.memory?.endsWith("Mi") ?
-            parseInt(resourceRequests?.memory) * 1.0 / 1024 :
+        const memory: number = resourceRequests?.memory ? (resourceRequests?.memory?.endsWith('Mi') ?
+            parseInt(resourceRequests?.memory) / 1024 :
             parseInt(resourceRequests?.memory)) : 1;
         return { cpu, memory, capacity: target.sku?.capacity ?? 0 };
     }

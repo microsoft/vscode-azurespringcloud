@@ -32,19 +32,19 @@ export class AppService {
 
     public async start(app?: IApp): Promise<void> {
         const target: IApp = this.getTarget(app);
-        const activeDeploymentName = (await this.getActiveDeployment(app))?.name;
+        const activeDeploymentName: string | undefined = (await this.getActiveDeployment(app))?.name;
         await this.client.deployments.beginStartAndWait(target.service.resourceGroup, target.service.name, target.name, activeDeploymentName!);
     }
 
     public async stop(app?: IApp): Promise<void> {
         const target: IApp = this.getTarget(app);
-        const activeDeploymentName = (await this.getActiveDeployment(app))?.name;
+        const activeDeploymentName: string | undefined = (await this.getActiveDeployment(app))?.name;
         await this.client.deployments.beginStopAndWait(target.service.resourceGroup, target.service.name, target.name, activeDeploymentName!);
     }
 
     public async restart(app?: IApp): Promise<void> {
         const target: IApp = this.getTarget(app);
-        const activeDeploymentName = (await this.getActiveDeployment(app))?.name;
+        const activeDeploymentName: string | undefined = (await this.getActiveDeployment(app))?.name;
         await this.client.deployments.beginRestartAndWait(target.service.resourceGroup, target.service.name, target.name, activeDeploymentName!);
     }
 
@@ -62,14 +62,15 @@ export class AppService {
     public async getDeployments(app?: IApp): Promise<IDeployment[]> {
         const target: IApp = this.getTarget(app);
         const deployments: DeploymentResource[] = [];
-        for await (let deployment of this.client.deployments.list(target.service.resourceGroup, target.service.name, target.name)) {
+        const pagedResources: AsyncIterable<DeploymentResource> = this.client.deployments.list(target.service.resourceGroup, target.service.name, target.name);
+        for await (const deployment of pagedResources) {
             deployments.push(deployment);
         }
-        return deployments.map(app => IDeployment.fromResource(app, target));
+        return deployments.map(a => IDeployment.fromResource(a, target));
     }
 
     public async getActiveDeployment(app?: IApp): Promise<IDeployment | undefined> {
-        return (await this.getDeployments(app)).find(d => d.properties?.active)
+        return (await this.getDeployments(app)).find(d => d.properties?.active);
     }
 
     public async setActiveDeployment(deploymentName: string, app?: IApp): Promise<void> {
@@ -91,8 +92,8 @@ export class AppService {
                 },
                 deploymentSettings: {
                     resourceRequests: {
-                        memory: "1Gi",
-                        cpu: "1"
+                        memory: '1Gi',
+                        cpu: '1'
                     }
                 },
             },

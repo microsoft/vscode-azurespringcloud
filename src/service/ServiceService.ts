@@ -40,7 +40,8 @@ export class ServiceService {
     public async getApps(service?: IService): Promise<IApp[]> {
         const target: IService = this.getTarget(service);
         const apps: AppResource[] = [];
-        for await (let app of this.client.apps.list(target.resourceGroup, target.name)) {
+        const pagedApps: AsyncIterable<AppResource> = this.client.apps.list(target.resourceGroup, target.name);
+        for await (const app of pagedApps) {
             apps.push(app);
         }
         return apps.map(app => IApp.fromResource(app, target));
@@ -59,7 +60,7 @@ export class ServiceService {
 
     public isEnterpriseTier(service?: IService): boolean {
         const target: IService = this.getTarget(service);
-        return target.sku?.name?.toLowerCase().startsWith("e") ?? false;
+        return target.sku?.name === 'Enterprise';
     }
 
     private getTarget(service?: IService): IService {
