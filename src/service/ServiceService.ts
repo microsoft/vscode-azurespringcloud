@@ -29,11 +29,12 @@ export class ServiceService {
 
     public async createApp(name: string, service?: IService): Promise<IApp> {
         const target: IService = this.getTarget(service);
-        const app: AppResource = await this.client.apps.beginCreateOrUpdateAndWait(target.resourceGroup, target.name, name, {
+        await this.client.apps.beginCreateOrUpdateAndWait(target.resourceGroup, target.name, name, {
             properties: {
                 public: false
             }
         });
+        const app: AppResource = await this.client.apps.get(target.resourceGroup, target.name, name);
         return IApp.fromResource(app, target);
     }
 

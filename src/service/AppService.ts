@@ -83,7 +83,7 @@ export class AppService {
     public async createDeployment(name: string, runtime: KnownSupportedRuntimeValue, app?: IApp): Promise<IDeployment> {
         const target: IApp = this.getTarget(app);
         // refer: https://dev.azure.com/msazure/AzureDMSS/_git/AzureDMSS-PortalExtension?path=%2Fsrc%2FSpringCloudPortalExt%2FClient%2FShared%2FAppsApi.ts&version=GBdev&_a=contents
-        const resource: DeploymentResource = await this.client.deployments.beginCreateOrUpdateAndWait(target.service.resourceGroup, target.service.name, target.name, name, {
+        await this.client.deployments.beginCreateOrUpdateAndWait(target.service.resourceGroup, target.service.name, target.name, name, {
             properties: {
                 source: {
                     type: 'Jar',
@@ -106,7 +106,8 @@ export class AppService {
                 name: 'S0',
             }
         });
-        return IDeployment.fromResource(resource, target);
+        const deployment: DeploymentResource = await this.client.deployments.get(target.service.resourceGroup, target.service.name, target.name, name);
+        return IDeployment.fromResource(deployment, target);
     }
 
     public async startDeployment(name: string, app?: IApp): Promise<void> {
