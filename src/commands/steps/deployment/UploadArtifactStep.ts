@@ -26,6 +26,7 @@ export class UploadArtifactStep extends AzureWizardExecuteStep<IAppDeploymentWiz
         ext.outputChannel.appendLog(message);
         progress.report({ message });
         context.uploadDefinition = await this.app.uploadArtifact(this.artifactPath);
+        ext.outputChannel.appendLog(localize('uploadingArtifactSuccess', 'Artifact "{0}" is successfully uploaded.', this.artifactPath));
         return Promise.resolve(undefined);
     }
 

@@ -26,6 +26,7 @@ export class UpdateDeploymentStep extends AzureWizardExecuteStep<IAppDeploymentW
         ext.outputChannel.appendLog(message);
         progress.report({ message });
         await this.deployment.updateArtifactPath(context.uploadDefinition?.relativePath!);
+        ext.outputChannel.appendLog(localize('updateDeploymentSuccess', 'Deployment is successfully updated.'));
         return Promise.resolve(undefined);
     }
 

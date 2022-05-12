@@ -33,6 +33,7 @@ export class CreateAppDeploymentStep extends AzureWizardExecuteStep<IAppCreation
 
         const app: EnhancedApp = this.service.enhanceApp(context.newApp!);
         context.newDeployment = await app.createDeployment(AppService.DEFAULT_DEPLOYMENT, appRuntime);
+        ext.outputChannel.appendLog(localize('creatingNewAppDeploymentSuccess', 'Default deployment is successfully created.'));
         await app.startDeployment(AppService.DEFAULT_DEPLOYMENT);
         return Promise.resolve(undefined);
     }
