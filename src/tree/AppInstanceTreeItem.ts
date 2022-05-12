@@ -9,7 +9,7 @@ import { getThemedIconPath } from "../utils";
 import { AppInstancesTreeItem } from "./AppInstancesTreeItem";
 
 export class AppInstanceTreeItem extends AzExtTreeItem {
-    public static contextValue: RegExp = /^azureSpringCloud\.app\.instance\.status-.+$/;
+    public static contextValue: RegExp = /^azureSpringApps\.app\.instance\.status-.+$/;
     public readonly parent: AppInstancesTreeItem;
     public readonly data: DeploymentInstance;
 
@@ -35,6 +35,6 @@ export class AppInstanceTreeItem extends AzExtTreeItem {
     }
 
     public get contextValue(): string {
-        return `azureSpringCloud.app.instance.status-${this.data.status}`;
+        return `azureSpringApps.app.instance.status-${this.data.status}`;
     }
 }

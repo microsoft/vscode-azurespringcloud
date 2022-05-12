@@ -23,9 +23,9 @@ import { AppSettingTreeItem, IOptions } from "./AppSettingTreeItem";
 import { AppTreeItem } from "./AppTreeItem";
 
 export class AppJvmOptionsTreeItem extends AppSettingsTreeItem {
-    public static contextValue: string = 'azureSpringCloud.app.jvmOptions';
+    public static contextValue: string = 'azureSpringApps.app.jvmOptions';
     private static readonly _options: IOptions = {
-        contextValue: 'azureSpringCloud.app.jvmOption',
+        contextValue: 'azureSpringApps.app.jvmOption',
     };
     private static readonly JVM_OPTION_PATTERN: RegExp = /^-[a-zA-Z_]+\S*$/;
     public readonly contextValue: string = AppJvmOptionsTreeItem.contextValue;

@@ -15,9 +15,9 @@ import { AppSettingTreeItem, IOptions } from "./AppSettingTreeItem";
 import { AppTreeItem } from "./AppTreeItem";
 
 export class AppScaleSettingsTreeItem extends AppSettingsTreeItem {
-    public static contextValue: string = 'azureSpringCloud.app.scaleSettings';
+    public static contextValue: string = 'azureSpringApps.app.scaleSettings';
     private static readonly _options: IOptions = {
-        contextValue: 'azureSpringCloud.app.scaleSetting',
+        contextValue: 'azureSpringApps.app.scaleSetting',
     };
 
     public readonly contextValue: string = AppScaleSettingsTreeItem.contextValue;

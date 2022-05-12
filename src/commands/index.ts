@@ -23,34 +23,34 @@ import { ServiceCommands } from "./ServiceCommands";
 
 // tslint:disable-next-line:export-name
 export function registerCommands(): void {
-    registerCommandWithTelemetryWrapper('azureSpringCloud.common.loadMore', loadMore);
-    registerCommandWithTelemetryWrapper('azureSpringCloud.common.refresh', refreshNode);
-    registerCommandWithTelemetryWrapper('azureSpringCloud.common.toggleVisibility', AppCommands.toggleVisibility);
-    registerCommandWithTelemetryWrapper('azureSpringCloud.subscription.select', selectSubscription);
-    registerCommandWithTelemetryWrapper('azureSpringCloud.subscription.createServiceFromPortal', ServiceCommands.createServiceInPortal);
-    registerCommandWithTelemetryWrapper('azureSpringCloud.subscription.openInPortal', openPortal);
-    registerCommandWithTelemetryWrapper('azureSpringCloud.service.createApp', ServiceCommands.createApp);
-    registerCommandWithTelemetryWrapper('azureSpringCloud.service.delete', ServiceCommands.deleteService);
-    registerCommandWithTelemetryWrapper('azureSpringCloud.service.openInPortal', ServiceCommands.openPortal);
-    registerCommandWithTelemetryWrapper('azureSpringCloud.service.viewProperties', ServiceCommands.viewProperties);
-    registerCommandWithTelemetryWrapper('azureSpringCloud.app.openPublicEndpoint', AppCommands.openPublicEndpoint);
-    registerCommandWithTelemetryWrapper('azureSpringCloud.app.openTestEndpoint', AppCommands.openTestEndpoint);
-    registerCommandWithTelemetryWrapper('azureSpringCloud.app.toggleEndpoint', AppCommands.toggleEndpoint);
-    registerCommandWithTelemetryWrapper('azureSpringCloud.app.start', AppCommands.startApp);
-    registerCommandWithTelemetryWrapper('azureSpringCloud.app.stop', AppCommands.stopApp);
-    registerCommandWithTelemetryWrapper('azureSpringCloud.app.restart', AppCommands.restartApp);
-    registerCommandWithTelemetryWrapper('azureSpringCloud.app.delete', AppCommands.deleteApp);
-    registerCommandWithTelemetryWrapper('azureSpringCloud.app.deploy', AppCommands.deploy);
-    registerCommandWithTelemetryWrapper('azureSpringCloud.app.scale', AppCommands.scale);
-    registerCommandWithTelemetryWrapper('azureSpringCloud.app.openInPortal', AppCommands.openPortal);
-    registerCommandWithTelemetryWrapper('azureSpringCloud.app.viewProperties', AppCommands.viewProperties);
-    registerCommandWithTelemetryWrapper('azureSpringCloud.app.instance.startStreamingLog', AppCommands.startStreamingLogs);
-    registerCommandWithTelemetryWrapper('azureSpringCloud.app.instance.stopStreamingLog', AppCommands.stopStreamingLogs);
-    registerCommandWithTelemetryWrapper('azureSpringCloud.app.instance.viewProperties', AppCommands.viewInstanceProperties);
-    registerCommandWithTelemetryWrapper('azureSpringCloud.app.settings.add', AppCommands.addSetting);
-    registerCommandWithTelemetryWrapper('azureSpringCloud.app.settings.edit', AppCommands.editSettings);
-    registerCommandWithTelemetryWrapper('azureSpringCloud.app.setting.edit', AppCommands.editSetting);
-    registerCommandWithTelemetryWrapper('azureSpringCloud.app.setting.delete', AppCommands.deleteSetting);
+    registerCommandWithTelemetryWrapper('azureSpringApps.common.loadMore', loadMore);
+    registerCommandWithTelemetryWrapper('azureSpringApps.common.refresh', refreshNode);
+    registerCommandWithTelemetryWrapper('azureSpringApps.common.toggleVisibility', AppCommands.toggleVisibility);
+    registerCommandWithTelemetryWrapper('azureSpringApps.subscription.select', selectSubscription);
+    registerCommandWithTelemetryWrapper('azureSpringApps.subscription.createServiceFromPortal', ServiceCommands.createServiceInPortal);
+    registerCommandWithTelemetryWrapper('azureSpringApps.subscription.openInPortal', openPortal);
+    registerCommandWithTelemetryWrapper('azureSpringApps.apps.createApp', ServiceCommands.createApp);
+    registerCommandWithTelemetryWrapper('azureSpringApps.apps.delete', ServiceCommands.deleteService);
+    registerCommandWithTelemetryWrapper('azureSpringApps.apps.openInPortal', ServiceCommands.openPortal);
+    registerCommandWithTelemetryWrapper('azureSpringApps.apps.viewProperties', ServiceCommands.viewProperties);
+    registerCommandWithTelemetryWrapper('azureSpringApps.app.openPublicEndpoint', AppCommands.openPublicEndpoint);
+    registerCommandWithTelemetryWrapper('azureSpringApps.app.openTestEndpoint', AppCommands.openTestEndpoint);
+    registerCommandWithTelemetryWrapper('azureSpringApps.app.toggleEndpoint', AppCommands.toggleEndpoint);
+    registerCommandWithTelemetryWrapper('azureSpringApps.app.start', AppCommands.startApp);
+    registerCommandWithTelemetryWrapper('azureSpringApps.app.stop', AppCommands.stopApp);
+    registerCommandWithTelemetryWrapper('azureSpringApps.app.restart', AppCommands.restartApp);
+    registerCommandWithTelemetryWrapper('azureSpringApps.app.delete', AppCommands.deleteApp);
+    registerCommandWithTelemetryWrapper('azureSpringApps.app.deploy', AppCommands.deploy);
+    registerCommandWithTelemetryWrapper('azureSpringApps.app.scale', AppCommands.scale);
+    registerCommandWithTelemetryWrapper('azureSpringApps.app.openInPortal', AppCommands.openPortal);
+    registerCommandWithTelemetryWrapper('azureSpringApps.app.viewProperties', AppCommands.viewProperties);
+    registerCommandWithTelemetryWrapper('azureSpringApps.app.instance.startStreamingLog', AppCommands.startStreamingLogs);
+    registerCommandWithTelemetryWrapper('azureSpringApps.app.instance.stopStreamingLog', AppCommands.stopStreamingLogs);
+    registerCommandWithTelemetryWrapper('azureSpringApps.app.instance.viewProperties', AppCommands.viewInstanceProperties);
+    registerCommandWithTelemetryWrapper('azureSpringApps.app.settings.add', AppCommands.addSetting);
+    registerCommandWithTelemetryWrapper('azureSpringApps.app.settings.edit', AppCommands.editSettings);
+    registerCommandWithTelemetryWrapper('azureSpringApps.app.setting.edit', AppCommands.editSetting);
+    registerCommandWithTelemetryWrapper('azureSpringApps.app.setting.delete', AppCommands.deleteSetting);
 }
 
 function registerCommandWithTelemetryWrapper(commandId: string, callback: CommandCallback): void {

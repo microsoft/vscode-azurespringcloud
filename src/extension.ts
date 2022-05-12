@@ -23,14 +23,14 @@ export async function activateInternal(context: vscode.ExtensionContext, perfSta
     registerAzureUtilsExtensionVariables(ext);
 
     // tslint:disable-next-line: no-unsafe-any
-    await callWithTelemetryAndErrorHandling('azureSpringCloud.activate', async (activateContext: IActionContext) => {
+    await callWithTelemetryAndErrorHandling('azureSpringApps.activate', async (activateContext: IActionContext) => {
         activateContext.telemetry.properties.isActivationEvent = 'true';
         activateContext.telemetry.measurements.mainFileLoad = (perfStats.loadEndTime - perfStats.loadStartTime) / 1000;
 
         ext.azureAccountTreeItem = new AzureAccountTreeItem();
         context.subscriptions.push(ext.azureAccountTreeItem);
-        ext.tree = new AzExtTreeDataProvider(ext.azureAccountTreeItem, 'azureSpringCloud.common.loadMore');
-        ext.treeView = vscode.window.createTreeView('azureSpringCloud', { treeDataProvider: ext.tree, showCollapseAll: true, canSelectMany: true });
+        ext.tree = new AzExtTreeDataProvider(ext.azureAccountTreeItem, 'azureSpringApps.common.loadMore');
+        ext.treeView = vscode.window.createTreeView('azureSpringApps', { treeDataProvider: ext.tree, showCollapseAll: true, canSelectMany: true });
         context.subscriptions.push(ext.treeView);
         registerCommands();
 

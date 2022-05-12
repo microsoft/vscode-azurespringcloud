@@ -12,11 +12,11 @@ import { AppSettingTreeItem, IOptions } from "./AppSettingTreeItem";
 import { AppTreeItem } from "./AppTreeItem";
 
 export class AppEnvVariablesTreeItem extends AppSettingsTreeItem {
-    public static contextValue: string = 'azureSpringCloud.app.envVariables';
+    public static contextValue: string = 'azureSpringApps.app.envVariables';
     //refer: https://dev.azure.com/msazure/AzureDMSS/_git/AzureDMSS-PortalExtension?path=%2Fsrc%2FSpringCloudPortalExt%2FClient%2FApplicationConfiguration%2FApplicationConfigurationBlade.ts&version=GBdev&line=304&lineEnd=304&lineStartColumn=61&lineEndColumn=80&lineStyle=plain&_a=contents
     private static readonly _options: IOptions = {
         hidden: true,
-        contextValue: 'azureSpringCloud.app.envVariable',
+        contextValue: 'azureSpringApps.app.envVariable',
     };
     public readonly contextValue: string = AppEnvVariablesTreeItem.contextValue;
     public readonly label: string = 'Environment Variables';
