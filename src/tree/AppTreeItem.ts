@@ -112,15 +112,7 @@ export class AppTreeItem extends AzExtParentTreeItem {
     }
 
     public async loadMoreChildrenImpl(_clearCache: boolean, context: IActionContext): Promise<AzExtTreeItem[]> {
-        this.deploymentData = await this.getActiveDeployment(context);
-        if (!this.deploymentData) {
-            return [];
-        }
-        this.scaleSettingsTreeItem = new AppScaleSettingsTreeItem(this, this.deploymentData);
-        this.appInstancesTreeItem = new AppInstancesTreeItem(this, this.deploymentData);
-        this.envPropertiesTreeItem = new AppEnvVariablesTreeItem(this, this.deploymentData);
-        this.jvmOptionsTreeItem = new AppJvmOptionsTreeItem(this, this.deploymentData);
-        return [this.appInstancesTreeItem, this.envPropertiesTreeItem, this.scaleSettingsTreeItem, this.jvmOptionsTreeItem];
+        return this.initItemsIfNot(context);
     }
 
     public async deleteTreeItemImpl(context: IActionContext): Promise<void> {
@@ -171,6 +163,7 @@ export class AppTreeItem extends AzExtParentTreeItem {
     }
 
     public async scaleInstances(context: IActionContext): Promise<void> {
+        await this.initItemsIfNot(context);
         await this.scaleSettingsTreeItem.updateSettingsValue(context);
     }
 
@@ -182,12 +175,25 @@ export class AppTreeItem extends AzExtParentTreeItem {
         }
     }
 
-    public pickTreeItemImpl(expectedContextValues: (string | RegExp)[]): AzExtTreeItem | undefined | Promise<AzExtTreeItem | undefined> {
+    public async pickTreeItemImpl(expectedContextValues: (string | RegExp)[], context: IActionContext): Promise<AzExtTreeItem | undefined> {
         for (const expectedContextValue of expectedContextValues) {
             if (expectedContextValue === AppInstanceTreeItem.contextValue) {
+                await this.initItemsIfNot(context);
                 return this.appInstancesTreeItem;
             }
         }
         return undefined;
+    }
+
+    private async initItemsIfNot(context: IActionContext): Promise<AzExtTreeItem[]> {
+        this.deploymentData = await this.getActiveDeployment(context);
+        if (!this.deploymentData) {
+            return [];
+        }
+        this.scaleSettingsTreeItem = this.scaleSettingsTreeItem ?? new AppScaleSettingsTreeItem(this, this.deploymentData);
+        this.appInstancesTreeItem = this.appInstancesTreeItem ?? new AppInstancesTreeItem(this, this.deploymentData);
+        this.envPropertiesTreeItem = this.envPropertiesTreeItem ?? new AppEnvVariablesTreeItem(this, this.deploymentData);
+        this.jvmOptionsTreeItem = this.jvmOptionsTreeItem ?? new AppJvmOptionsTreeItem(this, this.deploymentData);
+        return [this.appInstancesTreeItem, this.envPropertiesTreeItem, this.scaleSettingsTreeItem, this.jvmOptionsTreeItem];
     }
 }
