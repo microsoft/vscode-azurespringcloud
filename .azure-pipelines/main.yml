@@ -33,9 +33,9 @@ jobs:
 trigger:
   branches:
     include:
-    - 'main'
+    - main
 
 pr:
   branches:
     include:
-    - 'main'
+    - main
