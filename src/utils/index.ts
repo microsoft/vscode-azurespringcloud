@@ -24,10 +24,8 @@ export async function openUrl(url: string): Promise<void> {
 
 export async function runInBackground(doing: string, done: string, task: () => Promise<void>): Promise<void> {
     await window.withProgress({ location: ProgressLocation.Notification, title: doing }, async (): Promise<void> => {
-        ext.outputChannel.appendLog(doing);
         await task();
         window.showInformationMessage(done);
-        ext.outputChannel.appendLog(done);
     });
 }
 
