@@ -30,7 +30,7 @@ export function registerCommands(): void {
     registerCommandWithTelemetryWrapper('azureSpringApps.subscription.createServiceFromPortal', ServiceCommands.createServiceInPortal);
     registerCommandWithTelemetryWrapper('azureSpringApps.subscription.openInPortal', openPortal);
     registerCommandWithTelemetryWrapper('azureSpringApps.apps.createApp', ServiceCommands.createApp);
-    registerCommandWithTelemetryWrapper('azureSpringApps.appslete', ServiceCommands.deleteService);
+    registerCommandWithTelemetryWrapper('azureSpringApps.apps.delete', ServiceCommands.deleteService);
     registerCommandWithTelemetryWrapper('azureSpringApps.apps.openInPortal', ServiceCommands.openPortal);
     registerCommandWithTelemetryWrapper('azureSpringApps.apps.viewProperties', ServiceCommands.viewProperties);
     registerCommandWithTelemetryWrapper('azureSpringApps.app.openPublicEndpoint', AppCommands.openPublicEndpoint);
