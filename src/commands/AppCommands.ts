@@ -18,11 +18,13 @@ export namespace AppCommands {
 
     export async function openPublicEndpoint(context: IActionContext, node?: AppTreeItem): Promise<void> {
         node = await getNode(node, context);
-        const app: EnhancedApp = node.getApp(context);
-        const endPoint: string | undefined = await app.getPublicEndpoint();
+        let app: EnhancedApp = node.getApp(context);
+        let endPoint: string | undefined = await app.getPublicEndpoint();
         if (!endPoint || endPoint.toLowerCase() === 'none') {
             await context.ui.showWarningMessage(`App [${app.name}] is not publicly accessible. Do you want to set it public and assign it a public endpoint?`, { modal: true }, DialogResponses.yes);
             await toggleEndpoint(context, node);
+            app = await app.reload();
+            endPoint = await app.getPublicEndpoint();
         }
         await openUrl(endPoint!);
     }

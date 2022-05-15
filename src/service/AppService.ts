@@ -52,10 +52,10 @@ export class AppService {
         await this.client.apps.beginDeleteAndWait(target.service.resourceGroup, target.service.name, target.name);
     }
 
-    public async reload(app?: IApp): Promise<IApp> {
+    public async reload(app?: IApp): Promise<EnhancedApp> {
         const target: IApp = this.getTarget(app);
         const resouce: AppResource = await this.client.apps.get(target.service.resourceGroup, target.service.name, target.name);
-        return IApp.fromResource(resouce, target.service);
+        return this.enhanceApp(IApp.fromResource(resouce, target.service));
     }
 
     public async getDeployments(app?: IApp): Promise<IDeployment[]> {
