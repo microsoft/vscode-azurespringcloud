@@ -7,44 +7,48 @@ import { openInPortal } from "@microsoft/vscode-azext-azureutils";
 import { DialogResponses, IActionContext, openReadOnlyJson } from "@microsoft/vscode-azext-utils";
 import { OpenDialogOptions, TextEditor, Uri, window, workspace, WorkspaceFolder } from "vscode";
 import { ext } from "../extensionVariables";
-import { EnhancedApp } from "../model";
+import { EnhancedApp } from "../service/EnhancedApp";
 import { AppInstanceTreeItem } from "../tree/AppInstanceTreeItem";
 import { AppSettingsTreeItem } from "../tree/AppSettingsTreeItem";
 import { AppSettingTreeItem } from "../tree/AppSettingTreeItem";
 import { AppTreeItem } from "../tree/AppTreeItem";
-import { localize, openUrl } from "../utils";
+import * as utils from "../utils";
 
 export namespace AppCommands {
 
     export async function openPublicEndpoint(context: IActionContext, node?: AppTreeItem): Promise<void> {
         node = await getNode(node, context);
-        let app: EnhancedApp = node.getApp(context);
+        const app: EnhancedApp = node.app;
         let endPoint: string | undefined = await app.getPublicEndpoint();
         if (!endPoint || endPoint.toLowerCase() === 'none') {
             await context.ui.showWarningMessage(`App [${app.name}] is not publicly accessible. Do you want to set it public and assign it a public endpoint?`, { modal: true }, DialogResponses.yes);
             await toggleEndpoint(context, node);
-            app = await app.reload();
             endPoint = await app.getPublicEndpoint();
         }
-        await openUrl(endPoint!);
+        await utils.openUrl(endPoint!);
     }
 
     export async function openTestEndpoint(context: IActionContext, node?: AppTreeItem): Promise<void> {
         node = await getNode(node, context);
-        const app: EnhancedApp = node.getApp(context);
+        const app: EnhancedApp = node.app;
         const endpoint: string | undefined = await app.getTestEndpoint();
-        await openUrl(endpoint!);
+        await utils.openUrl(endpoint!);
     }
 
     export async function toggleEndpoint(context: IActionContext, node?: AppTreeItem): Promise<void> {
         node = await getNode(node, context);
-        await node.toggleEndpoint(context);
+        const app: EnhancedApp = node.app;
+        const isPublic: boolean = app.properties?.public ?? false;
+        const doing: string = isPublic ? `Unassigning public endpoint of "${app.name}".` : `Assigning public endpoint to "${app.name}".`;
+        const done: string = isPublic ? `Successfully unassigned public endpoint of "${app.name}".` : `Successfully assigned public endpoint to "${app.name}".`;
+        await utils.runInBackground(doing, done, () => app.setPublic(!isPublic));
     }
 
     export async function startApp(context: IActionContext, node?: AppTreeItem): Promise<AppTreeItem> {
         node = await getNode(node, context);
-        await node.runWithTemporaryDescription(context, localize('starting', 'Starting...'), async () => {
-            await node!.getApp(context).start();
+        const app: EnhancedApp = node.app;
+        await node.runWithTemporaryDescription(context, utils.localize('starting', 'Starting...'), async () => {
+            await app.start();
             node!.refresh(context);
         });
         return node;
@@ -52,9 +56,9 @@ export namespace AppCommands {
 
     export async function stopApp(context: IActionContext, node?: AppTreeItem): Promise<AppTreeItem> {
         node = await getNode(node, context);
-        const app: EnhancedApp = node.getApp(context);
+        const app: EnhancedApp = node.app;
         await context.ui.showWarningMessage(`Are you sure to stop "${app.name}"?`, { modal: true }, DialogResponses.yes);
-        await node.runWithTemporaryDescription(context, localize('stopping', 'Stopping...'), async () => {
+        await node.runWithTemporaryDescription(context, utils.localize('stopping', 'Stopping...'), async () => {
             await app.stop();
             node!.refresh(context);
         });
@@ -63,8 +67,9 @@ export namespace AppCommands {
 
     export async function restartApp(context: IActionContext, node?: AppTreeItem): Promise<AppTreeItem> {
         node = await getNode(node, context);
-        await node.runWithTemporaryDescription(context, localize('restart', 'Restarting...'), async () => {
-            await node!.getApp(context)?.restart();
+        const app: EnhancedApp = node.app;
+        await node.runWithTemporaryDescription(context, utils.localize('restart', 'Restarting...'), async () => {
+            await app.restart();
             node!.refresh(context);
         });
         return node;
@@ -72,9 +77,11 @@ export namespace AppCommands {
 
     export async function deleteApp(context: IActionContext, node?: AppTreeItem): Promise<void> {
         node = await getNode(node, context);
-        const app: EnhancedApp = node.getApp(context);
+        const app: EnhancedApp = node.app;
         await context.ui.showWarningMessage(`Are you sure to delete Spring App "${app.name}"?`, { modal: true }, DialogResponses.deleteResponse);
-        await node.deleteTreeItem(context);
+        const deleting: string = utils.localize('deletingSpringCLoudApp', 'Deleting Spring app "{0}"...', app.name);
+        const deleted: string = utils.localize('deletedSpringCLoudApp', 'Successfully deleted Spring app "{0}".', app.name);
+        await utils.runInBackground(deleting, deleted, () => node!.deleteTreeItem(context));
     }
 
     export async function deploy(context: IActionContext, node?: AppTreeItem): Promise<AppTreeItem> {
@@ -91,7 +98,7 @@ export namespace AppCommands {
         const fileUri: Uri[] | undefined = await window.showOpenDialog(options);
         if (fileUri && fileUri[0] !== undefined) {
             const artifactPath: string = fileUri[0].fsPath;
-            await node.runWithTemporaryDescription(context, localize('deploying', 'Deploying...'), async () => node!.deployArtifact(context, artifactPath));
+            await node.runWithTemporaryDescription(context, utils.localize('deploying', 'Deploying...'), async () => node!.deployArtifact(context, artifactPath));
         }
         return node;
     }
@@ -110,31 +117,33 @@ export namespace AppCommands {
 
     export async function viewProperties(context: IActionContext, node?: AppTreeItem): Promise<AppTreeItem> {
         node = await getNode(node, context);
-        await openReadOnlyJson(node, node.data);
+        await openReadOnlyJson(node, node.app.properties ?? {});
         return node;
     }
 
     export async function startStreamingLogs(context: IActionContext, node?: AppInstanceTreeItem): Promise<AppInstanceTreeItem> {
         node = await getInstanceNode(node, context);
-        await node.runWithTemporaryDescription(context, localize('startStreamingLog', 'Starting streaming log...'), async () => {
+        await node.runWithTemporaryDescription(context, utils.localize('startStreamingLog', 'Starting streaming log...'), async () => {
             const appTreeItem: AppTreeItem = node!.parent.parent;
-            return appTreeItem.getApp(context).startStreamingLogs(context, node?.data!, appTreeItem.data);
+            const app: EnhancedApp = appTreeItem.app;
+            return app.startStreamingLogs(context, node?.instance!);
         });
         return node;
     }
 
     export async function stopStreamingLogs(context: IActionContext, node?: AppInstanceTreeItem): Promise<AppInstanceTreeItem> {
         node = await getInstanceNode(node, context);
-        await node.runWithTemporaryDescription(context, localize('stopStreamingLog', 'Stopping streaming log...'), async () => {
+        await node.runWithTemporaryDescription(context, utils.localize('stopStreamingLog', 'Stopping streaming log...'), async () => {
             const appTreeItem: AppTreeItem = node!.parent.parent;
-            return appTreeItem.getApp(context).stopStreamingLogs(node?.data!, appTreeItem.data);
+            const app: EnhancedApp = appTreeItem.app;
+            return app.stopStreamingLogs(node?.instance!);
         });
         return node;
     }
 
     export async function viewInstanceProperties(context: IActionContext, node?: AppInstanceTreeItem): Promise<AppInstanceTreeItem> {
         node = await getInstanceNode(node, context);
-        await openReadOnlyJson(node, node.data);
+        await openReadOnlyJson(node, node.instance);
         return node;
     }
 
@@ -147,13 +156,13 @@ export namespace AppCommands {
     }
 
     export async function editSettings(context: IActionContext, node: AppSettingsTreeItem): Promise<void> {
-        await node.runWithTemporaryDescription(context, localize('editing', 'Editing...'), async () => {
+        await node.runWithTemporaryDescription(context, utils.localize('editing', 'Editing...'), async () => {
             await node.updateSettingsValue(context);
         });
     }
 
     export async function editSetting(context: IActionContext, node: AppSettingTreeItem): Promise<AppSettingTreeItem> {
-        await node.runWithTemporaryDescription(context, localize('editing', 'Editing...'), async () => {
+        await node.runWithTemporaryDescription(context, utils.localize('editing', 'Editing...'), async () => {
             await node.updateValue(context);
         });
         return node;

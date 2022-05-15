@@ -5,7 +5,7 @@
 
 import { DeploymentInstance } from "@azure/arm-appplatform";
 import { AzExtParentTreeItem, AzExtTreeItem, IActionContext, TreeItemIconPath } from "@microsoft/vscode-azext-utils";
-import { IDeployment } from "../model";
+import { EnhancedDeployment } from "../service/EnhancedDeployment";
 import { getThemedIconPath, localize } from "../utils";
 import { AppInstanceTreeItem } from "./AppInstanceTreeItem";
 import { AppTreeItem } from './AppTreeItem';
@@ -16,11 +16,9 @@ export class AppInstancesTreeItem extends AzExtParentTreeItem {
     public readonly childTypeLabel: string = localize('appInstance', 'Spring App Instance');
     public readonly label: string = 'App Instances';
     public readonly parent: AppTreeItem;
-    private data: IDeployment;
 
-    public constructor(parent: AppTreeItem, deployment: IDeployment) {
+    public constructor(parent: AppTreeItem) {
         super(parent);
-        this.data = deployment;
     }
 
     public get id(): string { return AppInstancesTreeItem.contextValue; }
@@ -31,15 +29,19 @@ export class AppInstancesTreeItem extends AzExtParentTreeItem {
     }
 
     public async loadMoreChildrenImpl(_clearCache: boolean, _context: IActionContext): Promise<AzExtTreeItem[]> {
-        return await this.createTreeItemsWithErrorHandling(
-            this.data.properties!.instances,
-            'invalidSpringCloudAppInstance',
-            (instance: DeploymentInstance) => new AppInstanceTreeItem(this, instance),
-            (instance: DeploymentInstance) => instance.name
-        );
+        const deployment: EnhancedDeployment | undefined = await this.parent.app.getActiveDeployment();
+        if (deployment) {
+            return await this.createTreeItemsWithErrorHandling(
+                deployment.properties!.instances,
+                'invalidSpringCloudAppInstance',
+                (instance: DeploymentInstance) => new AppInstanceTreeItem(this, instance),
+                (instance: DeploymentInstance) => instance.name
+            );
+        }
+        return [];
     }
 
-    public async refreshImpl(context: IActionContext): Promise<void> {
-        this.data = (await this.parent.getActiveDeployment(context, true))!;
+    public async refreshImpl(_context: IActionContext): Promise<void> {
+        await this.parent.app.refresh();
     }
 }

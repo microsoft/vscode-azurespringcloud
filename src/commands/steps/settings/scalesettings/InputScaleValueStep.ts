@@ -4,7 +4,8 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { AzureWizardPromptStep } from "@microsoft/vscode-azext-utils";
-import { EnhancedDeployment, IScaleSettings } from "../../../../model";
+import { IScaleSettings } from "../../../../model";
+import { EnhancedDeployment } from "../../../../service/EnhancedDeployment";
 import { localize } from "../../../../utils";
 import { IScaleSettingsUpdateWizardContext } from "./IScaleSettingsUpdateWizardContext";
 
@@ -36,11 +37,12 @@ export class InputScaleValueStep extends AzureWizardPromptStep<IScaleSettingsUpd
 
     private async validateInput(val: string): Promise<string | undefined> {
         const numVal: number = Number(val);
-        const scope: { max: number; min: number } = IScaleSettings.SCOPES[this.deployment.sku?.tier ?? 'Basic'][this.key];
+        const tier: string | undefined = this.deployment.app.service.sku?.tier;
+        const scope: { max: number; min: number } = IScaleSettings.SCOPES[tier ?? 'Basic'][this.key];
         if (this.key === 'cpu') {
             const valid: boolean = numVal === 0.5 || (Number.isInteger(numVal) && numVal <= scope.max || numVal >= scope.min);
             if (!valid) {
-                if (this.deployment.sku?.tier === 'Basic') {
+                if (tier === 'Basic') {
                     return localize('invalidBasicCPU', 'Each app instance can have only 0.5 or 1 vCPU for Basic pricing tier');
                 } else {
                     return localize('invalidScaleSettingValue', 'The value can only be 0.5 or an integer between 1 and {0}', scope.max);

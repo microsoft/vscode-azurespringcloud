@@ -3,29 +3,17 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { AppPlatformManagementClient } from "@azure/arm-appplatform";
-import { createAzureClient } from "@microsoft/vscode-azext-azureutils";
 import { AzExtParentTreeItem, IActionContext } from '@microsoft/vscode-azext-utils';
 import { ext } from "../extensionVariables";
-import { EnhancedDeployment, IDeployment } from "../model";
-import { DeploymentService } from "../service/DeploymentService";
 import { AppSettingTreeItem, IOptions } from "./AppSettingTreeItem";
 import { AppTreeItem } from "./AppTreeItem";
 
 export abstract class AppSettingsTreeItem extends AzExtParentTreeItem {
     public readonly childTypeLabel: string = 'App Setting';
     public parent: AppTreeItem;
-    protected data: IDeployment;
 
-    protected constructor(parent: AppTreeItem, deployment: IDeployment) {
+    protected constructor(parent: AppTreeItem) {
         super(parent);
-        this.data = deployment;
-    }
-
-    public getDeployment(context: IActionContext): EnhancedDeployment {
-        const client: AppPlatformManagementClient = createAzureClient([context, this], AppPlatformManagementClient);
-        const deploymentService: DeploymentService = new DeploymentService(client, this.data);
-        return Object.assign(deploymentService, this.data);
     }
 
     public hasMoreChildrenImpl(): boolean {
@@ -46,8 +34,8 @@ export abstract class AppSettingsTreeItem extends AzExtParentTreeItem {
         }
     }
 
-    public async refreshImpl(context: IActionContext): Promise<void> {
-        this.data = await this.getDeployment(context).reload();
+    public async refreshImpl(): Promise<void> {
+        await this.parent.app.refresh();
     }
 
     public abstract updateSettingValue(node: AppSettingTreeItem, context: IActionContext): Promise<string>;

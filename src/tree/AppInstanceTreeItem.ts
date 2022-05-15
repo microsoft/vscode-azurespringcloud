@@ -11,23 +11,23 @@ import { AppInstancesTreeItem } from "./AppInstancesTreeItem";
 export class AppInstanceTreeItem extends AzExtTreeItem {
     public static contextValue: RegExp = /^azureSpringApps\.app\.instance\.status-.+$/;
     public readonly parent: AppInstancesTreeItem;
-    public readonly data: DeploymentInstance;
+    public readonly instance: DeploymentInstance;
 
     public constructor(parent: AppInstancesTreeItem, instance: DeploymentInstance) {
         super(parent);
-        this.data = instance;
+        this.instance = instance;
     }
 
     public get id(): string {
-        return this.data.name!;
+        return this.instance.name!;
     }
 
     public get label(): string {
-        return this.data.name!;
+        return this.instance.name!;
     }
 
     public get description(): string {
-        return this.data.status!;
+        return this.instance.status!;
     }
 
     public get iconPath(): TreeItemIconPath {
@@ -35,6 +35,6 @@ export class AppInstanceTreeItem extends AzExtTreeItem {
     }
 
     public get contextValue(): string {
-        return `azureSpringApps.app.instance.status-${this.data.status}`;
+        return `azureSpringApps.app.instance.status-${this.instance.status}`;
     }
 }

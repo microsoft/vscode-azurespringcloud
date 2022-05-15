@@ -6,14 +6,15 @@
 import { openInPortal } from "@microsoft/vscode-azext-azureutils";
 import { DialogResponses, IActionContext, openReadOnlyJson } from "@microsoft/vscode-azext-utils";
 import { ext } from "../extensionVariables";
+import { EnhancedService } from "../service/EnhancedService";
 import { ServiceTreeItem } from "../tree/ServiceTreeItem";
 import { SubscriptionTreeItem } from "../tree/SubscriptionTreeItem";
-import { openUrl } from "../utils";
+import * as utils from "../utils";
 
 export namespace ServiceCommands {
 
     export async function createServiceInPortal(_context: IActionContext, _node?: SubscriptionTreeItem): Promise<void> {
-        await openUrl('https://portal.azure.com/#create/Microsoft.AppPlatform');
+        await utils.openUrl('https://portal.azure.com/#create/Microsoft.AppPlatform');
     }
 
     export async function createApp(context: IActionContext, node?: ServiceTreeItem): Promise<void> {
@@ -28,8 +29,11 @@ export namespace ServiceCommands {
 
     export async function deleteService(context: IActionContext, node?: ServiceTreeItem): Promise<ServiceTreeItem> {
         node = await getNode(node, context);
-        await context.ui.showWarningMessage(`Are you sure to delete Spring Apps "${node.data.name}"?`, { modal: true }, DialogResponses.deleteResponse);
-        await node.deleteTreeItem(context);
+        const service: EnhancedService = node.service;
+        await context.ui.showWarningMessage(`Are you sure to delete Spring Apps "${node.service.name}"?`, { modal: true }, DialogResponses.deleteResponse);
+        const deleting: string = utils.localize('deletingSpringCLoudService', 'Deleting Azure Spring Apps "{0}"...', service.name);
+        const deleted: string = utils.localize('deletedSpringCloudService', 'Successfully deleted Azure Spring Apps "{0}".', service.name);
+        await utils.runInBackground(deleting, deleted, () => node!.deleteTreeItem(context));
         return node;
     }
 
@@ -41,7 +45,7 @@ export namespace ServiceCommands {
 
     export async function viewProperties(context: IActionContext, node?: ServiceTreeItem): Promise<ServiceTreeItem> {
         node = await getNode(node, context);
-        await openReadOnlyJson(node, node.data);
+        await openReadOnlyJson(node, node.service.properties ?? {});
         return node;
     }
 

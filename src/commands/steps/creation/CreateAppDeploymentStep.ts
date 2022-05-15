@@ -7,8 +7,7 @@ import { KnownSupportedRuntimeValue } from "@azure/arm-appplatform";
 import { AzureWizardExecuteStep } from "@microsoft/vscode-azext-utils";
 import { Progress } from "vscode";
 import { ext } from "../../../extensionVariables";
-import { EnhancedApp, EnhancedService } from "../../../model";
-import { AppService } from "../../../service/AppService";
+import { EnhancedApp } from "../../../service/EnhancedApp";
 import { localize, nonNullProp } from "../../../utils";
 import { IAppCreationWizardContext } from "./IAppCreationWizardContext";
 
@@ -16,25 +15,17 @@ export class CreateAppDeploymentStep extends AzureWizardExecuteStep<IAppCreation
 
     // tslint:disable-next-line: no-unexternalized-strings
     public priority: number = 140;
-    private readonly service: EnhancedService;
-
-    constructor(service: EnhancedService) {
-        super();
-        this.service = service;
-    }
 
     public async execute(context: IAppCreationWizardContext, progress: Progress<{ message?: string; increment?: number }>): Promise<void> {
-
         const message: string = localize('creatingNewAppDeployment', 'Creating default deployment...');
         ext.outputChannel.appendLog(message);
         progress.report({ message });
 
         const appRuntime: KnownSupportedRuntimeValue = nonNullProp(context, 'newAppRuntime');
-
-        const app: EnhancedApp = this.service.enhanceApp(context.newApp!);
-        context.newDeployment = await app.createDeployment(AppService.DEFAULT_DEPLOYMENT, appRuntime);
+        const app: EnhancedApp = context.newApp!;
+        context.newDeployment = await app.createDeployment(EnhancedApp.DEFAULT_DEPLOYMENT, appRuntime);
         ext.outputChannel.appendLog(localize('creatingNewAppDeploymentSuccess', 'Default deployment is successfully created.'));
-        await app.startDeployment(AppService.DEFAULT_DEPLOYMENT);
+        await app.startDeployment(EnhancedApp.DEFAULT_DEPLOYMENT);
         return Promise.resolve(undefined);
     }
 

@@ -6,6 +6,7 @@
 import { AppPlatformManagementClient, ServiceResource } from '@azure/arm-appplatform';
 import { createAzureClient, SubscriptionTreeItemBase } from '@microsoft/vscode-azext-azureutils';
 import { AzExtTreeItem, IActionContext } from '@microsoft/vscode-azext-utils';
+import { EnhancedService } from '../service/EnhancedService';
 import { localize } from '../utils';
 import { ServiceTreeItem } from './ServiceTreeItem';
 
@@ -32,7 +33,7 @@ export class SubscriptionTreeItem extends SubscriptionTreeItemBase {
         return await this.createTreeItemsWithErrorHandling(
             services,
             'invalidSpringCloudService',
-            service => new ServiceTreeItem(this, service),
+            service => new ServiceTreeItem(this, new EnhancedService(client, service)),
             service => service.name
         );
     }
