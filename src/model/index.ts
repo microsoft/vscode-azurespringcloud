@@ -3,31 +3,6 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-export class SpringCloudResourceId {
-    private readonly parts: string[];
-
-    public constructor(id: string) {
-        // tslint:disable-next-line: no-unexternalized-strings
-        this.parts = id.split("/");
-    }
-
-    public get subscription(): string {
-        return this.parts[2];
-    }
-
-    public get resourceGroup(): string {
-        return this.parts[4];
-    }
-
-    public get serviceName(): string {
-        return this.parts[8];
-    }
-
-    public get appName(): string {
-        return this.parts[10];
-    }
-}
-
 export interface IScaleSettings {
     capacity?: number;
     cpu?: number;
@@ -35,11 +10,10 @@ export interface IScaleSettings {
 }
 
 export namespace IScaleSettings {
-    // tslint:disable:no-unexternalized-strings
     export const LABELS: { [key: string]: string } = {
-        cpu: "vCPU",
-        memory: "Memory/GB",
-        capacity: "Instance count"
+        cpu: 'vCPU',
+        memory: 'Memory/GB',
+        capacity: 'Instance count'
     };
     export const SCOPES: { [key: string]: { [key: string]: { max: number; min: number } } } = {
         Enterprise: {

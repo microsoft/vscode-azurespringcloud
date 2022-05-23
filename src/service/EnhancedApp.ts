@@ -3,8 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { AppPlatformManagementClient, AppResource, AppResourceProperties, Build, BuildResult, BuildResultProvisioningState, DeploymentResource, KnownSupportedRuntimeValue, ResourceUploadDefinition, TestKeys, UserSourceInfoUnion } from "@azure/arm-appplatform";
-import { DeploymentInstance } from "@azure/arm-appplatform/src/models/index";
+import { AppPlatformManagementClient, AppResource, AppResourceProperties, Build, BuildResult, BuildResultProvisioningState, DeploymentInstance, DeploymentResource, KnownSupportedRuntimeValue, ResourceUploadDefinition, TestKeys, UserSourceInfoUnion } from "@azure/arm-appplatform";
 import { AnonymousCredential, ShareFileClient } from "@azure/storage-file-share";
 import { IActionContext } from "../../extension.bundle";
 import { localize } from "../utils";

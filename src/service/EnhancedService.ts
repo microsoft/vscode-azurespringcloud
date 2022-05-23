@@ -4,8 +4,6 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { AppPlatformManagementClient, AppResource, ClusterResourceProperties, ServiceResource, Sku } from "@azure/arm-appplatform";
-import { nonNullProp } from "@microsoft/vscode-azext-utils";
-import { SpringCloudResourceId } from "../model";
 import { EnhancedApp } from "./EnhancedApp";
 
 export class EnhancedService {
@@ -75,7 +73,6 @@ export class EnhancedService {
 
     private setRemote(resource: ServiceResource): void {
         this._remote = resource;
-        const resourceId: SpringCloudResourceId = new SpringCloudResourceId(nonNullProp(resource, 'id'));
-        this._resourceGroup = resourceId.resourceGroup;
+        this._resourceGroup = resource.id!.split("/")[4];
     }
 }
