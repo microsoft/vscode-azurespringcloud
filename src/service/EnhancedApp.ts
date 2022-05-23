@@ -26,7 +26,7 @@ export class EnhancedApp {
         this.name = resource.name!;
         this.id = resource.id!;
         this.service = service;
-        this.setRemote(resource);
+        this._remote = resource;
         this.getActiveDeployment();
     }
 
@@ -72,9 +72,8 @@ export class EnhancedApp {
     }
 
     public async refresh(): Promise<EnhancedApp> {
-        const resouce: AppResource = await this.client.apps.get(this.service.resourceGroup, this.service.name, this.name);
-        this.setRemote(resouce);
-        this.getActiveDeployment(true);
+        this._remote = await this.client.apps.get(this.service.resourceGroup, this.service.name, this.name);
+        await this.getActiveDeployment(true);
         return this;
     }
 
@@ -95,10 +94,9 @@ export class EnhancedApp {
     }
 
     public async setActiveDeployment(deploymentName: string): Promise<void> {
-        await this.client.apps.beginSetActiveDeploymentsAndWait(this.service.resourceGroup, this.service.name, this.name, {
+        this._remote = await this.client.apps.beginSetActiveDeploymentsAndWait(this.service.resourceGroup, this.service.name, this.name, {
             activeDeploymentNames: [deploymentName]
         });
-        this.refresh();
     }
 
     public async createDeployment(name: string, runtime: KnownSupportedRuntimeValue): Promise<EnhancedDeployment> {
@@ -109,7 +107,7 @@ export class EnhancedApp {
             source = { type: 'Jar', relativePath: '<default>', runtimeVersion: runtime ?? EnhancedApp.DEFAULT_RUNTIME };
         }
         // refer: https://dev.azure.com/msazure/AzureDMSS/_git/AzureDMSS-PortalExtension?path=%2Fsrc%2FSpringCloudPortalExt%2FClient%2FShared%2FAppsApi.ts&version=GBdev&_a=contents
-        await this.client.deployments.beginCreateOrUpdateAndWait(this.service.resourceGroup, this.service.name, this.name, name, {
+        const deployment: DeploymentResource = await this.client.deployments.beginCreateOrUpdateAndWait(this.service.resourceGroup, this.service.name, this.name, name, {
             properties: {
                 source,
                 deploymentSettings: {
@@ -128,8 +126,6 @@ export class EnhancedApp {
                 name: 'S0',
             }
         });
-        const deployment: DeploymentResource = await this.client.deployments.get(this.service.resourceGroup, this.service.name, this.name, name);
-        this.refresh();
         return new EnhancedDeployment(this, deployment);
     }
 
@@ -155,11 +151,9 @@ export class EnhancedApp {
     }
 
     public async setPublic(isPublic: boolean): Promise<void> {
-        await this.client.apps.beginCreateOrUpdateAndWait(this.service.resourceGroup, this.service.name, this.name, {
+        this._remote = await this.client.apps.beginCreateOrUpdateAndWait(this.service.resourceGroup, this.service.name, this.name, {
             properties: { public: isPublic }
         });
-        // reuse the returned value to update remote;
-        this.refresh();
     }
 
     public async togglePublic(): Promise<void> {
@@ -217,9 +211,5 @@ export class EnhancedApp {
 
     public async stopStreamingLogs(instance: DeploymentInstance): Promise<void> {
         await stopStreamingLogs(this.name, instance);
-    }
-
-    private setRemote(resource: AppResource): void {
-        this._remote = resource;
     }
 }

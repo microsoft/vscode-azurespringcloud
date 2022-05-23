@@ -38,13 +38,11 @@ export class EnhancedService {
     }
 
     public async createApp(name: string): Promise<EnhancedApp> {
-        await this.client.apps.beginCreateOrUpdateAndWait(this.resourceGroup, this.name, name, {
+        const app: AppResource = await this.client.apps.beginCreateOrUpdateAndWait(this.resourceGroup, this.name, name, {
             properties: {
                 public: false
             }
         });
-        const app: AppResource = await this.client.apps.get(this.resourceGroup, this.name, name);
-        this.refresh();
         return new EnhancedApp(this, app);
     }
 

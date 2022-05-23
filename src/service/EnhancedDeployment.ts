@@ -21,7 +21,7 @@ export class EnhancedDeployment {
         this.name = resource.name!;
         this.id = resource.id!;
         this.app = app;
-        this.setRemote(resource);
+        this._remote = resource;
     }
 
     public static validateKey(v: string): string | undefined {
@@ -56,8 +56,7 @@ export class EnhancedDeployment {
     }
 
     public async refresh(): Promise<EnhancedDeployment> {
-        const resource: DeploymentResource = await this.client.deployments.get(this.app.service.resourceGroup, this.app.service.name, this.app.name, this.name);
-        this.setRemote(resource);
+        this._remote = await this.client.deployments.get(this.app.service.resourceGroup, this.app.service.name, this.app.name, this.name);
         return this;
     }
 
@@ -72,9 +71,8 @@ export class EnhancedDeployment {
                 source: { type: 'Jar', relativePath: relativePathOrBuildId }
             };
         }
-        await this.client.deployments.beginUpdateAndWait(this.app.service.resourceGroup, this.app.service.name, this.app.name,
-                                                         this.name || EnhancedDeployment.DEFAULT_DEPLOYMENT_NAME, { properties });
-        this.refresh();
+        this._remote = await this.client.deployments.beginUpdateAndWait(this.app.service.resourceGroup, this.app.service.name, this.app.name,
+            this.name || EnhancedDeployment.DEFAULT_DEPLOYMENT_NAME, { properties });
     }
 
     public async updateScaleSettings(settings: IScaleSettings): Promise<void> {
@@ -93,15 +91,13 @@ export class EnhancedDeployment {
                 ...sku, capacity: settings.capacity ?? sku?.capacity
             }
         };
-        await this.client.deployments.beginUpdateAndWait(this.app.service.resourceGroup, this.app.service.name, this.app.name, this.name, resource);
-        this.refresh();
+        this._remote = await this.client.deployments.beginUpdateAndWait(this.app.service.resourceGroup, this.app.service.name, this.app.name, this.name, resource);
     }
 
     public async updateEnvironmentVariables(environmentVariables: { [p: string]: string }): Promise<void> {
-        await this.client.deployments.beginUpdateAndWait(this.app.service.resourceGroup, this.app.service.name, this.app.name, this.name, {
+        this._remote = await this.client.deployments.beginUpdateAndWait(this.app.service.resourceGroup, this.app.service.name, this.app.name, this.name, {
             properties: { deploymentSettings: { environmentVariables } }
         });
-        this.refresh();
     }
 
     public getJvmOptions(): string {
@@ -114,11 +110,11 @@ export class EnhancedDeployment {
         if (this.app.service.isEnterpriseTier()) {
             const environmentVariables: { [p: string]: string } = this.properties?.deploymentSettings?.environmentVariables ?? {};
             environmentVariables.JAVA_OPTS = jvmOptions;
-            await this.client.deployments.beginUpdateAndWait(this.app.service.resourceGroup, this.app.service.name, this.app.name, this.name, {
+            this._remote = await this.client.deployments.beginUpdateAndWait(this.app.service.resourceGroup, this.app.service.name, this.app.name, this.name, {
                 properties: { deploymentSettings: { environmentVariables } }
             });
         } else {
-            await this.client.deployments.beginUpdateAndWait(this.app.service.resourceGroup, this.app.service.name, this.app.name, this.name, {
+            this._remote = await this.client.deployments.beginUpdateAndWait(this.app.service.resourceGroup, this.app.service.name, this.app.name, this.name, {
                 //@ts-ignore
                 properties: {
                     source: {
@@ -128,7 +124,6 @@ export class EnhancedDeployment {
                 }
             });
         }
-        this.refresh();
     }
 
     public getScaleSettings(): IScaleSettings {
@@ -141,9 +136,5 @@ export class EnhancedDeployment {
             parseInt(resourceRequests?.memory) / 1024 :
             parseInt(resourceRequests?.memory)) : 1;
         return { cpu, memory, capacity: this.properties?.instances?.length ?? 0 };
-    }
-
-    private setRemote(resource: DeploymentResource): void {
-        this._remote = resource;
     }
 }
