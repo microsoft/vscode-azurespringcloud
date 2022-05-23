@@ -57,7 +57,7 @@ export namespace AppCommands {
     export async function stopApp(context: IActionContext, node?: AppTreeItem): Promise<AppTreeItem> {
         node = await getNode(node, context);
         const app: EnhancedApp = node.app;
-        await context.ui.showWarningMessage(`Are you sure to stop "${app.name}"?`, { modal: true }, DialogResponses.yes);
+        await context.ui.showWarningMessage(`Are you sure to stop "${app.name}"?`, { modal: true }, { title: 'Stop', isCloseAffordance: true });
         await node.runWithTemporaryDescription(context, utils.localize('stopping', 'Stopping...'), async () => {
             await app.stop();
             node!.refresh(context);
@@ -78,7 +78,7 @@ export namespace AppCommands {
     export async function deleteApp(context: IActionContext, node?: AppTreeItem): Promise<void> {
         node = await getNode(node, context);
         const app: EnhancedApp = node.app;
-        await context.ui.showWarningMessage(`Are you sure to delete Spring App "${app.name}"?`, { modal: true }, DialogResponses.deleteResponse);
+        await context.ui.showWarningMessage(`Are you sure to delete "${app.name}"?`, { modal: true }, DialogResponses.deleteResponse);
         const deleting: string = utils.localize('deletingSpringCLoudApp', 'Deleting Spring app "{0}"...', app.name);
         const deleted: string = utils.localize('deletedSpringCLoudApp', 'Successfully deleted Spring app "{0}".', app.name);
         await utils.runInBackground(deleting, deleted, () => node!.deleteTreeItem(context));
