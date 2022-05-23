@@ -40,7 +40,7 @@ export class InputScaleValueStep extends AzureWizardPromptStep<IScaleSettingsUpd
         const tier: string | undefined = this.deployment.app.service.sku?.tier;
         const scope: { max: number; min: number } = IScaleSettings.SCOPES[tier ?? 'Basic'][this.key];
         if (this.key === 'cpu') {
-            const valid: boolean = numVal === 0.5 || (Number.isInteger(numVal) && numVal <= scope.max || numVal >= scope.min);
+            const valid: boolean = numVal === 0.5 || (Number.isInteger(numVal) && numVal <= scope.max && numVal >= scope.min);
             if (!valid) {
                 if (tier === 'Basic') {
                     return localize('invalidBasicCPU', 'Each app instance can have only 0.5 or 1 vCPU for Basic pricing tier');
@@ -49,12 +49,12 @@ export class InputScaleValueStep extends AzureWizardPromptStep<IScaleSettingsUpd
                 }
             }
         } else if (this.key === 'memory') {
-            const valid: boolean = numVal === 0.5 || (Number.isInteger(numVal) && numVal <= scope.max || numVal >= scope.min);
+            const valid: boolean = numVal === 0.5 || (Number.isInteger(numVal) && numVal <= scope.max && numVal >= scope.min);
             if (!valid) {
                 return localize('invalidScaleSettingValue', 'The value can only be 0.5 or an integer between 1 and {0}', scope.max);
             }
         } else {
-            const valid: boolean = Number.isInteger(numVal) && numVal <= scope.max || numVal >= scope.min;
+            const valid: boolean = Number.isInteger(numVal) && numVal <= scope.max && numVal >= scope.min;
             if (!valid) {
                 return localize('invalidCapacitySettingValue', 'The value can only be an integer between {0} and {1}', scope.min, scope.max);
             }
