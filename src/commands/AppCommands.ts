@@ -5,7 +5,7 @@
 
 import { openInPortal } from "@microsoft/vscode-azext-azureutils";
 import { DialogResponses, IActionContext, openReadOnlyJson } from "@microsoft/vscode-azext-utils";
-import { OpenDialogOptions, TextEditor, Uri, window, workspace, WorkspaceFolder } from "vscode";
+import { MessageItem, OpenDialogOptions, TextEditor, Uri, window, workspace, WorkspaceFolder } from "vscode";
 import { ext } from "../extensionVariables";
 import { EnhancedApp } from "../service/EnhancedApp";
 import { AppInstanceTreeItem } from "../tree/AppInstanceTreeItem";
@@ -57,7 +57,8 @@ export namespace AppCommands {
     export async function stopApp(context: IActionContext, node?: AppTreeItem): Promise<AppTreeItem> {
         node = await getNode(node, context);
         const app: EnhancedApp = node.app;
-        await context.ui.showWarningMessage(`Are you sure to stop "${app.name}"?`, { modal: true }, { title: 'Stop', isCloseAffordance: true });
+        const stopResponse: MessageItem = { title: 'Stop' };
+        await context.ui.showWarningMessage(`Are you sure to stop "${app.name}"?`, { modal: true }, stopResponse);
         await node.runWithTemporaryDescription(context, utils.localize('stopping', 'Stopping...'), async () => {
             await app.stop();
             node!.refresh(context);
