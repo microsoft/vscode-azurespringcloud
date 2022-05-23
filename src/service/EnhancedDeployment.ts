@@ -72,7 +72,7 @@ export class EnhancedDeployment {
             };
         }
         this._remote = await this.client.deployments.beginUpdateAndWait(this.app.service.resourceGroup, this.app.service.name, this.app.name,
-            this.name || EnhancedDeployment.DEFAULT_DEPLOYMENT_NAME, { properties });
+                                                                        this.name || EnhancedDeployment.DEFAULT_DEPLOYMENT_NAME, { properties });
     }
 
     public async updateScaleSettings(settings: IScaleSettings): Promise<void> {
@@ -120,7 +120,7 @@ export class EnhancedDeployment {
                     source: {
                         type: 'Jar',
                         jvmOptions
-                    } as JarUploadedUserSourceInfo
+                    }
                 }
             });
         }

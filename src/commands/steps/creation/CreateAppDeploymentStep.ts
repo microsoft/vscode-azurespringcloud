@@ -8,7 +8,7 @@ import { AzureWizardExecuteStep } from "@microsoft/vscode-azext-utils";
 import { Progress } from "vscode";
 import { ext } from "../../../extensionVariables";
 import { EnhancedApp } from "../../../service/EnhancedApp";
-import { localize, nonNullProp } from "../../../utils";
+import { localize } from "../../../utils";
 import { IAppCreationWizardContext } from "./IAppCreationWizardContext";
 
 export class CreateAppDeploymentStep extends AzureWizardExecuteStep<IAppCreationWizardContext> {
@@ -21,7 +21,7 @@ export class CreateAppDeploymentStep extends AzureWizardExecuteStep<IAppCreation
         ext.outputChannel.appendLog(message);
         progress.report({ message });
 
-        const appRuntime: KnownSupportedRuntimeValue = nonNullProp(context, 'newAppRuntime');
+        const appRuntime: KnownSupportedRuntimeValue | undefined = context.newAppRuntime;
         const app: EnhancedApp = context.newApp!;
         context.newDeployment = await app.createDeployment(EnhancedApp.DEFAULT_DEPLOYMENT, appRuntime);
         ext.outputChannel.appendLog(localize('creatingNewAppDeploymentSuccess', 'Default deployment is successfully created.'));

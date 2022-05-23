@@ -71,6 +71,6 @@ export class EnhancedService {
 
     private setRemote(resource: ServiceResource): void {
         this._remote = resource;
-        this._resourceGroup = resource.id!.split("/")[4];
+        this._resourceGroup = resource.id!.split('/')[4];
     }
 }

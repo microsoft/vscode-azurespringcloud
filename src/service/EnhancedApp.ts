@@ -96,7 +96,7 @@ export class EnhancedApp {
         });
     }
 
-    public async createDeployment(name: string, runtime: KnownSupportedRuntimeValue): Promise<EnhancedDeployment> {
+    public async createDeployment(name: string, runtime?: KnownSupportedRuntimeValue): Promise<EnhancedDeployment> {
         let source: UserSourceInfoUnion | undefined;
         if (this.service.sku?.name?.toLowerCase().startsWith('e')) {
             source = { type: 'BuildResult', buildResultId: '<default>' };

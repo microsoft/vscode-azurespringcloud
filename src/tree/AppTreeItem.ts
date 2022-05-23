@@ -67,12 +67,6 @@ export class AppTreeItem extends AzExtParentTreeItem {
         return this._status;
     }
 
-    private async reloadStatus(context: IActionContext): Promise<void> {
-        await this.runWithTemporaryDescription(context, utils.localize('loading', 'Loading...'), async () => {
-            await this.refresh(context);
-        });
-    }
-
     public hasMoreChildrenImpl(): boolean {
         return false;
     }
@@ -127,5 +121,11 @@ export class AppTreeItem extends AzExtParentTreeItem {
             }
         }
         return undefined;
+    }
+
+    private async reloadStatus(context: IActionContext): Promise<void> {
+        await this.runWithTemporaryDescription(context, utils.localize('loading', 'Loading...'), async () => {
+            await this.refresh(context);
+        });
     }
 }

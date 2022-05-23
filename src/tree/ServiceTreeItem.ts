@@ -84,7 +84,7 @@ export class ServiceTreeItem extends AzExtParentTreeItem {
         const promptSteps: AzureWizardPromptStep<IAppCreationWizardContext>[] = [];
         const executeSteps: AzureWizardExecuteStep<IAppCreationWizardContext>[] = [];
         promptSteps.push(new InputAppNameStep(this.service));
-        promptSteps.push(new SelectAppStackStep());
+        promptSteps.push(new SelectAppStackStep(this.service));
         executeSteps.push(new VerifyProvidersStep(['Microsoft.AppPlatform']));
         executeSteps.push(new CreateAppStep(this.service));
         executeSteps.push(new CreateAppDeploymentStep());
