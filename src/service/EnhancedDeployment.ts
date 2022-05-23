@@ -120,7 +120,7 @@ export class EnhancedDeployment {
                     source: {
                         type: 'Jar',
                         jvmOptions
-                    }
+                    } as JarUploadedUserSourceInfo
                 }
             });
         }

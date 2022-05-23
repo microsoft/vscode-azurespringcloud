@@ -52,19 +52,16 @@ export class EnhancedApp {
     public async start(): Promise<void> {
         const activeDeploymentName: string | undefined = (await this.getActiveDeployment())?.name;
         await this.client.deployments.beginStartAndWait(this.service.resourceGroup, this.service.name, this.name, activeDeploymentName!);
-        this.refresh();
     }
 
     public async stop(): Promise<void> {
         const activeDeploymentName: string | undefined = (await this.getActiveDeployment())?.name;
         await this.client.deployments.beginStopAndWait(this.service.resourceGroup, this.service.name, this.name, activeDeploymentName!);
-        this.refresh();
     }
 
     public async restart(): Promise<void> {
         const activeDeploymentName: string | undefined = (await this.getActiveDeployment())?.name;
         await this.client.deployments.beginRestartAndWait(this.service.resourceGroup, this.service.name, this.name, activeDeploymentName!);
-        this.refresh();
     }
 
     public async remove(): Promise<void> {
@@ -131,7 +128,6 @@ export class EnhancedApp {
 
     public async startDeployment(name: string): Promise<void> {
         await this.client.deployments.beginStartAndWait(this.service.resourceGroup, this.service.name, this.name, name);
-        this.refresh();
     }
 
     public async getTestKeys(): Promise<TestKeys> {

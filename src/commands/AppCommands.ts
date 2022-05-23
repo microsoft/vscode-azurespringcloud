@@ -49,7 +49,7 @@ export namespace AppCommands {
         const app: EnhancedApp = node.app;
         await node.runWithTemporaryDescription(context, utils.localize('starting', 'Starting...'), async () => {
             await app.start();
-            node!.refresh(context);
+            await node!.refresh(context);
         });
         return node;
     }
@@ -61,7 +61,7 @@ export namespace AppCommands {
         await context.ui.showWarningMessage(`Are you sure to stop "${app.name}"?`, { modal: true }, stopResponse);
         await node.runWithTemporaryDescription(context, utils.localize('stopping', 'Stopping...'), async () => {
             await app.stop();
-            node!.refresh(context);
+            await node!.refresh(context);
         });
         return node;
     }
@@ -71,7 +71,7 @@ export namespace AppCommands {
         const app: EnhancedApp = node.app;
         await node.runWithTemporaryDescription(context, utils.localize('restart', 'Restarting...'), async () => {
             await app.restart();
-            node!.refresh(context);
+            await node!.refresh(context);
         });
         return node;
     }
