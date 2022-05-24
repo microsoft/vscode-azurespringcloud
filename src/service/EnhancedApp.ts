@@ -46,7 +46,7 @@ export class EnhancedApp {
         if (_status.endsWith('ing') && _status !== 'running') {
             _status = 'pending';
         }
-        if (_status == 'succeeded') { // inactive
+        if (_status === 'succeeded') { // inactive
             _status = 'unknown';
         }
         return _status;
