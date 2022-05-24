@@ -5,7 +5,7 @@
 
 import { AzureWizardExecuteStep } from "@microsoft/vscode-azext-utils";
 import { Progress } from "vscode";
-import { EnhancedDeployment } from "../../../../model";
+import { EnhancedDeployment } from "../../../../service/EnhancedDeployment";
 import { localize } from "../../../../utils";
 import { IJvmOptionsUpdateWizardContext } from "./IJvmOptionsUpdateWizardContext";
 

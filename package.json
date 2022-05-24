@@ -2,7 +2,7 @@
     "name": "vscode-azurespringcloud",
     "displayName": "Azure Spring Apps",
     "description": "%azureSpringApps.description%",
-    "version": "0.3.0",
+    "version": "0.4.0",
     "publisher": "vscjava",
     "icon": "resources/azure-spring-apps.png",
     "aiKey": "AIF-d9b70cd4-b9f9-4d70-929b-a071c400b217",
@@ -507,7 +507,7 @@
         "webpack-cli": "^4.6.0"
     },
     "dependencies": {
-        "@azure/arm-appplatform": "^1.4.0",
+        "@azure/arm-appplatform": "^2.0.0",
         "@azure/ms-rest-js": "^2.6.1",
         "@azure/storage-file-share": "^12.3.0",
         "@microsoft/vscode-azext-azureutils": "^0.1.3",

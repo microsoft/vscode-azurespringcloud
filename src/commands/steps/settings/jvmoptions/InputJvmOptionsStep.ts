@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { AzureWizardPromptStep } from "@microsoft/vscode-azext-utils";
-import { EnhancedDeployment } from "../../../../model";
+import { EnhancedDeployment } from "../../../../service/EnhancedDeployment";
 import { localize } from "../../../../utils";
 import { IJvmOptionsUpdateWizardContext } from "./IJvmOptionsUpdateWizardContext";
 
@@ -17,11 +17,12 @@ export class InputJvmOptionsStep extends AzureWizardPromptStep<IJvmOptionsUpdate
     }
 
     public async prompt(context: IJvmOptionsUpdateWizardContext): Promise<void> {
+        const jvmOptions: string = this.deployment.getJvmOptions();
         const prompt: string = localize('jvmOptionsPrompt', 'Enter new JVM options for the Spring app.');
         context.newJvmOptions = (await context.ui.showInputBox({
             prompt,
             placeHolder: 'e.g. -Xmx2048m -Xms256m',
-            value: this.deployment.properties?.deploymentSettings?.jvmOptions ?? '',
+            value: jvmOptions ?? '',
         })).trim();
         return Promise.resolve(undefined);
     }

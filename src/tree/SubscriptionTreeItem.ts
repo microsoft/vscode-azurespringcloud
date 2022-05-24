@@ -3,10 +3,10 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { AppPlatformManagementClient } from '@azure/arm-appplatform';
-import { ServicesListBySubscriptionNextResponse } from "@azure/arm-appplatform/esm/models";
+import { AppPlatformManagementClient, ServiceResource } from '@azure/arm-appplatform';
 import { createAzureClient, SubscriptionTreeItemBase } from '@microsoft/vscode-azext-azureutils';
 import { AzExtTreeItem, IActionContext } from '@microsoft/vscode-azext-utils';
+import { EnhancedService } from '../service/EnhancedService';
 import { localize } from '../utils';
 import { ServiceTreeItem } from './ServiceTreeItem';
 
@@ -25,12 +25,15 @@ export class SubscriptionTreeItem extends SubscriptionTreeItemBase {
         }
 
         const client: AppPlatformManagementClient = createAzureClient([context, this], AppPlatformManagementClient);
-        const services: ServicesListBySubscriptionNextResponse = this._nextLink ? await client.services.listBySubscriptionNext(this._nextLink) : await client.services.listBySubscription();
-        this._nextLink = services.nextLink;
+        const services: ServiceResource[] = [];
+        const pagedServices: AsyncIterable<ServiceResource> = client.services.listBySubscription();
+        for await (const service of pagedServices) {
+            services.push(service);
+        }
         return await this.createTreeItemsWithErrorHandling(
             services,
             'invalidSpringCloudService',
-            service => new ServiceTreeItem(this, service),
+            service => new ServiceTreeItem(this, new EnhancedService(client, service)),
             service => service.name
         );
     }

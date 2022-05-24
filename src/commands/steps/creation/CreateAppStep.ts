@@ -6,7 +6,7 @@
 import { AzureWizardExecuteStep } from "@microsoft/vscode-azext-utils";
 import { Progress } from "vscode";
 import { ext } from "../../../extensionVariables";
-import { EnhancedService } from "../../../model";
+import { EnhancedService } from "../../../service/EnhancedService";
 import { localize, nonNullProp } from "../../../utils";
 import { IAppCreationWizardContext } from "./IAppCreationWizardContext";
 

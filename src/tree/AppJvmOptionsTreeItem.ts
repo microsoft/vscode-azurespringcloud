@@ -3,6 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
+import { JarUploadedUserSourceInfo } from "@azure/arm-appplatform";
 import {
     AzExtTreeItem,
     AzureWizard,
@@ -16,7 +17,7 @@ import { window } from "vscode";
 import { IJvmOptionsUpdateWizardContext } from "../commands/steps/settings/jvmoptions/IJvmOptionsUpdateWizardContext";
 import { InputJvmOptionsStep } from "../commands/steps/settings/jvmoptions/InputJvmOptionsStep";
 import { UpdateJvmOptionsStep } from "../commands/steps/settings/jvmoptions/UpdateJvmOptionsStep";
-import { EnhancedDeployment, IDeployment } from "../model";
+import { EnhancedDeployment } from "../service/EnhancedDeployment";
 import { getThemedIconPath, localize } from "../utils";
 import { AppSettingsTreeItem } from "./AppSettingsTreeItem";
 import { AppSettingTreeItem, IOptions } from "./AppSettingTreeItem";
@@ -31,23 +32,30 @@ export class AppJvmOptionsTreeItem extends AppSettingsTreeItem {
     public readonly contextValue: string = AppJvmOptionsTreeItem.contextValue;
     public readonly label: string = 'JVM Options';
 
-    public constructor(parent: AppTreeItem, deployment: IDeployment) {
-        super(parent, deployment);
+    public constructor(parent: AppTreeItem) {
+        super(parent);
     }
 
     public get iconPath(): TreeItemIconPath { return getThemedIconPath('app-jvmoptions'); }
     public get id(): string { return AppJvmOptionsTreeItem.contextValue; }
 
-    public get options(): string[] {
-        const optionsStr: string | undefined = this.data.properties?.deploymentSettings?.jvmOptions?.trim();
-        if (optionsStr) {
-            return ` ${optionsStr}`.split(/\s+-/).filter(s => s.trim()).map(s => `-${s}`);
-        }
-        return [];
+    public get options(): Promise<string[]> {
+        return (async () => {
+            const deployment: EnhancedDeployment | undefined = await this.parent.app.getActiveDeployment();
+            const enterpriseOptionsStr: string | undefined = deployment?.properties?.deploymentSettings?.environmentVariables?.JAVA_OPTS;
+            const source: JarUploadedUserSourceInfo = <JarUploadedUserSourceInfo>deployment?.properties?.source;
+            const oldOptionsStr: string | undefined = source?.jvmOptions?.trim();
+            const optionsStr: string | undefined = enterpriseOptionsStr ?? oldOptionsStr;
+            if (optionsStr) {
+                return ` ${optionsStr}`.split(/\s+-/).filter(s => s.trim()).map(s => `-${s}`);
+            }
+            return [];
+        })();
+
     }
 
     public async loadMoreChildrenImpl(_clearCache: boolean, _context: IActionContext): Promise<AzExtTreeItem[]> {
-        return this.options.map(option => this.toAppSettingItem('', option.trim(), Object.assign({}, AppJvmOptionsTreeItem._options)));
+        return (await this.options).map(option => this.toAppSettingItem('', option.trim(), Object.assign({}, AppJvmOptionsTreeItem._options)));
     }
 
     public async createChildImpl(context: ICreateChildImplContext): Promise<AzExtTreeItem> {
@@ -57,7 +65,7 @@ export class AppJvmOptionsTreeItem extends AppSettingsTreeItem {
             validateInput: this.validateJvmOption
         });
         context.showCreatingTreeItem(newVal);
-        await this.updateSettingsValue(context, [...this.options, newVal]);
+        await this.updateSettingsValue(context, [...await this.options, newVal]);
         return this.toAppSettingItem('', newVal, Object.assign({}, AppJvmOptionsTreeItem._options));
     }
 
@@ -68,7 +76,7 @@ export class AppJvmOptionsTreeItem extends AppSettingsTreeItem {
             placeHolder: 'e.g. -Xmx2048m',
             validateInput: this.validateJvmOption
         });
-        const options: string[] = [...this.options];
+        const options: string[] = [...await this.options];
         const index: number = options.indexOf(node.value.trim());
         options.splice(index, 1, newVal.trim());
         await this.updateSettingsValue(context, options);
@@ -76,30 +84,32 @@ export class AppJvmOptionsTreeItem extends AppSettingsTreeItem {
     }
 
     public async deleteSettingItem(node: AppSettingTreeItem, context: IActionContext): Promise<void> {
-        const tempOptions: string[] = [...this.options];
+        const tempOptions: string[] = [...await this.options];
         const index: number = tempOptions.indexOf(node.value);
         tempOptions.splice(index, 1);
         await this.updateSettingsValue(context, tempOptions);
     }
 
     public async updateSettingsValue(context: IActionContext, newJvmOptions?: string[]): Promise<void> {
-        const deployment: EnhancedDeployment = this.getDeployment(context);
-        const updating: string = localize('updatingJvmOptions', 'Updating JVM options of "{0}"', deployment.app.name);
-        const updated: string = localize('updatedJvmOptions', 'Successfully updated JVM options of "{0}".', deployment.app.name);
+        const deployment: EnhancedDeployment | undefined = await this.parent.app.getActiveDeployment();
+        if (deployment) {
+            const updating: string = localize('updatingJvmOptions', 'Updating JVM options of "{0}"', deployment.app.name);
+            const updated: string = localize('updatedJvmOptions', 'Successfully updated JVM options of "{0}".', deployment.app.name);
 
-        const wizardContext: IJvmOptionsUpdateWizardContext = Object.assign(context, this.subscription, {
-            newJvmOptions: newJvmOptions?.join(' ')
-        });
+            const wizardContext: IJvmOptionsUpdateWizardContext = Object.assign(context, this.subscription, {
+                newJvmOptions: newJvmOptions?.join(' ')
+            });
 
-        const promptSteps: AzureWizardPromptStep<IJvmOptionsUpdateWizardContext>[] = [];
-        const executeSteps: AzureWizardExecuteStep<IJvmOptionsUpdateWizardContext>[] = [];
-        promptSteps.push(new InputJvmOptionsStep(deployment));
-        executeSteps.push(new UpdateJvmOptionsStep(deployment));
-        const wizard: AzureWizard<IJvmOptionsUpdateWizardContext> = new AzureWizard(wizardContext, { promptSteps, executeSteps, title: updating });
-        await wizard.prompt();
-        await wizard.execute();
-        window.showInformationMessage(updated);
-        this.refresh(context);
+            const promptSteps: AzureWizardPromptStep<IJvmOptionsUpdateWizardContext>[] = [];
+            const executeSteps: AzureWizardExecuteStep<IJvmOptionsUpdateWizardContext>[] = [];
+            promptSteps.push(new InputJvmOptionsStep(deployment));
+            executeSteps.push(new UpdateJvmOptionsStep(deployment));
+            const wizard: AzureWizard<IJvmOptionsUpdateWizardContext> = new AzureWizard(wizardContext, { promptSteps, executeSteps, title: updating });
+            await wizard.prompt();
+            await wizard.execute();
+            window.showInformationMessage(updated);
+            this.parent.refresh(context);
+        }
     }
 
     public async validateJvmOption(v: string): Promise<string | undefined> {
@@ -107,7 +117,7 @@ export class AppJvmOptionsTreeItem extends AppSettingsTreeItem {
             return `Enter a value.`;
         } else if (!AppJvmOptionsTreeItem.JVM_OPTION_PATTERN.test(v)) {
             return `Invalid JVM option.`;
-        } else if (this.options.includes(v)) {
+        } else if ((await this.options).includes(v)) {
             return `${v} is already set`;
         }
         return undefined;

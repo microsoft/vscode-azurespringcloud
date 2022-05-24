@@ -4,7 +4,8 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { AzureWizardPromptStep } from "@microsoft/vscode-azext-utils";
-import { EnhancedDeployment, IScaleSettings } from "../../../../model";
+import { IScaleSettings } from "../../../../model";
+import { EnhancedDeployment } from "../../../../service/EnhancedDeployment";
 import { localize } from "../../../../utils";
 import { IScaleSettingsUpdateWizardContext } from "./IScaleSettingsUpdateWizardContext";
 
@@ -36,12 +37,27 @@ export class InputScaleValueStep extends AzureWizardPromptStep<IScaleSettingsUpd
 
     private async validateInput(val: string): Promise<string | undefined> {
         const numVal: number = Number(val);
-        const scope: { max: number; min: number } = IScaleSettings.SCOPES[this.deployment.sku?.tier ?? 'Basic'][this.key];
-        if (!Number.isInteger(numVal) || numVal > scope.max || numVal < scope.min) {
-            if (this.key === 'cpu' && this.deployment.sku?.tier === 'Basic') {
-                return localize('invalidBasicCPU', 'Each app instance can have only 1 vCPU for Basic pricing tier');
+        const tier: string | undefined = this.deployment.app.service.sku?.tier;
+        const scope: { max: number; min: number } = IScaleSettings.SCOPES[tier ?? 'Basic'][this.key];
+        if (this.key === 'cpu') {
+            const valid: boolean = numVal === 0.5 || (Number.isInteger(numVal) && numVal <= scope.max && numVal >= scope.min);
+            if (!valid) {
+                if (tier === 'Basic') {
+                    return localize('invalidBasicCPU', 'Each app instance can have only 0.5 or 1 vCPU for Basic pricing tier');
+                } else {
+                    return localize('invalidScaleSettingValue', 'The value can only be 0.5 or an integer between 1 and {0}', scope.max);
+                }
             }
-            return localize('invalidScaleSettingValue', 'The value must be integer and between {0} and {1}', scope.min, scope.max);
+        } else if (this.key === 'memory') {
+            const valid: boolean = numVal === 0.5 || (Number.isInteger(numVal) && numVal <= scope.max && numVal >= scope.min);
+            if (!valid) {
+                return localize('invalidScaleSettingValue', 'The value can only be 0.5 or an integer between 1 and {0}', scope.max);
+            }
+        } else {
+            const valid: boolean = Number.isInteger(numVal) && numVal <= scope.max && numVal >= scope.min;
+            if (!valid) {
+                return localize('invalidCapacitySettingValue', 'The value can only be an integer between {0} and {1}', scope.min, scope.max);
+            }
         }
         return undefined;
     }

@@ -3,13 +3,14 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { RuntimeVersion } from "@azure/arm-appplatform/esm/models";
+import { KnownSupportedRuntimeValue } from "@azure/arm-appplatform";
 import { IResourceGroupWizardContext } from '@microsoft/vscode-azext-azureutils';
-import { IApp, IDeployment } from "../../../model";
+import { EnhancedApp } from "../../../service/EnhancedApp";
+import { EnhancedDeployment } from "../../../service/EnhancedDeployment";
 
 export interface IAppCreationWizardContext extends IResourceGroupWizardContext {
     newAppName?: string;
-    newAppRuntime?: RuntimeVersion;
-    newApp?: IApp;
-    newDeployment?: IDeployment;
+    newAppRuntime?: KnownSupportedRuntimeValue;
+    newApp?: EnhancedApp;
+    newDeployment?: EnhancedDeployment;
 }

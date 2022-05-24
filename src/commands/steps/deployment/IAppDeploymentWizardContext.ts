@@ -3,9 +3,8 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { ResourceUploadDefinition } from "@azure/arm-appplatform/esm/models";
 import { IResourceGroupWizardContext } from '@microsoft/vscode-azext-azureutils';
 
 export interface IAppDeploymentWizardContext extends IResourceGroupWizardContext {
-    uploadDefinition?: ResourceUploadDefinition;
+    relativePathOrBuildResultId?: string;
 }

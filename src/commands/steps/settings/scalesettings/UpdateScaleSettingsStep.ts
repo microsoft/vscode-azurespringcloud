@@ -5,7 +5,8 @@
 
 import { AzureWizardExecuteStep } from "@microsoft/vscode-azext-utils";
 import { Progress } from "vscode";
-import { EnhancedDeployment, IScaleSettings } from "../../../../model";
+import { IScaleSettings } from "../../../../model";
+import { EnhancedDeployment } from "../../../../service/EnhancedDeployment";
 import { localize } from "../../../../utils";
 import { IScaleSettingsUpdateWizardContext } from "./IScaleSettingsUpdateWizardContext";
 

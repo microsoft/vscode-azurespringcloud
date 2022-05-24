@@ -1,5 +1,14 @@
 # Change Log
 
+## 0.4.0 - 2022-05-23
+
+### Added
+- Add support for enterprise tier
+- Add support for 0.5Gi memory and 0.5vCUP
+
+### Updated
+- improve performance by lazy-loading and cache
+
 ## 0.3.0 - 2022-05-09
 
 ### Updated

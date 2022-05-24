@@ -6,7 +6,7 @@
 import { AzureWizardExecuteStep } from "@microsoft/vscode-azext-utils";
 import { Progress } from "vscode";
 import { ext } from "../../../extensionVariables";
-import { EnhancedDeployment } from "../../../model";
+import { EnhancedDeployment } from "../../../service/EnhancedDeployment";
 import { localize } from "../../../utils";
 import { IAppDeploymentWizardContext } from "./IAppDeploymentWizardContext";
 
@@ -25,9 +25,8 @@ export class UpdateDeploymentStep extends AzureWizardExecuteStep<IAppDeploymentW
         const message: string = localize('updateDeployment', 'Updating deployment...');
         ext.outputChannel.appendLog(message);
         progress.report({ message });
-        await this.deployment.updateArtifactPath(context.uploadDefinition?.relativePath!);
+        await this.deployment.updateArtifactPath(context.relativePathOrBuildResultId!);
         ext.outputChannel.appendLog(localize('updateDeploymentSuccess', 'Deployment is successfully updated.'));
-        return Promise.resolve(undefined);
     }
 
     public shouldExecute(_context: IAppDeploymentWizardContext): boolean {
