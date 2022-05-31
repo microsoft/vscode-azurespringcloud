@@ -186,7 +186,9 @@ export class EnhancedApp {
         while (status !== 'Succeeded') {
             const result: BuildResult = await this.client.buildServiceOperations.getBuildResult(this.service.resourceGroup, this.service.name, EnhancedApp.DEFAULT_TANZU_COMPONENT_NAME, this.name, buildResultName);
             status = result.properties?.provisioningState;
-            if (status === 'Queuing' || status === 'Building') {
+            if (status === 'Succeeded') {
+                break;
+            } else if (status === 'Queuing' || status === 'Building') {
                 if (Date.now() - start > 60000 * 60) {
                     throw new Error(`Build timeout for buildId: ${buildResultId}`);
                 }
