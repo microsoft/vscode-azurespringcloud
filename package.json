@@ -494,7 +494,7 @@
         "@types/vscode": "1.57.0",
         "glob": "^7.1.6",
         "gulp": "^4.0.2",
-        "mocha": "^8.3.2",
+        "mocha": "^10.0.0",
         "mocha-junit-reporter": "^2.0.0",
         "mocha-multi-reporters": "^1.5.1",
         "ts-node": "^7.0.1",
