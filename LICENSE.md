@@ -1,3 +1,5 @@
+    Azure Spring Apps Extension for Visual Studio Code
+
     MIT License
 
     Copyright (c) Microsoft Corporation. All rights reserved.
