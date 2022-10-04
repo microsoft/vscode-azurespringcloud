@@ -135,4 +135,14 @@ export class EnhancedDeployment {
             parseInt(resourceRequests?.memory)) : 1;
         return { cpu, memory, capacity: this.properties?.instances?.length ?? 0 };
     }
+
+    public async enableDebugging(port: number = 5005): Promise<void> {
+        await this.client.deployments.beginEnableRemoteDebuggingAndWait(this.app.service.resourceGroup, this.app.service.name, this.app.name, this.name, {
+            remoteDebuggingPayload: { port }
+        });
+    }
+
+    public async disableDebugging(): Promise<void> {
+        await this.client.deployments.beginDisableRemoteDebuggingAndWait(this.app.service.resourceGroup, this.app.service.name, this.app.name, this.name);
+    }
 }
