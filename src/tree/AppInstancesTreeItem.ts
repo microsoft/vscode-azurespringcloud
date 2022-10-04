@@ -4,6 +4,7 @@
 import { DeploymentInstance } from "@azure/arm-appplatform";
 import { AzExtParentTreeItem, AzExtTreeItem, IActionContext, TreeItemIconPath } from "@microsoft/vscode-azext-utils";
 import { EnhancedDeployment } from "../service/EnhancedDeployment";
+import { EnhancedInstance } from "../service/EnhancedInstance";
 import { getThemedIconPath, localize } from "../utils";
 import { AppInstanceTreeItem } from "./AppInstanceTreeItem";
 import { AppTreeItem } from './AppTreeItem';
@@ -32,7 +33,7 @@ export class AppInstancesTreeItem extends AzExtParentTreeItem {
             return await this.createTreeItemsWithErrorHandling(
                 deployment.properties!.instances,
                 'invalidSpringCloudAppInstance',
-                (instance: DeploymentInstance) => new AppInstanceTreeItem(this, instance),
+                (instance: DeploymentInstance) => new AppInstanceTreeItem(this, new EnhancedInstance(deployment, instance)),
                 (instance: DeploymentInstance) => instance.name
             );
         }

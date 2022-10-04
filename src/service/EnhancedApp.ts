@@ -192,7 +192,6 @@ export class EnhancedApp {
                 }
                 // tslint:disable-next-line no-string-based-set-timeout
                 await new Promise(r => setTimeout(r, 10000)); // wait for 10 seconds
-                continue;
             } else {
                 throw new Error(`Build failed for buildId: ${buildResultId}`);
             }

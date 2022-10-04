@@ -1,17 +1,17 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import { DeploymentInstance } from "@azure/arm-appplatform";
 import { AzExtTreeItem, TreeItemIconPath } from "@microsoft/vscode-azext-utils";
+import { EnhancedInstance } from "../service/EnhancedInstance";
 import { getThemedIconPath } from "../utils";
 import { AppInstancesTreeItem } from "./AppInstancesTreeItem";
 
 export class AppInstanceTreeItem extends AzExtTreeItem {
     public static contextValue: RegExp = /^azureSpringApps\.app\.instance\.status-.+$/;
     public readonly parent: AppInstancesTreeItem;
-    public readonly instance: DeploymentInstance;
+    public readonly instance: EnhancedInstance;
 
-    public constructor(parent: AppInstancesTreeItem, instance: DeploymentInstance) {
+    public constructor(parent: AppInstancesTreeItem, instance: EnhancedInstance) {
         super(parent);
         this.instance = instance;
     }
