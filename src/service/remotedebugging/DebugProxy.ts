@@ -7,16 +7,17 @@ import { EventEmitter } from 'events';
 import { createServer, Server, Socket } from 'net';
 import * as websocket from 'websocket';
 import { ext } from '../../extensionVariables';
-import { EnhancedDeployment } from "../EnhancedDeployment";
-import { EnhancedInstance } from "../EnhancedInstance";
+import { EnhancedDeployment } from '../EnhancedDeployment';
+import { EnhancedInstance } from '../EnhancedInstance';
 
 export class DebugProxy extends EventEmitter {
+    private readonly _instance: EnhancedInstance;
+    private readonly _port: number;
+
     private _server: Server | undefined;
     private _wsclient: websocket.client | undefined;
     private _wsconnection: websocket.connection | undefined;
-    private readonly _instance: EnhancedInstance;
-    private readonly _port: number;
-    private messagesRead: number = 0;
+    private _messagesRead: number = 0;
 
     constructor(instance: EnhancedInstance, port: number) {
         super();
@@ -59,14 +60,16 @@ export class DebugProxy extends EventEmitter {
                         });
 
                         connection.on('message', (msg: websocket.Message) => {
-                            this.messagesRead = this.messagesRead + 1;
-                            if (this.messagesRead > 2 && 'binaryData' in msg && msg.binaryData) {
+                            this._messagesRead = this._messagesRead + 1;
+                            if (this._messagesRead > 2 && 'binaryData' in msg) {
                                 const channel: number = msg.binaryData.readUInt8(0);
                                 const data: Buffer = msg.binaryData.slice(1);
                                 if (channel === 1) {
-                                    ext.outputChannel.appendLog(`[WebSocket] Received an error: ${data.toString()}`);
+                                    const err: Error = new Error(data.toString());
+                                    ext.outputChannel.appendLog(`[WebSocket] Received an error: ${err}`);
                                     this.dispose();
                                     socket.destroy();
+                                    this.emit('error', err);
                                 } else {
                                     ext.outputChannel.appendLog(`[WebSocket] Received: ${data.toString()}`);
                                     socket.write(data);
@@ -83,22 +86,7 @@ export class DebugProxy extends EventEmitter {
                         this.emit('error', err);
                     });
 
-                    const deployment: EnhancedDeployment = this._instance.deployment;
-                    const credential: { accessToken: string } = await deployment.app.service.subscription.credentials.getToken();
-                    const appName: string = deployment.app.name;
-                    const deploymentName: string = deployment.name;
-                    const instanceName: string = this._instance.name ?? 'unknown-instance';
-                    const fqdn: string = deployment.app.properties?.fqdn ?? 'unknown-host';
-                    this._wsclient.connect(
-                        `wss://${fqdn}/api/remoteDebugging/apps/${appName}/deployments/${deploymentName}/instances/${instanceName}?port=5005`,
-                        undefined,
-                        undefined,
-                        {
-                            Upgrade: 'websocket',
-                            Connection: 'Upgrade',
-                            Authorization: `Bearer ${credential.accessToken}`
-                        }
-                    );
+                    await this.connect();
 
                     socket.on('data', (data: Buffer) => {
                         if (this._wsconnection) {
@@ -149,5 +137,24 @@ export class DebugProxy extends EventEmitter {
             this._server.close();
             this._server = undefined;
         }
+    }
+
+    private async connect(): Promise<void> {
+        const deployment: EnhancedDeployment = this._instance.deployment;
+        const credential: { accessToken: string } = <{ accessToken: string }>await deployment.app.service.subscription.credentials.getToken();
+        const appName: string = deployment.app.name;
+        const deploymentName: string = deployment.name;
+        const instanceName: string = this._instance.name ?? 'unknown-instance';
+        const fqdn: string = deployment.app.properties?.fqdn ?? 'unknown-host';
+        this._wsclient!.connect(
+            `wss://${fqdn}/api/remoteDebugging/apps/${appName}/deployments/${deploymentName}/instances/${instanceName}?port=5005`,
+            undefined,
+            undefined,
+            {
+                Upgrade: 'websocket',
+                Connection: 'Upgrade',
+                Authorization: `Bearer ${credential.accessToken}`
+            }
+        );
     }
 }
