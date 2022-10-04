@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 import { AppPlatformManagementClient, AppResource, ClusterResourceProperties, ServiceResource, Sku } from "@azure/arm-appplatform";
+import { ISubscriptionContext } from "@microsoft/vscode-azext-utils";
 import { EnhancedApp } from "./EnhancedApp";
 
 export class EnhancedService {
@@ -9,11 +10,13 @@ export class EnhancedService {
 
     public readonly name: string;
     public readonly id: string;
+    public readonly subscription: ISubscriptionContext;
     private _remote: ServiceResource;
     private _resourceGroup: string;
 
-    public constructor(client: AppPlatformManagementClient, resource: ServiceResource) {
+    public constructor(client: AppPlatformManagementClient, subscription: ISubscriptionContext, resource: ServiceResource) {
         this.client = client;
+        this.subscription = subscription;
         this.name = resource.name!;
         this.id = resource.id!;
         this.setRemote(resource);
