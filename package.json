@@ -52,6 +52,7 @@
         "onCommand:azureSpringApps.app.scale",
         "onCommand:azureSpringApps.app.openInPortal",
         "onCommand:azureSpringApps.app.viewProperties",
+        "onCommand:azureSpringApps.app.instance.startRemoteDebugging",
         "onCommand:azureSpringApps.app.instance.startStreamingLog",
         "onCommand:azureSpringApps.app.instance.stopStreamingLog",
         "onCommand:azureSpringApps.app.instance.viewProperties",
@@ -166,6 +167,11 @@
                 "command": "azureSpringApps.app.viewProperties",
                 "title": "%azureSpringApps.menu.common.viewProperties%",
                 "category": "Spring App"
+            },
+            {
+                "command": "azureSpringApps.app.instance.startRemoteDebugging",
+                "title": "%azureSpringApps.menu.app.instance.startRemoteDebugging%",
+                "category": "Spring App Instance"
             },
             {
                 "command": "azureSpringApps.app.instance.startStreamingLog",
@@ -354,6 +360,11 @@
                     "group": "9@2"
                 },
                 {
+                    "command": "azureSpringApps.app.instance.startRemoteDebugging",
+                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app\\.instance\\.status-Running$/",
+                    "group": "6@1"
+                },
+                {
                     "command": "azureSpringApps.app.instance.startStreamingLog",
                     "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app\\.instance\\.status-Running$/",
                     "group": "6@1"
@@ -492,6 +503,7 @@
         "@types/node": "^14.0.0",
         "@types/request": "^2.48.4",
         "@types/vscode": "1.57.0",
+        "@types/websocket": "^1.0.5",
         "glob": "^7.1.6",
         "gulp": "^4.0.2",
         "mocha": "^10.0.0",
@@ -516,7 +528,8 @@
         "open": "^8.0.4",
         "request": "^2.88.2",
         "vscode-extension-telemetry-wrapper": "^0.8.0",
-        "vscode-nls": "^4.1.1"
+        "vscode-nls": "^4.1.1",
+        "websocket": "^1.0.34"
     },
     "extensionDependencies": [
         "ms-vscode.azure-account"

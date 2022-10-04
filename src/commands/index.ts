@@ -42,6 +42,7 @@ export function registerCommands(): void {
     registerCommandWithTelemetryWrapper('azureSpringApps.app.scale', AppCommands.scale);
     registerCommandWithTelemetryWrapper('azureSpringApps.app.openInPortal', AppCommands.openPortal);
     registerCommandWithTelemetryWrapper('azureSpringApps.app.viewProperties', AppCommands.viewProperties);
+    registerCommandWithTelemetryWrapper('azureSpringApps.app.instance.startRemoteDebugging', AppCommands.startRemoteDebugging);
     registerCommandWithTelemetryWrapper('azureSpringApps.app.instance.startStreamingLog', AppCommands.startStreamingLogs);
     registerCommandWithTelemetryWrapper('azureSpringApps.app.instance.stopStreamingLog', AppCommands.stopStreamingLogs);
     registerCommandWithTelemetryWrapper('azureSpringApps.app.instance.viewProperties', AppCommands.viewInstanceProperties);

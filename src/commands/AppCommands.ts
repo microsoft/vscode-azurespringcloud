@@ -8,6 +8,7 @@ import { DialogResponses, IActionContext, openReadOnlyJson } from "@microsoft/vs
 import { MessageItem, OpenDialogOptions, TextEditor, Uri, window, workspace, WorkspaceFolder } from "vscode";
 import { ext } from "../extensionVariables";
 import { EnhancedApp } from "../service/EnhancedApp";
+import { DebugProxy } from "../service/remotedebugging/DebugProxy";
 import { AppInstanceTreeItem } from "../tree/AppInstanceTreeItem";
 import { AppSettingsTreeItem } from "../tree/AppSettingsTreeItem";
 import { AppSettingTreeItem } from "../tree/AppSettingTreeItem";
@@ -128,6 +129,15 @@ export namespace AppCommands {
             const appTreeItem: AppTreeItem = node!.parent.parent;
             const app: EnhancedApp = appTreeItem.app;
             return app.startStreamingLogs(context, node?.instance!);
+        });
+        return node;
+    }
+
+    export async function startRemoteDebugging(context: IActionContext, node?: AppInstanceTreeItem): Promise<AppInstanceTreeItem> {
+        node = await getInstanceNode(node, context);
+        await node.runWithTemporaryDescription(context, utils.localize('startRemoteDebugging', 'Starting port forwarding...'), async () => {
+            const proxy: DebugProxy = new DebugProxy(node?.instance!, 5005);
+            return proxy.start();
         });
         return node;
     }
