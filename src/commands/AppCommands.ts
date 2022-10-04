@@ -8,12 +8,12 @@ import { DialogResponses, IActionContext, openReadOnlyJson } from "@microsoft/vs
 import { MessageItem, OpenDialogOptions, TextEditor, Uri, window, workspace, WorkspaceFolder } from "vscode";
 import { ext } from "../extensionVariables";
 import { EnhancedApp } from "../service/EnhancedApp";
+import { DebugController } from "../service/remotedebugging/DebugController";
 import { AppInstanceTreeItem } from "../tree/AppInstanceTreeItem";
 import { AppSettingsTreeItem } from "../tree/AppSettingsTreeItem";
 import { AppSettingTreeItem } from "../tree/AppSettingTreeItem";
 import { AppTreeItem } from "../tree/AppTreeItem";
 import * as utils from "../utils";
-import {DebugProxy} from "../service/remotedebugging/DebugProxy";
 
 export namespace AppCommands {
 
@@ -136,8 +136,8 @@ export namespace AppCommands {
     export async function startRemoteDebugging(context: IActionContext, node?: AppInstanceTreeItem): Promise<AppInstanceTreeItem> {
         node = await getInstanceNode(node, context);
         await node.runWithTemporaryDescription(context, utils.localize('startRemoteDebugging', 'Attaching debugger...'), async () => {
-            const proxy: DebugProxy = new DebugProxy(node?.instance!, 5005);
-            return proxy.start();
+            // return new DebugProxy(node?.instance!, 5005).start();
+            return DebugController.attachDebugger(context, node?.instance!);
         });
         return node;
     }
