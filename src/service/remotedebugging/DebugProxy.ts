@@ -11,8 +11,8 @@ import { EnhancedDeployment } from '../EnhancedDeployment';
 import { EnhancedInstance } from '../EnhancedInstance';
 
 export class DebugProxy extends EventEmitter {
+    public readonly port: number;
     private readonly _instance: EnhancedInstance;
-    private readonly _port: number;
 
     private _server: Server | undefined;
     private _wsclient: websocket.client | undefined;
@@ -21,8 +21,8 @@ export class DebugProxy extends EventEmitter {
 
     constructor(instance: EnhancedInstance, port: number) {
         super();
+        this.port = port;
         this._instance = instance;
-        this._port = port;
         this._server = createServer();
     }
 
@@ -112,13 +112,13 @@ export class DebugProxy extends EventEmitter {
             });
 
             this._server.on('listening', () => {
-                ext.outputChannel.appendLog(`[Proxy Server] start listening at ${this._port}`);
+                ext.outputChannel.appendLog(`[Proxy Server] start listening at ${this.port}`);
                 this.emit('start');
             });
 
             this._server.listen({
                 host: 'localhost',
-                port: this._port,
+                port: this.port,
                 backlog: 1
             });
         }
