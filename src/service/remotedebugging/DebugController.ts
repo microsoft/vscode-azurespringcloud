@@ -4,72 +4,42 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { RemoteDebugging } from "@azure/arm-appplatform";
-import { DialogResponses, findFreePort, IActionContext, openUrl } from "@microsoft/vscode-azext-utils";
-import * as vscode from 'vscode';
-import { ext } from '../../extensionVariables';
+import { AzureWizard, AzureWizardExecuteStep, DialogResponses, IActionContext, openUrl } from "@microsoft/vscode-azext-utils";
+import { MessageItem, window } from "vscode";
 import { localize } from "../../utils";
 import { EnhancedInstance } from "../EnhancedInstance";
-import { DebugProxy } from "./DebugProxy";
+import { EnableRemoteDebuggingStep } from "./steps/EnableRemoteDebuggingStep";
+import { IRemoteDebuggingContext } from "./steps/IRemoteDebuggingContext";
+import { StartDebugConfigurationStep } from "./steps/StartDebugConfigurationStep";
+import { StartDebuggingProxyStep } from "./steps/StartDebuggingProxyStep";
 
 // tslint:disable-next-line:no-unnecessary-class
 export class DebugController {
     public static async attachDebugger(context: IActionContext, instance: EnhancedInstance): Promise<void> {
-        const proxyPort: number = await findFreePort();
-        const proxy: DebugProxy = new DebugProxy(instance, proxyPort);
-        proxy.on('error', (err: Error) => {
-            proxy.dispose();
-            throw err;
-        });
+        const attaching: string = localize('attachDebugger', 'Attaching debugger to Azure Spring Apps app instance "{0}".', instance.name);
+        const attached: string = localize('attachDebuggerSuccess', 'Debugger is successfully attached to Azure Spring Apps app instance "{0}".', instance.name);
 
-        await vscode.window.withProgress({ location: vscode.ProgressLocation.Window }, async (p: vscode.Progress<{}>) => {
-            // eslint-disable-next-line @typescript-eslint/no-misused-promises, @typescript-eslint/no-explicit-any, no-async-promise-executor
-            return new Promise(async (resolve: (value: unknown) => void, reject: (e: unknown) => void): Promise<void> => {
-                try {
-                    let config: RemoteDebugging = await instance.deployment.getDebuggingConfig();
-                    if (!config?.enabled) {
-                        const confirmMsg: string = localize('confirmRemoteDebug', 'The configurations of the selected app will be changed before debugging. Would you like to continue?');
-                        const result: vscode.MessageItem = await context.ui.showWarningMessage(confirmMsg, { modal: true }, DialogResponses.yes, DialogResponses.learnMore);
-                        if (result === DialogResponses.learnMore) {
-                            await openUrl('https://aka.ms/asa-remotedebug');
-                            return;
-                        } else {
-                            p.report({ message: 'enabling remote debugging...' });
-                            ext.outputChannel.appendLog('enabling remote debugging...');
-                            config = await instance.deployment.enableDebugging();
-                            if (!config.enabled || !config.port) {
-                                config = await instance.deployment.getDebuggingConfig();
-                            }
-                            ext.outputChannel.appendLog('enabled remote debugging...');
-                        }
-                    }
-                    p.report({ message: 'starting debug proxy...' });
-                    ext.outputChannel.appendLog('starting debug proxy...');
-                    proxy.on('start', resolve);
-                    void proxy.start(config.port!);
-                } catch (error) {
-                    reject(error);
-                }
-            });
-        });
+        const config: RemoteDebugging = await instance.deployment.enableDebugging();
+        const wizardContext: IRemoteDebuggingContext = Object.assign(context, instance.deployment.app.service.subscription, { config });
+        const executeSteps: AzureWizardExecuteStep<IRemoteDebuggingContext>[] = [];
 
-        const instanceName: string = instance.name!;
-        const configurationName: string = `Attach "${instanceName}"`;
-        await vscode.debug.startDebugging(undefined, {
-            type: 'java',
-            name: configurationName,
-            projectName: instance.deployment.app.name,
-            request: 'attach',
-            hostName: 'localhost',
-            port: proxyPort
-        });
-
-        const terminateDebugListener: vscode.Disposable = vscode.debug.onDidTerminateDebugSession((event: vscode.DebugSession) => {
-            if (event.name === configurationName) {
-                if (proxy !== undefined) {
-                    proxy.dispose();
-                }
-                terminateDebugListener.dispose();
+        if (!config?.enabled) {
+            const confirmMsg: string = localize('confirmRemoteDebug', 'The configurations of the selected app will be changed before debugging. Would you like to continue?');
+            const result: MessageItem = await context.ui.showWarningMessage(confirmMsg, { modal: true }, DialogResponses.yes, DialogResponses.learnMore);
+            if (result === DialogResponses.learnMore) {
+                await openUrl('https://aka.ms/asa-remotedebug');
+                return;
+            } else {
+                executeSteps.push(new EnableRemoteDebuggingStep(instance));
             }
-        });
+        }
+        executeSteps.push(new StartDebuggingProxyStep(instance));
+        executeSteps.push(new StartDebugConfigurationStep(instance));
+        const wizard: AzureWizard<IRemoteDebuggingContext> = new AzureWizard(wizardContext, { executeSteps, title: attaching });
+        await wizard.execute();
+        const task: () => void = async () => {
+            window.showInformationMessage(attached);
+        };
+        setTimeout(task, 0);
     }
 }

@@ -71,7 +71,7 @@ export class DebugProxy extends EventEmitter {
                                     socket.destroy();
                                     this.emit('error', err);
                                 } else {
-                                    ext.outputChannel.appendLog(`[WebSocket] Received: ${data.toString()}`);
+                                    // ext.outputChannel.appendLog(`[WebSocket] Received: ${data.toString()}`);
                                     socket.write(data);
                                 }
                             }
@@ -91,7 +91,7 @@ export class DebugProxy extends EventEmitter {
                     socket.on('data', (data: Buffer) => {
                         if (this._wsconnection) {
                             const channel: Buffer = Buffer.from([0]);
-                            ext.outputChannel.appendLog(`[Proxy Server] Sent: ${data.toString()}`);
+                            // ext.outputChannel.appendLog(`[Proxy Server] Sent: ${data.toString()}`);
                             this._wsconnection.send(Buffer.concat([channel, data]));
                         }
                     });
