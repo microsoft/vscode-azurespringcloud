@@ -362,7 +362,7 @@
                 {
                     "command": "azureSpringApps.app.instance.startRemoteDebugging",
                     "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app\\.instance\\.status-Running$/",
-                    "group": "6@1"
+                    "group": "5@1"
                 },
                 {
                     "command": "azureSpringApps.app.instance.startStreamingLog",
