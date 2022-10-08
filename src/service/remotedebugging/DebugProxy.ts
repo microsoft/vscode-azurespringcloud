@@ -26,7 +26,7 @@ export class DebugProxy extends EventEmitter {
         this._server = createServer();
     }
 
-    public async start(): Promise<void> {
+    public start(serverPort: number): void {
         if (!this._server) {
             this.emit('error', new Error('Proxy server is not started.'));
         } else {
@@ -86,7 +86,7 @@ export class DebugProxy extends EventEmitter {
                         this.emit('error', err);
                     });
 
-                    await this.connect();
+                    await this.connect(serverPort);
 
                     socket.on('data', (data: Buffer) => {
                         if (this._wsconnection) {
@@ -112,7 +112,7 @@ export class DebugProxy extends EventEmitter {
             });
 
             this._server.on('listening', () => {
-                ext.outputChannel.appendLog('[Proxy Server] start listening');
+                ext.outputChannel.appendLog(`[Proxy Server] start listening at ${this._port}`);
                 this.emit('start');
             });
 
@@ -139,7 +139,7 @@ export class DebugProxy extends EventEmitter {
         }
     }
 
-    private async connect(): Promise<void> {
+    private async connect(serverPort: number): Promise<void> {
         const deployment: EnhancedDeployment = this._instance.deployment;
         const credential: { accessToken: string } = <{ accessToken: string }>await deployment.app.service.subscription.credentials.getToken();
         const appName: string = deployment.app.name;
@@ -147,7 +147,7 @@ export class DebugProxy extends EventEmitter {
         const instanceName: string = this._instance.name ?? 'unknown-instance';
         const fqdn: string = deployment.app.properties?.fqdn ?? 'unknown-host';
         this._wsclient!.connect(
-            `wss://${fqdn}/api/remoteDebugging/apps/${appName}/deployments/${deploymentName}/instances/${instanceName}?port=5005`,
+            `wss://${fqdn}/api/remoteDebugging/apps/${appName}/deployments/${deploymentName}/instances/${instanceName}?port=${serverPort}`,
             undefined,
             undefined,
             {

@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import { AppPlatformManagementClient, DeploymentResource, DeploymentResourceProperties, DeploymentSettings, JarUploadedUserSourceInfo, ResourceRequests, Sku } from "@azure/arm-appplatform";
+import { AppPlatformManagementClient, DeploymentResource, DeploymentResourceProperties, DeploymentSettings, JarUploadedUserSourceInfo, RemoteDebugging, ResourceRequests, Sku } from "@azure/arm-appplatform";
 import { IScaleSettings } from "../model";
 import { localize } from "../utils";
 import { EnhancedApp } from "./EnhancedApp";
@@ -136,8 +136,12 @@ export class EnhancedDeployment {
         return { cpu, memory, capacity: this.properties?.instances?.length ?? 0 };
     }
 
-    public async enableDebugging(port: number = 5005): Promise<void> {
-        await this.client.deployments.beginEnableRemoteDebuggingAndWait(this.app.service.resourceGroup, this.app.service.name, this.app.name, this.name, {
+    public async getDebuggingConfig(): Promise<RemoteDebugging> {
+        return this.client.deployments.getRemoteDebuggingConfig(this.app.service.resourceGroup, this.app.service.name, this.app.name, this.name);
+    }
+
+    public async enableDebugging(port: number = 5005): Promise<RemoteDebugging> {
+        return this.client.deployments.beginEnableRemoteDebuggingAndWait(this.app.service.resourceGroup, this.app.service.name, this.app.name, this.name, {
             remoteDebuggingPayload: { port }
         });
     }
