@@ -154,7 +154,8 @@ export namespace AppCommands {
 
     export async function viewInstanceProperties(context: IActionContext, node?: AppInstanceTreeItem): Promise<AppInstanceTreeItem> {
         node = await getInstanceNode(node, context);
-        await openReadOnlyJson(node, node.instance);
+        const { deployment, ...instance } = node.instance;
+        await openReadOnlyJson(node, instance);
         return node;
     }
 
