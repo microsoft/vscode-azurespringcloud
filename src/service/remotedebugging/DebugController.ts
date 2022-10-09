@@ -19,7 +19,7 @@ export class DebugController {
         const attaching: string = localize('attachDebugger', 'Attaching debugger to Azure Spring Apps app instance "{0}".', instance.name);
         const attached: string = localize('attachDebuggerSuccess', 'Debugger is successfully attached to Azure Spring Apps app instance "{0}".', instance.name);
 
-        const config: RemoteDebugging = await instance.deployment.enableDebugging();
+        const config: RemoteDebugging = await instance.deployment.getDebuggingConfig();
         const wizardContext: IRemoteDebuggingContext = Object.assign(context, instance.deployment.app.service.subscription, { config });
         const executeSteps: AzureWizardExecuteStep<IRemoteDebuggingContext>[] = [];
 
