@@ -3,22 +3,12 @@
 
 // tslint:disable-next-line:no-require-imports no-implicit-dependencies
 import { TreeItemIconPath } from "@microsoft/vscode-azext-utils";
-import * as open from 'open';
 import * as path from 'path';
 import { ProgressLocation, window } from "vscode";
 import * as nls from 'vscode-nls';
 import { ext } from "../extensionVariables";
 
 export const localize: nls.LocalizeFunc = nls.loadMessageBundle();
-
-export async function openUrl(url: string): Promise<void> {
-    // Using this functionality is blocked by https://github.com/Microsoft/vscode/issues/25852
-    // Specifically, opening the Live Metrics Stream for Linux Function Apps doesn't work in this extension.
-    // await vscode.env.openExternal(vscode.Uri.parse(url));
-
-    // tslint:disable-next-line: no-unsafe-any
-    open(url);
-}
 
 export async function runInBackground(doing: string, done: string, task: () => Promise<void>): Promise<void> {
     await window.withProgress({ location: ProgressLocation.Notification, title: doing }, async (): Promise<void> => {
