@@ -19,7 +19,6 @@ import { showError } from '../utils';
 import { AppCommands } from "./AppCommands";
 import { ServiceCommands } from "./ServiceCommands";
 
-// tslint:disable-next-line:export-name
 export function registerCommands(): void {
     registerCommandWithTelemetryWrapper('azureSpringApps.common.loadMore', loadMore);
     registerCommandWithTelemetryWrapper('azureSpringApps.common.refresh', refreshNode);
@@ -53,10 +52,9 @@ export function registerCommands(): void {
 }
 
 function registerCommandWithTelemetryWrapper(commandId: string, callback: CommandCallback): void {
-    // tslint:disable-next-line:no-any
-    const callbackWithTroubleshooting: CommandCallback = (context: IActionContext, ...args: any[]) => instrumentOperation(commandId, async () => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    const callbackWithTroubleshooting: CommandCallback = (context: IActionContext, ...args: []) => instrumentOperation(commandId, async () => {
         try {
-            // tslint:disable-next-line: no-unsafe-any
             await callback(context, ...args);
         } catch (error) {
             const e: IParsedError = parseError(error);

@@ -38,7 +38,7 @@ export class DebugController {
         const wizard: AzureWizard<IRemoteDebuggingContext> = new AzureWizard(wizardContext, { executeSteps, title: attaching });
         await wizard.execute();
         const task: () => void = async () => {
-            window.showInformationMessage(attached);
+            void window.showInformationMessage(attached);
         };
         setTimeout(task, 0);
     }

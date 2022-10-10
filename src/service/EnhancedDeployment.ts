@@ -16,7 +16,9 @@ export class EnhancedDeployment {
     private _remote: DeploymentResource;
 
     public constructor(app: EnhancedApp, resource: DeploymentResource) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         this.name = resource.name!;
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         this.id = resource.id!;
         this.app = app;
         this._remote = resource;
@@ -70,7 +72,7 @@ export class EnhancedDeployment {
             };
         }
         this._remote = await this.client.deployments.beginUpdateAndWait(this.app.service.resourceGroup, this.app.service.name, this.app.name,
-                                                                        this.name || EnhancedDeployment.DEFAULT_DEPLOYMENT_NAME, { properties });
+            this.name || EnhancedDeployment.DEFAULT_DEPLOYMENT_NAME, { properties });
     }
 
     public async updateScaleSettings(settings: IScaleSettings): Promise<void> {
@@ -113,7 +115,6 @@ export class EnhancedDeployment {
             });
         } else {
             this._remote = await this.client.deployments.beginUpdateAndWait(this.app.service.resourceGroup, this.app.service.name, this.app.name, this.name, {
-                //@ts-ignore
                 properties: {
                     source: {
                         type: 'Jar',

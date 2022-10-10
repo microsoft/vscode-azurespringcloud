@@ -20,20 +20,24 @@ export namespace AppCommands {
     export async function openPublicEndpoint(context: IActionContext, n?: AzExtTreeItem): Promise<void> {
         const node: AppTreeItem = await getNode(n, context);
         const app: EnhancedApp = node.app;
-        let endPoint: string | undefined = await app.getPublicEndpoint();
-        if (!endPoint || endPoint.toLowerCase() === 'none') {
+        let endpoint: string | undefined = await app.getPublicEndpoint();
+        if (!endpoint || endpoint.toLowerCase() === 'none') {
             await context.ui.showWarningMessage(`App [${app.name}] is not publicly accessible. Do you want to set it public and assign it a public endpoint?`, { modal: true }, DialogResponses.yes);
             await toggleEndpoint(context, node);
-            endPoint = await app.getPublicEndpoint();
+            endpoint = await app.getPublicEndpoint();
         }
-        await openUrl(endPoint!);
+        if (endpoint) {
+            await openUrl(endpoint);
+        }
     }
 
     export async function openTestEndpoint(context: IActionContext, n?: AzExtTreeItem): Promise<void> {
         const node: AppTreeItem = await getNode(n, context);
         const app: EnhancedApp = node.app;
         const endpoint: string | undefined = await app.getTestEndpoint();
-        await openUrl(endpoint!);
+        if (endpoint) {
+            await openUrl(endpoint);
+        }
     }
 
     export async function toggleEndpoint(context: IActionContext, n?: AzExtTreeItem): Promise<void> {
@@ -50,7 +54,7 @@ export namespace AppCommands {
         const app: EnhancedApp = node.app;
         await node.runWithTemporaryDescription(context, utils.localize('starting', 'Starting...'), async () => {
             await app.start();
-            await node!.refresh(context);
+            await node.refresh(context);
         });
         return node;
     }
@@ -62,7 +66,7 @@ export namespace AppCommands {
         await context.ui.showWarningMessage(`Are you sure to stop "${app.name}"?`, { modal: true }, stopResponse);
         await node.runWithTemporaryDescription(context, utils.localize('stopping', 'Stopping...'), async () => {
             await app.stop();
-            await node!.refresh(context);
+            await node.refresh(context);
         });
         return node;
     }
@@ -72,7 +76,7 @@ export namespace AppCommands {
         const app: EnhancedApp = node.app;
         await node.runWithTemporaryDescription(context, utils.localize('restart', 'Restarting...'), async () => {
             await app.restart();
-            await node!.refresh(context);
+            await node.refresh(context);
         });
         return node;
     }
@@ -83,7 +87,7 @@ export namespace AppCommands {
         await context.ui.showWarningMessage(`Are you sure to delete "${app.name}"?`, { modal: true }, DialogResponses.deleteResponse);
         const deleting: string = utils.localize('deletingSpringCLoudApp', 'Deleting Spring app "{0}"...', app.name);
         const deleted: string = utils.localize('deletedSpringCLoudApp', 'Successfully deleted Spring app "{0}".', app.name);
-        await utils.runInBackground(deleting, deleted, () => node!.deleteTreeItem(context));
+        await utils.runInBackground(deleting, deleted, () => node.deleteTreeItem(context));
     }
 
     export async function deploy(context: IActionContext, n?: AzExtTreeItem): Promise<AppTreeItem> {
@@ -100,7 +104,7 @@ export namespace AppCommands {
         const fileUri: Uri[] | undefined = await window.showOpenDialog(options);
         if (fileUri && fileUri[0] !== undefined) {
             const artifactPath: string = fileUri[0].fsPath;
-            await node.runWithTemporaryDescription(context, utils.localize('deploying', 'Deploying...'), async () => node!.deployArtifact(context, artifactPath));
+            await node.runWithTemporaryDescription(context, utils.localize('deploying', 'Deploying...'), async () => node.deployArtifact(context, artifactPath));
         }
         return node;
     }
@@ -126,9 +130,9 @@ export namespace AppCommands {
     export async function startStreamingLogs(context: IActionContext, n?: AzExtTreeItem): Promise<AppInstanceTreeItem> {
         const node: AppInstanceTreeItem = await getInstanceNode(n, context);
         await node.runWithTemporaryDescription(context, utils.localize('startStreamingLog', 'Starting streaming log...'), async () => {
-            const appTreeItem: AppTreeItem = node!.parent.parent;
+            const appTreeItem: AppTreeItem = node.parent.parent;
             const app: EnhancedApp = appTreeItem.app;
-            return app.startStreamingLogs(context, node?.instance!);
+            return app.startStreamingLogs(context, node.instance);
         });
         return node;
     }
@@ -136,8 +140,7 @@ export namespace AppCommands {
     export async function startRemoteDebugging(context: IActionContext, n?: AzExtTreeItem): Promise<AppInstanceTreeItem> {
         const node: AppInstanceTreeItem = await getInstanceNode(n, context);
         await node.runWithTemporaryDescription(context, utils.localize('startRemoteDebugging', 'Attaching debugger...'), async () => {
-            // return new DebugProxy(node?.instance!, 5005).start();
-            return DebugController.attachDebugger(context, node?.instance!);
+            return DebugController.attachDebugger(context, node.instance);
         });
         return node;
     }
@@ -145,15 +148,16 @@ export namespace AppCommands {
     export async function stopStreamingLogs(context: IActionContext, n?: AzExtTreeItem): Promise<AppInstanceTreeItem> {
         const node: AppInstanceTreeItem = await getInstanceNode(n, context);
         await node.runWithTemporaryDescription(context, utils.localize('stopStreamingLog', 'Stopping streaming log...'), async () => {
-            const appTreeItem: AppTreeItem = node!.parent.parent;
+            const appTreeItem: AppTreeItem = node.parent.parent;
             const app: EnhancedApp = appTreeItem.app;
-            return app.stopStreamingLogs(node?.instance!);
+            return app.stopStreamingLogs(node.instance);
         });
         return node;
     }
 
     export async function viewInstanceProperties(context: IActionContext, n?: AzExtTreeItem): Promise<AppInstanceTreeItem> {
         const node: AppInstanceTreeItem = await getInstanceNode(n, context);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { deployment, ...instance } = node.instance;
         await openReadOnlyJson(node, instance);
         return node;

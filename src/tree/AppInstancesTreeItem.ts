@@ -31,7 +31,7 @@ export class AppInstancesTreeItem extends AzExtParentTreeItem {
         const deployment: EnhancedDeployment | undefined = await this.parent.app.getActiveDeployment();
         if (deployment) {
             return await this.createTreeItemsWithErrorHandling(
-                deployment.properties!.instances,
+                deployment.properties?.instances,
                 'invalidSpringCloudAppInstance',
                 (instance: DeploymentInstance) => new AppInstanceTreeItem(this, new EnhancedInstance(deployment, instance)),
                 (instance: DeploymentInstance) => instance.name

@@ -30,7 +30,7 @@ export class DebugProxy extends EventEmitter {
         if (!this._server) {
             this.emit('error', new Error('Proxy server is not started.'));
         } else {
-            this._server.on('connection', async (socket: Socket) => {
+            this._server.on('connection', (socket: Socket) => {
                 if (this._wsclient) {
                     ext.outputChannel.appendLog(`[Proxy Server] The server is already connected. Rejected connection to "${socket.remoteAddress}:${socket.remotePort}"`);
                     this.emit('error', new Error(`[Proxy Server]  The server is already connected. Rejected connection to "${socket.remoteAddress}:${socket.remotePort}"`));
@@ -86,8 +86,6 @@ export class DebugProxy extends EventEmitter {
                         this.emit('error', err);
                     });
 
-                    await this.connect(serverPort);
-
                     socket.on('data', (data: Buffer) => {
                         if (this._wsconnection) {
                             const channel: Buffer = Buffer.from([0]);
@@ -108,6 +106,8 @@ export class DebugProxy extends EventEmitter {
                         socket.destroy();
                         this.emit('error', err);
                     });
+
+                    void this.connect(serverPort);
                 }
             });
 
@@ -146,6 +146,7 @@ export class DebugProxy extends EventEmitter {
         const deploymentName: string = deployment.name;
         const instanceName: string = this._instance.name ?? 'unknown-instance';
         const fqdn: string = deployment.app.properties?.fqdn ?? 'unknown-host';
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         this._wsclient!.connect(
             `wss://${fqdn}/api/remoteDebugging/apps/${appName}/deployments/${deploymentName}/instances/${instanceName}?port=${serverPort}`,
             undefined,

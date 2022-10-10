@@ -2,10 +2,9 @@
 // Licensed under the MIT license.
 import { DeploymentResource, TestKeys } from '@azure/arm-appplatform';
 import { BasicAuthenticationCredentials, WebResource } from "@azure/ms-rest-js";
-import { parseError } from '@microsoft/vscode-azext-utils';
+import { IActionContext, parseError } from '@microsoft/vscode-azext-utils';
 import * as request from 'request';
 import * as vscode from 'vscode';
-import { IActionContext } from '../../../extension.bundle';
 import { ext } from '../../extensionVariables';
 import { localize } from '../../utils';
 
@@ -22,8 +21,7 @@ export async function startStreamingLogs(context: IActionContext, app: string, t
     const logStream: ILogStream | undefined = logStreams.get(logStreamId);
     if (logStream && logStream.isConnected) {
         logStream.outputChannel.show();
-        // tslint:disable-next-line:no-floating-promises
-        context.ui.showWarningMessage(localize('logStreamAlreadyActive', 'The log-streaming service for "{0}" is already active.', instance.name));
+        void context.ui.showWarningMessage(localize('logStreamAlreadyActive', 'The log-streaming service for "{0}" is already active.', instance.name));
         return logStream;
     } else {
         const outputChannel: vscode.OutputChannel = logStream ? logStream.outputChannel : vscode.window.createOutputChannel(localize('logStreamLabel', '{0} - Log Stream', instance.name));
@@ -58,8 +56,7 @@ export async function stopStreamingLogs(app: string, instance: DeploymentResourc
 }
 
 function createLogStream(outputChannel: vscode.OutputChannel, logsRequest: request.Request): ILogStream {
-    let newLogStream: ILogStream;
-    newLogStream = {
+    const newLogStream: ILogStream = {
         dispose: (): void => {
             logsRequest.removeAllListeners();
             logsRequest.destroy();

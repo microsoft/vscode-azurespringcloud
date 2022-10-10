@@ -25,6 +25,7 @@ export class UploadArtifactStep extends AzureWizardExecuteStep<IAppDeploymentWiz
         progress.report({ message });
         context.relativePathOrBuildResultId = await this.app.uploadArtifact(this.artifactPath);
         if (this.app?.service.sku?.name?.toLowerCase().startsWith('e')) {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             context.relativePathOrBuildResultId = await this.app.enqueueBuild(context.relativePathOrBuildResultId!);
         }
         ext.outputChannel.appendLog(localize('uploadingArtifactSuccess', 'Artifact "{0}" is successfully uploaded.', this.artifactPath));

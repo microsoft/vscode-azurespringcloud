@@ -17,14 +17,17 @@ export class AppInstanceTreeItem extends AzExtTreeItem {
     }
 
     public get id(): string {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         return this.instance.name!;
     }
 
     public get label(): string {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         return this.instance.name!;
     }
 
     public get description(): string {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         return this.instance.status!;
     }
 

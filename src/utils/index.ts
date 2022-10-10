@@ -13,7 +13,7 @@ export const localize: nls.LocalizeFunc = nls.loadMessageBundle();
 export async function runInBackground(doing: string, done: string, task: () => Promise<void>): Promise<void> {
     await window.withProgress({ location: ProgressLocation.Notification, title: doing }, async (): Promise<void> => {
         await task();
-        window.showInformationMessage(done);
+        void window.showInformationMessage(done);
     });
 }
 
@@ -49,5 +49,5 @@ export function getThemedIconPath(iconName: string): TreeItemIconPath {
 }
 
 export function showError(commandName: string, error: Error): void {
-    window.showErrorMessage(`Command "${commandName}" fails. ${error.message}`);
+    void window.showErrorMessage(`Command "${commandName}" fails. ${error.message}`);
 }

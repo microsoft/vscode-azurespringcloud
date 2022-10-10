@@ -31,6 +31,7 @@ export class StartDebuggingProxyStep extends AzureWizardExecuteStep<IRemoteDebug
         });
         await new Promise((resolve, _reject) => {
             proxy.on('start', resolve);
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             proxy.start(context.config.port!);
         });
         context.proxy = proxy;

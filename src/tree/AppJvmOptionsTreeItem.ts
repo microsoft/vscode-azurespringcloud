@@ -105,8 +105,8 @@ export class AppJvmOptionsTreeItem extends AppSettingsTreeItem {
             const wizard: AzureWizard<IJvmOptionsUpdateWizardContext> = new AzureWizard(wizardContext, { promptSteps, executeSteps, title: updating });
             await wizard.prompt();
             await wizard.execute();
-            window.showInformationMessage(updated);
-            this.parent.refresh(context);
+            void window.showInformationMessage(updated);
+            void this.parent.refresh(context);
         }
     }
 

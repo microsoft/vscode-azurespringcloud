@@ -15,6 +15,7 @@ export class EnhancedInstance implements DeploymentInstance {
     public readonly deployment: EnhancedDeployment;
 
     public constructor(deployment: EnhancedDeployment, resource: DeploymentInstance) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         this.name = resource.name!;
         this.status = resource.status;
         this.reason = resource.reason;

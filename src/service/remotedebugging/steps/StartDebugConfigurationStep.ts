@@ -21,7 +21,7 @@ export class StartDebugConfigurationStep extends AzureWizardExecuteStep<IRemoteD
         const message: string = localize('startDebugger', 'Starting debugger for instance "{0}"...', this.instance.name);
         ext.outputChannel.appendLog(message);
         progress.report({ message });
-
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const instanceName: string = this.instance.name!;
         const configurationName: string = `Attach "${instanceName}"`;
         const started: boolean = await debug.startDebugging(undefined, {

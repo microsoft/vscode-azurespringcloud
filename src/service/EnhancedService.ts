@@ -17,7 +17,9 @@ export class EnhancedService {
     public constructor(client: AppPlatformManagementClient, subscription: ISubscriptionContext, resource: ServiceResource) {
         this.client = client;
         this.subscription = subscription;
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         this.name = resource.name!;
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         this.id = resource.id!;
         this.setRemote(resource);
     }
@@ -72,6 +74,7 @@ export class EnhancedService {
 
     private setRemote(resource: ServiceResource): void {
         this._remote = resource;
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         this._resourceGroup = resource.id!.split('/')[4];
     }
 }

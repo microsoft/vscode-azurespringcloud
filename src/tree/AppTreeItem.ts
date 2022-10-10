@@ -37,7 +37,7 @@ export class AppTreeItem extends AzExtParentTreeItem {
         this._scaleSettingsTreeItem = new AppScaleSettingsTreeItem(this);
         this._envPropertiesTreeItem = new AppEnvVariablesTreeItem(this);
         this._jvmOptionsTreeItem = new AppJvmOptionsTreeItem(this);
-        this.reloadStatus(context);
+        void this.reloadStatus(context);
     }
 
     public get id(): string {
@@ -78,18 +78,21 @@ export class AppTreeItem extends AzExtParentTreeItem {
     }
 
     public async deleteTreeItemImpl(_context: IActionContext): Promise<void> {
-        this.app.remove();
+        await this.app.remove();
         this.deleted = true;
     }
 
     public async deployArtifact(context: IActionContext, artifactPath: string): Promise<void> {
         const deployment: EnhancedDeployment | undefined = await this.app.getActiveDeployment();
+        if (!deployment) {
+            throw new Error(`App "${this.app.name}" has no active deployment.`);
+        }
         const deploying: string = utils.localize('deploying', 'Deploying artifact to "{0}".', this.app.name);
         const deployed: string = utils.localize('deployed', 'Successfully deployed artifact to "{0}".', this.app.name);
         const wizardContext: IAppDeploymentWizardContext = Object.assign(context, this.subscription, { app: this.app });
         const executeSteps: AzureWizardExecuteStep<IAppDeploymentWizardContext>[] = [];
         executeSteps.push(new UploadArtifactStep(this.app, artifactPath));
-        executeSteps.push(new UpdateDeploymentStep(deployment!));
+        executeSteps.push(new UpdateDeploymentStep(deployment));
         const wizard: AzureWizard<IAppDeploymentWizardContext> = new AzureWizard(wizardContext, { executeSteps, title: deploying });
         await wizard.execute();
         const task: () => void = async () => {

@@ -37,7 +37,7 @@ export class ServiceTreeItem extends AzExtParentTreeItem {
     constructor(parent: AzExtParentTreeItem, service: EnhancedService) {
         super(parent);
         this.service = service;
-        this.reinit();
+        void this.reinit();
     }
 
     public get id(): string {
@@ -97,14 +97,14 @@ export class ServiceTreeItem extends AzExtParentTreeItem {
         context.showCreatingTreeItem(appName);
         await wizard.execute();
         const created: string = utils.localize('createdSpringCouldApp', 'Successfully created Spring app "{0}".', appName);
-        window.showInformationMessage(created);
+        void window.showInformationMessage(created);
         return new AppTreeItem(this, utils.nonNullProp(wizardContext, 'newApp'), context);
     }
 
     public async refreshImpl(_context: IActionContext): Promise<void> {
         if (!this.deleted) {
             await this.service.refresh();
-            this.reinit();
+            void this.reinit();
         }
     }
 
