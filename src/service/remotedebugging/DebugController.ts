@@ -24,8 +24,9 @@ export class DebugController {
         const executeSteps: AzureWizardExecuteStep<IRemoteDebuggingContext>[] = [];
 
         if (!config?.enabled) {
-            const confirmMsg: string = localize('confirmRemoteDebug', 'The configurations of the selected app will be changed before debugging. Would you like to continue?');
-            const result: MessageItem = await context.ui.showWarningMessage(confirmMsg, { modal: true }, DialogResponses.yes, DialogResponses.learnMore);
+            const confirmMsg: string = localize('confirmRemoteDebug', 'Remote debugging should be enabled first before debugging. Would you like to enable it?');
+            const enableResponse: MessageItem = { title: 'Enable' };
+            const result: MessageItem = await context.ui.showWarningMessage(confirmMsg, { modal: true }, enableResponse, DialogResponses.learnMore);
             if (result === DialogResponses.learnMore) {
                 await openUrl('https://aka.ms/asa-remotedebug');
                 return;
