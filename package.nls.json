@@ -19,6 +19,7 @@
     "azureSpringApps.menu.app.toggleEndpoint": "Assign/Unassign Public Endpoint",
     "azureSpringApps.menu.app.deploy": "Deploy",
     "azureSpringApps.menu.app.scale": "Scale",
+    "azureSpringApps.menu.app.toggleRemoteDebugging": "Enable/Disable Remote Debugging",
     "azureSpringApps.menu.app.instance.startRemoteDebugging": "Attach Debugger",
     "azureSpringApps.menu.app.instance.startStreamingLog": "Start Streaming Logs",
     "azureSpringApps.menu.app.instance.stopStreamingLog": "Stop Streaming Logs",

@@ -52,6 +52,7 @@
         "onCommand:azureSpringApps.app.scale",
         "onCommand:azureSpringApps.app.openInPortal",
         "onCommand:azureSpringApps.app.viewProperties",
+        "onCommand:azureSpringApps.app.toggleRemoteDebugging",
         "onCommand:azureSpringApps.app.instance.startRemoteDebugging",
         "onCommand:azureSpringApps.app.instance.startStreamingLog",
         "onCommand:azureSpringApps.app.instance.stopStreamingLog",
@@ -166,6 +167,11 @@
             {
                 "command": "azureSpringApps.app.viewProperties",
                 "title": "%azureSpringApps.menu.common.viewProperties%",
+                "category": "Spring App"
+            },
+            {
+                "command": "azureSpringApps.app.toggleRemoteDebugging",
+                "title": "%azureSpringApps.menu.app.toggleRemoteDebugging%",
                 "category": "Spring App"
             },
             {
@@ -320,6 +326,11 @@
                     "group": "5@1"
                 },
                 {
+                    "command": "azureSpringApps.app.toggleRemoteDebugging",
+                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app\\.status-running$/",
+                    "group": "4@2"
+                },
+                {
                     "command": "azureSpringApps.app.stop",
                     "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app\\.status-running$/",
                     "group": "5@2"
@@ -361,8 +372,8 @@
                 },
                 {
                     "command": "azureSpringApps.app.instance.startRemoteDebugging",
-                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app\\.instance\\.status-Running$/",
-                    "group": "5@1"
+                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app(\\.instance)?\\.status-[Rr]unning$/",
+                    "group": "4@1"
                 },
                 {
                     "command": "azureSpringApps.app.instance.startStreamingLog",

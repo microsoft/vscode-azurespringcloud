@@ -18,7 +18,7 @@ export class StartDebugConfigurationStep extends AzureWizardExecuteStep<IRemoteD
     }
 
     public async execute(context: IRemoteDebuggingContext, progress: Progress<{ message?: string; increment?: number }>): Promise<void> {
-        const message: string = localize('startDebugger', 'Starting debugger for instance "{0}"...', this.instance.name);
+        const message: string = localize('startDebugger', 'Attaching debugger to instance "{0}"...', this.instance.name);
         ext.outputChannel.appendLog(message);
         progress.report({ message });
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -34,7 +34,7 @@ export class StartDebugConfigurationStep extends AzureWizardExecuteStep<IRemoteD
         });
         if (started) {
             context.configurationName = configurationName;
-            ext.outputChannel.appendLog(localize('startDebuggerSuccess', 'Debugger is successfully started for instance "{0}".', this.instance.name));
+            ext.outputChannel.appendLog(localize('startDebuggerSuccess', 'Debugger is successfully attached to instance "{0}".', this.instance.name));
         } else {
             throw new Error(`Failed to attach debugger to instance "${this.instance.name}".`);
         }

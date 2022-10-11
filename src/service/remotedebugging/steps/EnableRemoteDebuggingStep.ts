@@ -19,7 +19,7 @@ export class EnableRemoteDebuggingStep extends AzureWizardExecuteStep<IRemoteDeb
     }
 
     public async execute(context: IRemoteDebuggingContext, progress: Progress<{ message?: string; increment?: number }>): Promise<void> {
-        const message: string = localize('enableRemoteDebugging', 'Enabling remote debugging for deployment "{0}"...', this.instance.deployment.name);
+        const message: string = localize('enableRemoteDebugging', 'Enabling remote debugging for app "{0}"...', this.instance.deployment.app.name);
         progress.report({ message });
         ext.outputChannel.appendLog(message);
         let config: RemoteDebugging = await this.instance.deployment.enableDebugging();
@@ -27,7 +27,7 @@ export class EnableRemoteDebuggingStep extends AzureWizardExecuteStep<IRemoteDeb
             config = await this.instance.deployment.getDebuggingConfig();
         }
         context.config = config;
-        ext.outputChannel.appendLog(localize('enableRemoteDebuggingSuccess', 'Remote debugging is successfully enabled for deployment "{0}".', this.instance.deployment.name));
+        ext.outputChannel.appendLog(localize('enableRemoteDebuggingSuccess', 'Remote debugging is successfully enabled for app "{0}".', this.instance.deployment.app.name));
     }
 
     public shouldExecute(context: IRemoteDebuggingContext): boolean {

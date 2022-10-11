@@ -3,11 +3,13 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
+import { RemoteDebugging } from "@azure/arm-appplatform";
 import { openInPortal } from "@microsoft/vscode-azext-azureutils";
 import { AzExtTreeItem, DialogResponses, IActionContext, openReadOnlyJson, openUrl } from "@microsoft/vscode-azext-utils";
 import { MessageItem, OpenDialogOptions, TextEditor, Uri, window, workspace, WorkspaceFolder } from "vscode";
 import { ext } from "../extensionVariables";
 import { EnhancedApp } from "../service/EnhancedApp";
+import { EnhancedDeployment } from "../service/EnhancedDeployment";
 import { DebugController } from "../service/remotedebugging/DebugController";
 import { AppInstanceTreeItem } from "../tree/AppInstanceTreeItem";
 import { AppSettingsTreeItem } from "../tree/AppSettingsTreeItem";
@@ -127,12 +129,30 @@ export namespace AppCommands {
         return node;
     }
 
-    export async function startStreamingLogs(context: IActionContext, n?: AzExtTreeItem): Promise<AppInstanceTreeItem> {
-        const node: AppInstanceTreeItem = await getInstanceNode(n, context);
-        await node.runWithTemporaryDescription(context, utils.localize('startStreamingLog', 'Starting streaming log...'), async () => {
-            const appTreeItem: AppTreeItem = node.parent.parent;
-            const app: EnhancedApp = appTreeItem.app;
-            return app.startStreamingLogs(context, node.instance);
+    export async function toggleRemoteDebugging(context: IActionContext, n?: AzExtTreeItem): Promise<AppTreeItem> {
+        const node: AppTreeItem = await getNode(n, context);
+        await node.runWithTemporaryDescription(context, utils.localize('loading', 'Loading details...'), async () => {
+            const deployment: EnhancedDeployment | undefined = await node.app.getActiveDeployment();
+            if (!deployment) {
+                void context.ui.showWarningMessage(`App "${node.app.name}" has no active deployment.`);
+                return;
+            }
+            const config: RemoteDebugging | undefined = await deployment.getDebuggingConfig();
+            const status: string = !config?.enabled ? 'disabled' : 'enabled';
+            const action: string = !config?.enabled ? 'enable' : 'disable';
+            const confirmMsg: string = utils.localize('confirm', `Remote debugging is ${status} for app "${node.app.name}", are you sure to ${action} it?`);
+            const actionResponse: MessageItem = { title: action[0].toUpperCase() + action.slice(1) };
+            const result: MessageItem = await context.ui.showWarningMessage(confirmMsg, { modal: true }, actionResponse, DialogResponses.learnMore);
+            if (result === DialogResponses.learnMore) {
+                await openUrl('https://aka.ms/asa-remotedebug');
+                return;
+            } else {
+                await node.runWithTemporaryDescription(context, utils.localize('toggling', `${action[0].toUpperCase() + action.slice(1, -1)}ing remote debugging...`), async () => {
+                    await deployment.enableDebugging();
+                    void window.showInformationMessage(`Remote debugging is successfully ${action}d for app "${node.app.name}".`);
+                });
+                return;
+            }
         });
         return node;
     }
@@ -141,6 +161,16 @@ export namespace AppCommands {
         const node: AppInstanceTreeItem = await getInstanceNode(n, context);
         await node.runWithTemporaryDescription(context, utils.localize('startRemoteDebugging', 'Attaching debugger...'), async () => {
             return DebugController.attachDebugger(context, node.instance);
+        });
+        return node;
+    }
+
+    export async function startStreamingLogs(context: IActionContext, n?: AzExtTreeItem): Promise<AppInstanceTreeItem> {
+        const node: AppInstanceTreeItem = await getInstanceNode(n, context);
+        await node.runWithTemporaryDescription(context, utils.localize('startStreamingLog', 'Starting streaming log...'), async () => {
+            const appTreeItem: AppTreeItem = node.parent.parent;
+            const app: EnhancedApp = appTreeItem.app;
+            return app.startStreamingLogs(context, node.instance);
         });
         return node;
     }
