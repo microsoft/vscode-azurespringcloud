@@ -32,8 +32,8 @@ export class DebugProxy extends EventEmitter {
         } else {
             this._server.on('connection', (socket: Socket) => {
                 if (this._wsclient) {
-                    ext.outputChannel.appendLog(`[Proxy Server] The server is already connected. Rejected connection to "${socket.remoteAddress}:${socket.remotePort}"`);
-                    this.emit('error', new Error(`[Proxy Server]  The server is already connected. Rejected connection to "${socket.remoteAddress}:${socket.remotePort}"`));
+                    ext.outputChannel.appendLog(`[Proxy Server] The server is already connected. Rejected connection from "${socket.remoteAddress}:${socket.remotePort}"`);
+                    this.emit('error', new Error(`[Proxy Server] The server is already connected. Rejected connection from "${socket.remoteAddress}:${socket.remotePort}"`));
                     socket.destroy();
                 } else {
                     ext.outputChannel.appendLog(`[Proxy Server] client connected ${socket.remoteAddress}:${socket.remotePort}`);
@@ -146,9 +146,11 @@ export class DebugProxy extends EventEmitter {
         const deploymentName: string = deployment.name;
         const instanceName: string = this._instance.name ?? 'unknown-instance';
         const fqdn: string = deployment.app.properties?.fqdn ?? 'unknown-host';
+        const url: string = `wss://${fqdn}/api/remoteDebugging/apps/${appName}/deployments/${deploymentName}/instances/${instanceName}?port=${serverPort}`;
+        ext.outputChannel.appendLog(`[Proxy Server] connecting server "${url}"`);
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         this._wsclient!.connect(
-            `wss://${fqdn}/api/remoteDebugging/apps/${appName}/deployments/${deploymentName}/instances/${instanceName}?port=${serverPort}`,
+            url,
             undefined,
             undefined,
             {
@@ -157,5 +159,6 @@ export class DebugProxy extends EventEmitter {
                 Authorization: `Bearer ${credential.accessToken}`
             }
         );
+        ext.outputChannel.appendLog(`[Proxy Server] connected server "${url}"`);
     }
 }
