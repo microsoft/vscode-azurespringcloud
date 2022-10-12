@@ -129,7 +129,7 @@ export namespace AppCommands {
         return node;
     }
 
-    export async function toggleRemoteDebugging(context: IActionContext, n?: AzExtTreeItem): Promise<AppTreeItem> {
+    export async function toggleRemoteDebugging(context: IActionContext, n?: AzExtTreeItem, providedConfig?: RemoteDebugging, providedMsg?: string): Promise<AppTreeItem> {
         const node: AppTreeItem = await getNode(n, context);
         await node.runWithTemporaryDescription(context, utils.localize('loading', 'Loading details...'), async () => {
             const deployment: EnhancedDeployment | undefined = await node.app.getActiveDeployment();
@@ -137,10 +137,10 @@ export namespace AppCommands {
                 void context.ui.showWarningMessage(`App "${node.app.name}" has no active deployment.`);
                 return;
             }
-            const config: RemoteDebugging | undefined = await deployment.getDebuggingConfig();
-            const status: string = !config?.enabled ? 'disabled' : 'enabled';
-            const action: string = !config?.enabled ? 'enable' : 'disable';
-            const confirmMsg: string = utils.localize('confirm', `Remote debugging is ${status} for app "${node.app.name}", are you sure to ${action} it?`);
+            const config: RemoteDebugging | undefined = providedConfig ?? await deployment.getDebuggingConfig();
+            const status: string = config?.enabled ? 'enabled' : 'disabled';
+            const action: string = config?.enabled ? 'disable' : 'enable';
+            const confirmMsg: string = providedMsg ?? utils.localize('confirm', `Remote debugging is ${status} for app "${node.app.name}", are you sure to ${action} it?`);
             const actionResponse: MessageItem = { title: action[0].toUpperCase() + action.slice(1) };
             const result: MessageItem = await context.ui.showWarningMessage(confirmMsg, { modal: true }, actionResponse, DialogResponses.learnMore);
             if (result === DialogResponses.learnMore) {
@@ -148,8 +148,19 @@ export namespace AppCommands {
                 return;
             } else {
                 await node.runWithTemporaryDescription(context, utils.localize('toggling', `${action[0].toUpperCase() + action.slice(1, -1)}ing remote debugging...`), async () => {
-                    await deployment.enableDebugging();
-                    void window.showInformationMessage(`Remote debugging is successfully ${action}d for app "${node.app.name}".`);
+                    const msg: string = `Remote debugging is successfully ${action}d for app "${node.app.name}".`;
+                    if (config?.enabled) {
+                        await deployment.disableDebugging();
+                        await node.refresh(context);
+                        void window.showInformationMessage(msg);
+                    } else {
+                        await deployment.enableDebugging();
+                        await node.refresh(context);
+                        void (async () => {
+                            const action: string | undefined = await window.showInformationMessage(msg, "Attach Debugger");
+                            action && void AppCommands.startRemoteDebugging(context, node);
+                        })();
+                    }
                 });
                 return;
             }
@@ -160,7 +171,7 @@ export namespace AppCommands {
     export async function startRemoteDebugging(context: IActionContext, n?: AzExtTreeItem): Promise<AppInstanceTreeItem> {
         const node: AppInstanceTreeItem = await getInstanceNode(n, context);
         await node.runWithTemporaryDescription(context, utils.localize('startRemoteDebugging', 'Attaching debugger...'), async () => {
-            return DebugController.attachDebugger(context, node.instance);
+            return DebugController.attachDebugger(context, node);
         });
         return node;
     }

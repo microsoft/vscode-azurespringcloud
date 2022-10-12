@@ -19,8 +19,8 @@ import { ServiceTreeItem } from "./ServiceTreeItem";
 
 export class AppTreeItem extends AzExtParentTreeItem {
     public static contextValue: RegExp = /^azureSpringApps\.app\.status-.+$/;
-    private static readonly ACCESS_PUBLIC_ENDPOINT: string = 'Access public endpoint';
-    private static readonly ACCESS_TEST_ENDPOINT: string = 'Access test endpoint';
+    public static readonly ACCESS_PUBLIC_ENDPOINT: string = 'Access public endpoint';
+    public static readonly ACCESS_TEST_ENDPOINT: string = 'Access test endpoint';
     public readonly parent: ServiceTreeItem;
     public readonly app: EnhancedApp;
     private readonly _appInstancesTreeItem: AppInstancesTreeItem;
