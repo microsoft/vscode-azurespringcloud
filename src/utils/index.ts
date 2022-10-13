@@ -10,10 +10,10 @@ import { ext } from "../extensionVariables";
 
 export const localize: nls.LocalizeFunc = nls.loadMessageBundle();
 
-export async function runInBackground(doing: string, done: string, task: () => Promise<void>): Promise<void> {
+export async function runInBackground(doing: string, done: string | null, task: () => Promise<void>): Promise<void> {
     await window.withProgress({ location: ProgressLocation.Notification, title: doing }, async (): Promise<void> => {
         await task();
-        void window.showInformationMessage(done);
+        done && void window.showInformationMessage(done);
     });
 }
 

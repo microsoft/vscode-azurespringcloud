@@ -136,11 +136,6 @@ export namespace AppCommands {
     export async function enableRemoteDebugging(context: IActionContext, n?: AzExtTreeItem, confirmation?: string): Promise<AppTreeItem> {
         const node: AppTreeItem = await getNode(n, context);
         await node.runWithTemporaryDescription(context, utils.localize('loading', 'Loading details...'), async () => {
-            const deployment: EnhancedDeployment | undefined = await node.app.getActiveDeployment();
-            if (!deployment) {
-                void window.showWarningMessage(`Failed to enable remote debugging for app "${node.app.name}", because it has no active deployment.`);
-                return;
-            }
             let result: MessageItem | undefined;
             if (confirmation) {
                 const actionResponse: MessageItem = { title: 'Enable' };
@@ -150,7 +145,13 @@ export namespace AppCommands {
                     return;
                 }
             }
-            await node.runWithTemporaryDescription(context, utils.localize('enabling', `Enabling remote debugging...`), async () => {
+            const doing: string = `Enabling remote debugging for app "${node.app.name}".`;
+            void utils.runInBackground(doing, null, async () => {
+                const deployment: EnhancedDeployment | undefined = await node.app.getActiveDeployment();
+                if (!deployment) {
+                    void window.showWarningMessage(`Failed to enable remote debugging for app "${node.app.name}", because it has no active deployment.`);
+                    return;
+                }
                 await deployment.enableDebugging();
                 await node.refresh(context);
                 void (async () => {
@@ -169,7 +170,9 @@ export namespace AppCommands {
 
     export async function disableRemoteDebugging(context: IActionContext, n?: AzExtTreeItem): Promise<AppTreeItem> {
         const node: AppTreeItem = await getNode(n, context);
-        await node.runWithTemporaryDescription(context, utils.localize('disabling', 'Disabling remote debugging...'), async () => {
+        const doing: string = `Disabling remote debugging for app "${node.app.name}".`;
+        const done: string = `Remote debugging is successfully disabled for app "${node.app.name}".`;
+        await utils.runInBackground(doing, done, async () => {
             const deployment: EnhancedDeployment | undefined = await node.app.getActiveDeployment();
             if (!deployment) {
                 void window.showWarningMessage(`Disable Remote Debugging: App "${node.app.name}" has no active deployment.`);
@@ -177,7 +180,6 @@ export namespace AppCommands {
             }
             await deployment.disableDebugging();
             await node.refresh(context);
-            void window.showInformationMessage(`Remote debugging is successfully disabled for app "${node.app.name}".`);
         });
         return node;
     }
