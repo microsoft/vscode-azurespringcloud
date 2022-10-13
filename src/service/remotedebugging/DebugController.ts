@@ -19,8 +19,8 @@ import { StartDebuggingProxyStep } from "./steps/StartDebuggingProxyStep";
 export class DebugController {
     public static async attachDebugger(context: IActionContext, node: AppInstanceTreeItem): Promise<void> {
         const instance: EnhancedInstance = node.instance;
-        const attaching: string = localize('attachDebugger', 'Attaching debugger to Azure Spring Apps app instance "{0}".', instance.name);
-        const attached: string = localize('attachDebuggerSuccess', 'Debugger is successfully attached to Azure Spring Apps app instance "{0}".', instance.name);
+        const attaching: string = localize('attachDebugger', 'Attaching debugger to app instance "{0}".', instance.name);
+        const attached: string = localize('attachDebuggerSuccess', 'Successfully attached debugger to app instance "{0}".', instance.name);
 
         const config: RemoteDebugging = await instance.deployment.getDebuggingConfig();
         const wizardContext: IRemoteDebuggingContext = Object.assign(context, instance.deployment.app.service.subscription, { config });

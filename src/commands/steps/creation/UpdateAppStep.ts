@@ -21,7 +21,7 @@ export class UpdateAppStep extends AzureWizardExecuteStep<IAppCreationWizardCont
         const app: EnhancedApp = context.newApp!;
         const activeDeploymentName: string = context.newDeployment?.name ?? EnhancedApp.DEFAULT_DEPLOYMENT;
         await app.setActiveDeployment(context.newDeployment?.name ?? EnhancedApp.DEFAULT_DEPLOYMENT);
-        ext.outputChannel.appendLog(localize('updatingNewAppSuccess', 'Deployment "{0}" is successfully activated.', activeDeploymentName));
+        ext.outputChannel.appendLog(localize('updatingNewAppSuccess', 'Successfully activated deployment "{0}".', activeDeploymentName));
         return Promise.resolve(undefined);
     }
 

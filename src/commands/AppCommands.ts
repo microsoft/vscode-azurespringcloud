@@ -155,7 +155,7 @@ export namespace AppCommands {
                 await deployment.enableDebugging();
                 await node.refresh(context);
                 void (async () => {
-                    const msg: string = `Remote debugging is successfully enabled for app "${node.app.name}".`;
+                    const msg: string = `Successfully enabled remote debugging for app "${node.app.name}".`;
                     const action: string | undefined = await window.showInformationMessage(msg, 'Start Debugging', 'Learn More');
                     if (action === 'Learn More') {
                         void openUrl('https://aka.ms/asa-remotedebug');
@@ -171,7 +171,7 @@ export namespace AppCommands {
     export async function disableRemoteDebugging(context: IActionContext, n?: AzExtTreeItem): Promise<AppTreeItem> {
         const node: AppTreeItem = await getNode(n, context);
         const doing: string = `Disabling remote debugging for app "${node.app.name}".`;
-        const done: string = `Remote debugging is successfully disabled for app "${node.app.name}".`;
+        const done: string = `Successfully disabled remote debugging for app "${node.app.name}".`;
         await utils.runInBackground(doing, done, async () => {
             const deployment: EnhancedDeployment | undefined = await node.app.getActiveDeployment();
             if (!deployment) {

@@ -35,7 +35,7 @@ export class StartDebuggingProxyStep extends AzureWizardExecuteStep<IRemoteDebug
             proxy.start(context.config.port!);
         });
         context.proxy = proxy;
-        ext.outputChannel.appendLog(localize('startDebuggingProxySuccess', 'Debugging proxy is successfully started at port "{0}".', proxyPort));
+        ext.outputChannel.appendLog(localize('startDebuggingProxySuccess', 'Successfully started debugging proxy at port "{0}".', proxyPort));
     }
 
     public shouldExecute(_context: IRemoteDebuggingContext): boolean {

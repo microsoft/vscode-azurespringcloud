@@ -34,7 +34,7 @@ export class StartDebugConfigurationStep extends AzureWizardExecuteStep<IRemoteD
         });
         if (started) {
             context.configurationName = configurationName;
-            ext.outputChannel.appendLog(localize('startDebuggerSuccess', 'Debugger is successfully attached to instance "{0}".', this.instance.name));
+            ext.outputChannel.appendLog(localize('startDebuggerSuccess', 'Successfully attached debugger to instance "{0}".', this.instance.name));
         } else {
             throw new Error(`Failed to attach debugger to instance "${this.instance.name}".`);
         }

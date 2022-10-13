@@ -27,7 +27,7 @@ export class EnableRemoteDebuggingStep extends AzureWizardExecuteStep<IRemoteDeb
             config = await this.instance.deployment.getDebuggingConfig();
         }
         context.config = config;
-        ext.outputChannel.appendLog(localize('enableRemoteDebuggingSuccess', 'Remote debugging is successfully enabled for app "{0}".', this.instance.deployment.app.name));
+        ext.outputChannel.appendLog(localize('enableRemoteDebuggingSuccess', 'Successfully enabled remote debugging for app "{0}".', this.instance.deployment.app.name));
     }
 
     public shouldExecute(context: IRemoteDebuggingContext): boolean {

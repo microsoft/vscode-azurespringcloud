@@ -24,7 +24,7 @@ export class UpdateDeploymentStep extends AzureWizardExecuteStep<IAppDeploymentW
         progress.report({ message });
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         await this.deployment.updateArtifactPath(context.relativePathOrBuildResultId!);
-        ext.outputChannel.appendLog(localize('updateDeploymentSuccess', 'Deployment is successfully updated.'));
+        ext.outputChannel.appendLog(localize('updateDeploymentSuccess', 'Successfully updated deployment.'));
     }
 
     public shouldExecute(_context: IAppDeploymentWizardContext): boolean {

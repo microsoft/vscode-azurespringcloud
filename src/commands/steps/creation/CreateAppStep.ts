@@ -23,7 +23,7 @@ export class CreateAppStep extends AzureWizardExecuteStep<IAppCreationWizardCont
         progress.report({ message });
         const appName: string = nonNullProp(context, 'newAppName');
         context.newApp = await this.service.createApp(appName);
-        ext.outputChannel.appendLog(localize('creatingNewAppSuccess', 'App "{0}" is successfully created.', context.newAppName));
+        ext.outputChannel.appendLog(localize('creatingNewAppSuccess', 'Successfully created app "{0}".', context.newAppName));
         return Promise.resolve(undefined);
     }
 
