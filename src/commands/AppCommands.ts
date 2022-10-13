@@ -23,8 +23,8 @@ export namespace AppCommands {
         const app: EnhancedApp = node.app;
         let endpoint: string | undefined = await app.getPublicEndpoint();
         if (!endpoint || endpoint.toLowerCase() === 'none') {
-            await context.ui.showWarningMessage(`App [${app.name}] is not publicly accessible. Do you want to set it public and assign it a public endpoint?`, { modal: true }, DialogResponses.yes);
-            await toggleEndpoint(context, node);
+            await context.ui.showWarningMessage(`App "${app.name}" is not publicly accessible. Do you want to set it public and assign it a public endpoint?`, { modal: true }, DialogResponses.yes);
+            await assignEndpoint(context, node);
             endpoint = await app.getPublicEndpoint();
         }
         if (endpoint) {
@@ -41,13 +41,20 @@ export namespace AppCommands {
         }
     }
 
-    export async function toggleEndpoint(context: IActionContext, n?: AzExtTreeItem): Promise<void> {
+    export async function assignEndpoint(context: IActionContext, n?: AzExtTreeItem): Promise<void> {
         const node: AppTreeItem = await getNode(n, context);
         const app: EnhancedApp = node.app;
-        const isPublic: boolean = app.properties?.public ?? false;
-        const doing: string = isPublic ? `Unassigning public endpoint of "${app.name}".` : `Assigning public endpoint to "${app.name}".`;
-        const done: string = isPublic ? `Successfully unassigned public endpoint of "${app.name}".` : `Successfully assigned public endpoint to "${app.name}".`;
-        await utils.runInBackground(doing, done, () => app.setPublic(!isPublic));
+        const doing: string = `Assigning public endpoint to "${app.name}".`;
+        const done: string = `Successfully assigned public endpoint to "${app.name}".`;
+        await utils.runInBackground(doing, done, () => app.setPublic(true));
+    }
+
+    export async function unassignEndpoint(context: IActionContext, n?: AzExtTreeItem): Promise<void> {
+        const node: AppTreeItem = await getNode(n, context);
+        const app: EnhancedApp = node.app;
+        const doing: string = `Unassigning public endpoint of "${app.name}".`;
+        const done: string = `Successfully unassigned public endpoint of "${app.name}".`;
+        await utils.runInBackground(doing, done, () => app.setPublic(false));
     }
 
     export async function startApp(context: IActionContext, n?: AzExtTreeItem): Promise<AppTreeItem> {
@@ -63,8 +70,6 @@ export namespace AppCommands {
     export async function stopApp(context: IActionContext, n?: AzExtTreeItem): Promise<AppTreeItem> {
         const node: AppTreeItem = await getNode(n, context);
         const app: EnhancedApp = node.app;
-        const stopResponse: MessageItem = { title: 'Stop' };
-        await context.ui.showWarningMessage(`Are you sure to stop "${app.name}"?`, { modal: true }, stopResponse);
         await node.runWithTemporaryDescription(context, utils.localize('stopping', 'Stopping...'), async () => {
             await app.stop();
             await node.refresh(context);

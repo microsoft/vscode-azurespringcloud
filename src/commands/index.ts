@@ -32,7 +32,8 @@ export function registerCommands(): void {
     registerCommandWithTelemetryWrapper('azureSpringApps.apps.viewProperties', ServiceCommands.viewProperties);
     registerCommandWithTelemetryWrapper('azureSpringApps.app.openPublicEndpoint', AppCommands.openPublicEndpoint);
     registerCommandWithTelemetryWrapper('azureSpringApps.app.openTestEndpoint', AppCommands.openTestEndpoint);
-    registerCommandWithTelemetryWrapper('azureSpringApps.app.toggleEndpoint', AppCommands.toggleEndpoint);
+    registerCommandWithTelemetryWrapper('azureSpringApps.app.assignEndpoint', AppCommands.assignEndpoint);
+    registerCommandWithTelemetryWrapper('azureSpringApps.app.unassignEndpoint', AppCommands.unassignEndpoint);
     registerCommandWithTelemetryWrapper('azureSpringApps.app.start', AppCommands.startApp);
     registerCommandWithTelemetryWrapper('azureSpringApps.app.stop', AppCommands.stopApp);
     registerCommandWithTelemetryWrapper('azureSpringApps.app.restart', AppCommands.restartApp);

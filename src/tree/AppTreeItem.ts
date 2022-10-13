@@ -57,7 +57,7 @@ export class AppTreeItem extends AzExtParentTreeItem {
 
     public get contextValue(): string {
         const debugging: string = this._debuggingEnabled === undefined ? 'unknown' : this._debuggingEnabled ? 'enabled' : 'disabled'
-        return `azureSpringApps.app;status-${this.status};debugging-${debugging};`;
+        return `azureSpringApps.app;status-${this.status};debugging-${debugging};public-${this.app.properties?.public};`;
     }
 
     public get iconPath(): TreeItemIconPath {

@@ -43,7 +43,8 @@
         "onCommand:azureSpringApps.apps.viewProperties",
         "onCommand:azureSpringApps.app.openPublicEndpoint",
         "onCommand:azureSpringApps.app.openTestEndpoint",
-        "onCommand:azureSpringApps.app.toggleEndpoint",
+        "onCommand:azureSpringApps.app.assignEndpoint",
+        "onCommand:azureSpringApps.app.unassignEndpoint",
         "onCommand:azureSpringApps.app.start",
         "onCommand:azureSpringApps.app.stop",
         "onCommand:azureSpringApps.app.restart",
@@ -126,8 +127,13 @@
                 "category": "Spring App"
             },
             {
-                "command": "azureSpringApps.app.toggleEndpoint",
-                "title": "%azureSpringApps.menu.app.toggleEndpoint%",
+                "command": "azureSpringApps.app.assignEndpoint",
+                "title": "%azureSpringApps.menu.app.assignEndpoint%",
+                "category": "Spring App"
+            },
+            {
+                "command": "azureSpringApps.app.unassignEndpoint",
+                "title": "%azureSpringApps.menu.app.unassignEndpoint%",
                 "category": "Spring App"
             },
             {
@@ -322,8 +328,13 @@
                     "group": "2@2"
                 },
                 {
-                    "command": "azureSpringApps.app.toggleEndpoint",
-                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app;status-(running|stopped);/i",
+                    "command": "azureSpringApps.app.assignEndpoint",
+                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app;status-(running|stopped);.*;public-false;/i",
+                    "group": "3@1"
+                },
+                {
+                    "command": "azureSpringApps.app.unassignEndpoint",
+                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app;status-(running|stopped);.*;public-true;/i",
                     "group": "3@1"
                 },
                 {
