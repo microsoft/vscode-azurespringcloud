@@ -82,6 +82,7 @@ export class EnhancedApp {
 
     public async refresh(): Promise<EnhancedApp> {
         this._remote = await this.client.apps.get(this.service.resourceGroup, this.service.name, this.name);
+        this.activeDeployment = undefined;
         await this.getActiveDeployment(true);
         return this;
     }

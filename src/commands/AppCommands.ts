@@ -3,7 +3,6 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { RemoteDebugging } from "@azure/arm-appplatform";
 import { openInPortal } from "@microsoft/vscode-azext-azureutils";
 import { AzExtTreeItem, DialogResponses, IActionContext, openReadOnlyJson, openUrl } from "@microsoft/vscode-azext-utils";
 import { MessageItem, OpenDialogOptions, TextEditor, Uri, window, workspace, WorkspaceFolder } from "vscode";
@@ -129,41 +128,51 @@ export namespace AppCommands {
         return node;
     }
 
-    export async function toggleRemoteDebugging(context: IActionContext, n?: AzExtTreeItem, providedConfig?: RemoteDebugging, providedMsg?: string): Promise<AppTreeItem> {
+    export async function enableRemoteDebugging(context: IActionContext, n?: AzExtTreeItem, confirmation?: string): Promise<AppTreeItem> {
         const node: AppTreeItem = await getNode(n, context);
         await node.runWithTemporaryDescription(context, utils.localize('loading', 'Loading details...'), async () => {
             const deployment: EnhancedDeployment | undefined = await node.app.getActiveDeployment();
             if (!deployment) {
-                void context.ui.showWarningMessage(`App "${node.app.name}" has no active deployment.`);
+                void window.showWarningMessage(`Failed to enable remote debugging for app "${node.app.name}", because it has no active deployment.`);
                 return;
             }
-            const config: RemoteDebugging | undefined = providedConfig ?? await deployment.getDebuggingConfig();
-            const status: string = config?.enabled ? 'enabled' : 'disabled';
-            const action: string = config?.enabled ? 'disable' : 'enable';
-            const confirmMsg: string = providedMsg ?? utils.localize('confirm', `Remote debugging is ${status} for app "${node.app.name}", are you sure to ${action} it?`);
-            const actionResponse: MessageItem = { title: action[0].toUpperCase() + action.slice(1) };
-            const result: MessageItem = await context.ui.showWarningMessage(confirmMsg, { modal: true }, actionResponse, DialogResponses.learnMore);
-            if (result === DialogResponses.learnMore) {
-                await openUrl('https://aka.ms/asa-remotedebug');
-                return;
-            } else {
-                await node.runWithTemporaryDescription(context, utils.localize('toggling', `${action[0].toUpperCase() + action.slice(1, -1)}ing remote debugging...`), async () => {
-                    const msg: string = `Remote debugging is successfully ${action}d for app "${node.app.name}".`;
-                    if (config?.enabled) {
-                        await deployment.disableDebugging();
-                        await node.refresh(context);
-                        void window.showInformationMessage(msg);
-                    } else {
-                        await deployment.enableDebugging();
-                        await node.refresh(context);
-                        void (async () => {
-                            const action: string | undefined = await window.showInformationMessage(msg, "Attach Debugger");
-                            action && void AppCommands.startRemoteDebugging(context, node);
-                        })();
+            let result: MessageItem | undefined;
+            if (confirmation) {
+                const actionResponse: MessageItem = { title: 'Enable' };
+                result = await context.ui.showWarningMessage(confirmation, { modal: true }, actionResponse, DialogResponses.learnMore);
+                if (result === DialogResponses.learnMore) {
+                    void openUrl('https://aka.ms/asa-remotedebug');
+                    return;
+                }
+            }
+            await node.runWithTemporaryDescription(context, utils.localize('enabling', `Enabling remote debugging...`), async () => {
+                await deployment.enableDebugging();
+                await node.refresh(context);
+                void (async () => {
+                    const msg: string = `Remote debugging is successfully enabled for app "${node.app.name}".`;
+                    const action: string | undefined = await window.showInformationMessage(msg, 'Start Debugging', 'Learn More');
+                    if (action === 'Learn More') {
+                        void openUrl('https://aka.ms/asa-remotedebug');
+                    } else if (action) {
+                        void AppCommands.startRemoteDebugging(context, node);
                     }
-                });
+                })();
+            });
+        });
+        return node;
+    }
+
+    export async function disableRemoteDebugging(context: IActionContext, n?: AzExtTreeItem): Promise<AppTreeItem> {
+        const node: AppTreeItem = await getNode(n, context);
+        await node.runWithTemporaryDescription(context, utils.localize('disabling', 'Disabling remote debugging...'), async () => {
+            const deployment: EnhancedDeployment | undefined = await node.app.getActiveDeployment();
+            if (!deployment) {
+                void window.showWarningMessage(`Disable Remote Debugging: App "${node.app.name}" has no active deployment.`);
                 return;
             }
+            await deployment.disableDebugging();
+            await node.refresh(context);
+            void window.showInformationMessage(`Remote debugging is successfully disabled for app "${node.app.name}".`);
         });
         return node;
     }

@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
+import { RemoteDebugging } from '@azure/arm-appplatform';
 import { AzExtParentTreeItem, AzExtTreeItem, AzureWizard, AzureWizardExecuteStep, IActionContext, TreeItemIconPath } from '@microsoft/vscode-azext-utils';
 import { window } from "vscode";
 import { AppCommands } from "../commands/AppCommands";
@@ -18,7 +19,7 @@ import { AppScaleSettingsTreeItem } from "./AppScaleSettingsTreeItem";
 import { ServiceTreeItem } from "./ServiceTreeItem";
 
 export class AppTreeItem extends AzExtParentTreeItem {
-    public static contextValue: RegExp = /^azureSpringApps\.app\.status-.+$/;
+    public static contextValue: RegExp = /^azureSpringApps\.app;status-.+;debugging-.+;/i;
     public static readonly ACCESS_PUBLIC_ENDPOINT: string = 'Access public endpoint';
     public static readonly ACCESS_TEST_ENDPOINT: string = 'Access test endpoint';
     public readonly parent: ServiceTreeItem;
@@ -29,6 +30,7 @@ export class AppTreeItem extends AzExtParentTreeItem {
     private readonly _jvmOptionsTreeItem: AppJvmOptionsTreeItem;
     private _status: string = 'unknown';
     private deleted: boolean;
+    private _debuggingEnabled: boolean | undefined;
 
     constructor(parent: ServiceTreeItem, app: EnhancedApp, context: IActionContext) {
         super(parent);
@@ -54,7 +56,8 @@ export class AppTreeItem extends AzExtParentTreeItem {
     }
 
     public get contextValue(): string {
-        return `azureSpringApps.app.status-${this.status}`;
+        const debugging: string = this._debuggingEnabled === undefined ? 'unknown' : this._debuggingEnabled ? 'enabled' : 'disabled'
+        return `azureSpringApps.app;status-${this.status};debugging-${debugging};`;
     }
 
     public get iconPath(): TreeItemIconPath {
@@ -112,6 +115,9 @@ export class AppTreeItem extends AzExtParentTreeItem {
         if (!this.deleted) {
             await this.app.refresh();
             this._status = await this.app.getStatus();
+            const deployment: EnhancedDeployment | undefined = await this.app.getActiveDeployment();
+            const config: RemoteDebugging | undefined = await deployment?.getDebuggingConfig();
+            this._debuggingEnabled = config?.enabled;
         }
     }
 

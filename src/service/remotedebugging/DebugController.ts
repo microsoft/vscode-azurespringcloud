@@ -28,7 +28,7 @@ export class DebugController {
 
         if (!config?.enabled) {
             const confirmMsg: string = localize('confirmRemoteDebug', 'Remote debugging should be enabled first before debugging. Would you like to enable it?');
-            void AppCommands.toggleRemoteDebugging(context, node.parent.parent, config, confirmMsg);
+            void AppCommands.enableRemoteDebugging(context, node.parent.parent, confirmMsg);
             return;
         }
         executeSteps.push(new StartDebuggingProxyStep(instance));

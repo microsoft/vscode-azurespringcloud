@@ -52,7 +52,8 @@
         "onCommand:azureSpringApps.app.scale",
         "onCommand:azureSpringApps.app.openInPortal",
         "onCommand:azureSpringApps.app.viewProperties",
-        "onCommand:azureSpringApps.app.toggleRemoteDebugging",
+        "onCommand:azureSpringApps.app.enableRemoteDebugging",
+        "onCommand:azureSpringApps.app.disableRemoteDebugging",
         "onCommand:azureSpringApps.app.instance.startRemoteDebugging",
         "onCommand:azureSpringApps.app.instance.startStreamingLog",
         "onCommand:azureSpringApps.app.instance.stopStreamingLog",
@@ -170,8 +171,13 @@
                 "category": "Spring App"
             },
             {
-                "command": "azureSpringApps.app.toggleRemoteDebugging",
-                "title": "%azureSpringApps.menu.app.toggleRemoteDebugging%",
+                "command": "azureSpringApps.app.enableRemoteDebugging",
+                "title": "%azureSpringApps.menu.app.enableRemoteDebugging%",
+                "category": "Spring App"
+            },
+            {
+                "command": "azureSpringApps.app.disableRemoteDebugging",
+                "title": "%azureSpringApps.menu.app.disableRemoteDebugging%",
                 "category": "Spring App"
             },
             {
@@ -302,67 +308,72 @@
                 },
                 {
                     "command": "azureSpringApps.app.openInPortal",
-                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app\\.status-.+$/",
+                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app;status-.+;/i",
                     "group": "1@1"
                 },
                 {
                     "command": "azureSpringApps.app.openPublicEndpoint",
-                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app\\.status-running$/",
+                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app;status-running;/i",
                     "group": "2@1"
                 },
                 {
                     "command": "azureSpringApps.app.openTestEndpoint",
-                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app\\.status-running$/",
+                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app;status-running;/i",
                     "group": "2@2"
                 },
                 {
                     "command": "azureSpringApps.app.toggleEndpoint",
-                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app\\.status-(running|stopped)/",
+                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app;status-(running|stopped);/i",
                     "group": "3@1"
                 },
                 {
                     "command": "azureSpringApps.app.start",
-                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app\\.status-stopped$/",
+                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app;status-stopped;/i",
                     "group": "5@1"
                 },
                 {
-                    "command": "azureSpringApps.app.toggleRemoteDebugging",
-                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app\\.status-running$/",
+                    "command": "azureSpringApps.app.enableRemoteDebugging",
+                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app;status-running;debugging-disabled;/i",
+                    "group": "4@2"
+                },
+                {
+                    "command": "azureSpringApps.app.disableRemoteDebugging",
+                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app;status-running;debugging-enabled;/i",
                     "group": "4@2"
                 },
                 {
                     "command": "azureSpringApps.app.stop",
-                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app\\.status-running$/",
+                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app;status-running;/i",
                     "group": "5@2"
                 },
                 {
                     "command": "azureSpringApps.app.restart",
-                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app\\.status-running$/",
+                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app;status-running;/i",
                     "group": "5@3"
                 },
                 {
                     "command": "azureSpringApps.app.delete",
-                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app\\.status-.+$/",
+                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app;status-.+;/i",
                     "group": "5@4"
                 },
                 {
                     "command": "azureSpringApps.app.scale",
-                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app\\.status-(running|stopped)$/",
+                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app;status-(running|stopped);/i",
                     "group": "5@5"
                 },
                 {
                     "command": "azureSpringApps.app.deploy",
-                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app\\.status-(running|stopped)$/",
+                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app;status-(running|stopped);/i",
                     "group": "6@1"
                 },
                 {
                     "command": "azureSpringApps.app.viewProperties",
-                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app\\.status-.+$/",
+                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app;status-.+;/i",
                     "group": "9@1"
                 },
                 {
                     "command": "azureSpringApps.common.refresh",
-                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app\\.status-.+$/",
+                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app;status-.+;/i",
                     "group": "9@2"
                 },
                 {
@@ -372,22 +383,22 @@
                 },
                 {
                     "command": "azureSpringApps.app.instance.startRemoteDebugging",
-                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app(\\.instance)?\\.status-[Rr]unning$/",
+                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app(\\.instance)?;status-[Rr]unning;/i",
                     "group": "4@1"
                 },
                 {
                     "command": "azureSpringApps.app.instance.startStreamingLog",
-                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app\\.instance\\.status-Running$/",
+                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app\\.instance;status-Running;/i",
                     "group": "6@1"
                 },
                 {
                     "command": "azureSpringApps.app.instance.stopStreamingLog",
-                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app\\.instance\\.status-Running$/",
+                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app\\.instance;status-Running;/i",
                     "group": "6@2"
                 },
                 {
                     "command": "azureSpringApps.app.instance.viewProperties",
-                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app\\.instance\\.status-.+$/",
+                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app\\.instance;status-.+;/i",
                     "group": "9@1"
                 },
                 {
