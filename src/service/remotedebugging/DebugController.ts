@@ -27,7 +27,7 @@ export class DebugController {
         const executeSteps: AzureWizardExecuteStep<IRemoteDebuggingContext>[] = [];
 
         if (!config?.enabled) {
-            const confirmMsg: string = localize('confirmRemoteDebug', 'Remote debugging should be enabled first before debugging. Would you like to enable it?');
+            const confirmMsg: string = localize('confirmRemoteDebug', 'Remote debugging should be enabled first before debugging. Do you want to enable it?');
             void AppCommands.enableRemoteDebugging(context, node.parent.parent, confirmMsg);
             return;
         }
