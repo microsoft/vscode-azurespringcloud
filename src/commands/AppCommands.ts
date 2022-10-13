@@ -23,7 +23,7 @@ export namespace AppCommands {
         const app: EnhancedApp = node.app;
         let endpoint: string | undefined = await app.getPublicEndpoint();
         if (!endpoint || endpoint.toLowerCase() === 'none') {
-            await context.ui.showWarningMessage(`App "${app.name}" is not publicly accessible. Do you want to set it public and assign it a public endpoint?`, { modal: true }, DialogResponses.yes);
+            await context.ui.showWarningMessage(`App "${app.name}" is not publicly accessible. Do you want to assign it a public endpoint?`, { modal: true }, DialogResponses.yes);
             await assignEndpoint(context, node);
             endpoint = await app.getPublicEndpoint();
         }
@@ -52,8 +52,8 @@ export namespace AppCommands {
     export async function unassignEndpoint(context: IActionContext, n?: AzExtTreeItem): Promise<void> {
         const node: AppTreeItem = await getNode(n, context);
         const app: EnhancedApp = node.app;
-        const doing: string = `Unassigning public endpoint of "${app.name}".`;
-        const done: string = `Successfully unassigned public endpoint of "${app.name}".`;
+        const doing: string = `Unassigning public endpoint to "${app.name}".`;
+        const done: string = `Successfully unassigned public endpoint to "${app.name}".`;
         await utils.runInBackground(doing, done, () => app.setPublic(false));
     }
 
@@ -93,7 +93,9 @@ export namespace AppCommands {
         await context.ui.showWarningMessage(`Are you sure to delete "${app.name}"?`, { modal: true }, DialogResponses.deleteResponse);
         const deleting: string = utils.localize('deletingSpringCLoudApp', 'Deleting Spring app "{0}"...', app.name);
         const deleted: string = utils.localize('deletedSpringCLoudApp', 'Successfully deleted Spring app "{0}".', app.name);
-        await utils.runInBackground(deleting, deleted, () => node.deleteTreeItem(context));
+        await node.runWithTemporaryDescription(context, 'Deleting...', async () => {
+            await utils.runInBackground(deleting, deleted, () => node.deleteTreeItem(context));
+        });
     }
 
     export async function deploy(context: IActionContext, n?: AzExtTreeItem): Promise<AppTreeItem> {
@@ -117,7 +119,9 @@ export namespace AppCommands {
 
     export async function scale(context: IActionContext, n?: AzExtTreeItem): Promise<AppTreeItem> {
         const node: AppTreeItem = await getNode(n, context);
-        await node.scaleInstances(context);
+        await node.runWithTemporaryDescription(context, 'Scaling...', async () => {
+            await node.scaleInstances(context);
+        });
         return node;
     }
 
@@ -135,18 +139,18 @@ export namespace AppCommands {
 
     export async function enableRemoteDebugging(context: IActionContext, n?: AzExtTreeItem, confirmation?: string): Promise<AppTreeItem> {
         const node: AppTreeItem = await getNode(n, context);
-        await node.runWithTemporaryDescription(context, utils.localize('loading', 'Loading details...'), async () => {
-            let result: MessageItem | undefined;
-            if (confirmation) {
-                const actionResponse: MessageItem = { title: 'Enable' };
-                result = await context.ui.showWarningMessage(confirmation, { modal: true }, actionResponse, DialogResponses.learnMore);
-                if (result === DialogResponses.learnMore) {
-                    void openUrl('https://aka.ms/asa-remotedebug');
-                    return;
-                }
+        let result: MessageItem | undefined;
+        if (confirmation) {
+            const actionResponse: MessageItem = { title: 'Enable' };
+            result = await context.ui.showWarningMessage(confirmation, { modal: true }, actionResponse, DialogResponses.learnMore);
+            if (result === DialogResponses.learnMore) {
+                void openUrl('https://aka.ms/asa-remotedebug');
+                return node;
             }
+        }
+        await node.runWithTemporaryDescription(context, 'Updating...', async () => {
             const doing: string = `Enabling remote debugging for app "${node.app.name}".`;
-            void utils.runInBackground(doing, null, async () => {
+            await utils.runInBackground(doing, null, async () => {
                 const deployment: EnhancedDeployment | undefined = await node.app.getActiveDeployment();
                 if (!deployment) {
                     void window.showWarningMessage(`Failed to enable remote debugging for app "${node.app.name}", because it has no active deployment.`);
@@ -172,14 +176,16 @@ export namespace AppCommands {
         const node: AppTreeItem = await getNode(n, context);
         const doing: string = `Disabling remote debugging for app "${node.app.name}".`;
         const done: string = `Successfully disabled remote debugging for app "${node.app.name}".`;
-        await utils.runInBackground(doing, done, async () => {
-            const deployment: EnhancedDeployment | undefined = await node.app.getActiveDeployment();
-            if (!deployment) {
-                void window.showWarningMessage(`Disable Remote Debugging: App "${node.app.name}" has no active deployment.`);
-                return;
-            }
-            await deployment.disableDebugging();
-            await node.refresh(context);
+        await node.runWithTemporaryDescription(context, 'Updating...', async () => {
+            await utils.runInBackground(doing, done, async () => {
+                const deployment: EnhancedDeployment | undefined = await node.app.getActiveDeployment();
+                if (!deployment) {
+                    void window.showWarningMessage(`Disable Remote Debugging: App "${node.app.name}" has no active deployment.`);
+                    return;
+                }
+                await deployment.disableDebugging();
+                await node.refresh(context);
+            });
         });
         return node;
     }
@@ -194,7 +200,9 @@ export namespace AppCommands {
 
     export async function startStreamingLogs(context: IActionContext, n?: AzExtTreeItem): Promise<AppInstanceTreeItem> {
         const node: AppInstanceTreeItem = await getInstanceNode(n, context);
-        await node.runWithTemporaryDescription(context, utils.localize('startStreamingLog', 'Starting streaming log...'), async () => {
+        const doing: string = `Starting log streaming for instance "${node.instance.name}".`;
+        const done: string = `Successfully started log streaming for instance "${node.instance.name}".`;
+        await utils.runInBackground(doing, done, async () => {
             const appTreeItem: AppTreeItem = node.parent.parent;
             const app: EnhancedApp = appTreeItem.app;
             return app.startStreamingLogs(context, node.instance);
@@ -204,7 +212,9 @@ export namespace AppCommands {
 
     export async function stopStreamingLogs(context: IActionContext, n?: AzExtTreeItem): Promise<AppInstanceTreeItem> {
         const node: AppInstanceTreeItem = await getInstanceNode(n, context);
-        await node.runWithTemporaryDescription(context, utils.localize('stopStreamingLog', 'Stopping streaming log...'), async () => {
+        const doing: string = `Stopping log streaming for instance "${node.instance.name}".`;
+        const done: string = `Successfully stopped log streaming for instance "${node.instance.name}".`;
+        await utils.runInBackground(doing, done, async () => {
             const appTreeItem: AppTreeItem = node.parent.parent;
             const app: EnhancedApp = appTreeItem.app;
             return app.stopStreamingLogs(node.instance);

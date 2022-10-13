@@ -31,7 +31,9 @@ export namespace ServiceCommands {
         await context.ui.showWarningMessage(`Are you sure to delete "${node.service.name}"?`, { modal: true }, DialogResponses.deleteResponse);
         const deleting: string = utils.localize('deletingSpringCLoudService', 'Deleting Azure Spring Apps "{0}"...', service.name);
         const deleted: string = utils.localize('deletedSpringCloudService', 'Successfully deleted Azure Spring Apps "{0}".', service.name);
-        await utils.runInBackground(deleting, deleted, () => node.deleteTreeItem(context));
+        await node.runWithTemporaryDescription(context, 'Deleting...', async () => {
+            await utils.runInBackground(deleting, deleted, () => node.deleteTreeItem(context));
+        });
         return node;
     }
 
