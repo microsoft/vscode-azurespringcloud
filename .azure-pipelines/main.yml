@@ -22,13 +22,13 @@ jobs:
   - template: common/lint.yml
   - template: common/test.yml
 
-- job: macOS
-  pool:
-    vmImage: macOS-latest
-  steps:
-  - template: common/build.yml
-  - template: common/lint.yml
-  # - template: common/test.yml
+#- job: macOS
+#  pool:
+#    vmImage: macOS-latest
+#  steps:
+#  - template: common/build.yml
+#  - template: common/lint.yml
+# - template: common/test.yml
 
 trigger:
   branches:
