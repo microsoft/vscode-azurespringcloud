@@ -38,8 +38,7 @@ export abstract class AppSettingsTreeItem extends AzExtParentTreeItem {
 
     public abstract updateSettingValue(node: AppSettingTreeItem, context: IActionContext): Promise<string>;
 
-    // tslint:disable-next-line:no-any
-    public abstract updateSettingsValue(context: IActionContext): Promise<any>;
+    public abstract updateSettingsValue(context: IActionContext): Promise<unknown>;
 
     public abstract deleteSettingItem(node: AppSettingTreeItem, context: IActionContext): Promise<void>;
 }

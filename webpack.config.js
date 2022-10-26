@@ -1,9 +1,8 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 'use strict';
-
-//@ts-check
 
 // See https://github.com/Microsoft/vscode-azuretools/wiki/webpack for guidance
 

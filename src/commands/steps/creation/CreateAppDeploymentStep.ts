@@ -11,7 +11,6 @@ import { IAppCreationWizardContext } from "./IAppCreationWizardContext";
 
 export class CreateAppDeploymentStep extends AzureWizardExecuteStep<IAppCreationWizardContext> {
 
-    // tslint:disable-next-line: no-unexternalized-strings
     public priority: number = 140;
 
     public async execute(context: IAppCreationWizardContext, progress: Progress<{ message?: string; increment?: number }>): Promise<void> {
@@ -20,9 +19,10 @@ export class CreateAppDeploymentStep extends AzureWizardExecuteStep<IAppCreation
         progress.report({ message });
 
         const appRuntime: KnownSupportedRuntimeValue | undefined = context.newAppRuntime;
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const app: EnhancedApp = context.newApp!;
         context.newDeployment = await app.createDeployment(EnhancedApp.DEFAULT_DEPLOYMENT, appRuntime);
-        ext.outputChannel.appendLog(localize('creatingNewAppDeploymentSuccess', 'Default deployment is successfully created.'));
+        ext.outputChannel.appendLog(localize('creatingNewAppDeploymentSuccess', 'Successfully created default deployment.'));
         await app.startDeployment(EnhancedApp.DEFAULT_DEPLOYMENT);
         return Promise.resolve(undefined);
     }

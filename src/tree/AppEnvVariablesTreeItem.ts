@@ -76,7 +76,7 @@ export class AppEnvVariablesTreeItem extends AppSettingsTreeItem {
             const updating: string = utils.localize('updatingEnvVar', 'Updating environment variables of "{0}"...', deployment.app.name);
             const updated: string = utils.localize('updatedEnvVar', 'Successfully updated environment variables of {0}.', deployment.app.name);
             await utils.runInBackground(updating, updated, () => deployment.updateEnvironmentVariables(newVars ?? {}));
-            this.parent.refresh(context);
+            void this.parent.refresh(context);
         }
     }
 }

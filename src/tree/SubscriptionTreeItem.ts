@@ -31,7 +31,7 @@ export class SubscriptionTreeItem extends SubscriptionTreeItemBase {
         return await this.createTreeItemsWithErrorHandling(
             services,
             'invalidSpringCloudService',
-            service => new ServiceTreeItem(this, new EnhancedService(client, service)),
+            service => new ServiceTreeItem(this, new EnhancedService(client, this.subscription, service)),
             service => service.name
         );
     }

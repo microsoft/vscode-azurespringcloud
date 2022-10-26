@@ -3,7 +3,7 @@
 
 import { AppPlatformManagementClient, AppResource, AppResourceProperties, Build, BuildResult, BuildResultProvisioningState, DeploymentInstance, DeploymentResource, KnownSupportedRuntimeValue, ResourceUploadDefinition, TestKeys, UserSourceInfoUnion } from "@azure/arm-appplatform";
 import { AnonymousCredential, ShareFileClient } from "@azure/storage-file-share";
-import { IActionContext } from "../../extension.bundle";
+import { IActionContext } from "@microsoft/vscode-azext-utils";
 import { localize } from "../utils";
 import { EnhancedDeployment } from "./EnhancedDeployment";
 import { EnhancedService } from "./EnhancedService";
@@ -21,11 +21,13 @@ export class EnhancedApp {
     private activeDeployment: EnhancedDeployment | undefined;
 
     public constructor(service: EnhancedService, resource: AppResource) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         this.name = resource.name!;
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         this.id = resource.id!;
         this.service = service;
         this._remote = resource;
-        this.getActiveDeployment();
+        void this.getActiveDeployment();
     }
 
     public get properties(): AppResourceProperties | undefined {
@@ -52,17 +54,26 @@ export class EnhancedApp {
 
     public async start(): Promise<void> {
         const activeDeploymentName: string | undefined = (await this.getActiveDeployment())?.name;
-        await this.client.deployments.beginStartAndWait(this.service.resourceGroup, this.service.name, this.name, activeDeploymentName!);
+        if (!activeDeploymentName) {
+            throw new Error(`app ${this.name} has no active deployment.`);
+        }
+        await this.client.deployments.beginStartAndWait(this.service.resourceGroup, this.service.name, this.name, activeDeploymentName);
     }
 
     public async stop(): Promise<void> {
         const activeDeploymentName: string | undefined = (await this.getActiveDeployment())?.name;
-        await this.client.deployments.beginStopAndWait(this.service.resourceGroup, this.service.name, this.name, activeDeploymentName!);
+        if (!activeDeploymentName) {
+            throw new Error(`app ${this.name} has no active deployment.`);
+        }
+        await this.client.deployments.beginStopAndWait(this.service.resourceGroup, this.service.name, this.name, activeDeploymentName);
     }
 
     public async restart(): Promise<void> {
         const activeDeploymentName: string | undefined = (await this.getActiveDeployment())?.name;
-        await this.client.deployments.beginRestartAndWait(this.service.resourceGroup, this.service.name, this.name, activeDeploymentName!);
+        if (!activeDeploymentName) {
+            throw new Error(`app ${this.name} has no active deployment.`);
+        }
+        await this.client.deployments.beginRestartAndWait(this.service.resourceGroup, this.service.name, this.name, activeDeploymentName);
     }
 
     public async remove(): Promise<void> {
@@ -71,6 +82,7 @@ export class EnhancedApp {
 
     public async refresh(): Promise<EnhancedApp> {
         this._remote = await this.client.apps.get(this.service.resourceGroup, this.service.name, this.name);
+        this.activeDeployment = undefined;
         await this.getActiveDeployment(true);
         return this;
     }
@@ -164,7 +176,10 @@ export class EnhancedApp {
 
     public async uploadArtifact(path: string): Promise<string | undefined> {
         const uploadDefinition: ResourceUploadDefinition = await this.getUploadDefinition();
-        const fileClient: ShareFileClient = new ShareFileClient(uploadDefinition.uploadUrl!, new AnonymousCredential());
+        if (!uploadDefinition.uploadUrl) {
+            throw new Error(`faild to get upload url of app ${this.name}.`);
+        }
+        const fileClient: ShareFileClient = new ShareFileClient(uploadDefinition.uploadUrl, new AnonymousCredential());
         await fileClient.uploadFile(path);
         return uploadDefinition.relativePath;
     }
@@ -178,11 +193,12 @@ export class EnhancedApp {
             }
         });
         const buildResultId: string | undefined = build.properties?.triggeredBuildResult?.id;
-        const buildResultName: string | undefined = build.properties?.triggeredBuildResult?.id?.split('/').pop()!;
+        const buildResultName: string | undefined = build.properties?.triggeredBuildResult?.id?.split('/').pop();
         let status: BuildResultProvisioningState | undefined;
         const start: number = Date.now();
         while (status !== 'Succeeded') {
-            const result: BuildResult = await this.client.buildServiceOperations.getBuildResult(this.service.resourceGroup, this.service.name, EnhancedApp.DEFAULT_TANZU_COMPONENT_NAME, this.name, buildResultName);
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            const result: BuildResult = await this.client.buildServiceOperations.getBuildResult(this.service.resourceGroup, this.service.name, EnhancedApp.DEFAULT_TANZU_COMPONENT_NAME, this.name, buildResultName!);
             status = result.properties?.provisioningState;
             if (status === 'Succeeded') {
                 break;
@@ -192,7 +208,6 @@ export class EnhancedApp {
                 }
                 // tslint:disable-next-line no-string-based-set-timeout
                 await new Promise(r => setTimeout(r, 10000)); // wait for 10 seconds
-                continue;
             } else {
                 throw new Error(`Build failed for buildId: ${buildResultId}`);
             }

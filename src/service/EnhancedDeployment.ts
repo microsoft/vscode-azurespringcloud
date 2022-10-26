@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import { AppPlatformManagementClient, DeploymentResource, DeploymentResourceProperties, DeploymentSettings, JarUploadedUserSourceInfo, ResourceRequests, Sku } from "@azure/arm-appplatform";
+import { AppPlatformManagementClient, DeploymentResource, DeploymentResourceProperties, DeploymentSettings, JarUploadedUserSourceInfo, RemoteDebugging, ResourceRequests, Sku } from "@azure/arm-appplatform";
 import { IScaleSettings } from "../model";
 import { localize } from "../utils";
 import { EnhancedApp } from "./EnhancedApp";
@@ -16,7 +16,9 @@ export class EnhancedDeployment {
     private _remote: DeploymentResource;
 
     public constructor(app: EnhancedApp, resource: DeploymentResource) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         this.name = resource.name!;
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         this.id = resource.id!;
         this.app = app;
         this._remote = resource;
@@ -70,7 +72,7 @@ export class EnhancedDeployment {
             };
         }
         this._remote = await this.client.deployments.beginUpdateAndWait(this.app.service.resourceGroup, this.app.service.name, this.app.name,
-                                                                        this.name || EnhancedDeployment.DEFAULT_DEPLOYMENT_NAME, { properties });
+            this.name || EnhancedDeployment.DEFAULT_DEPLOYMENT_NAME, { properties });
     }
 
     public async updateScaleSettings(settings: IScaleSettings): Promise<void> {
@@ -113,7 +115,6 @@ export class EnhancedDeployment {
             });
         } else {
             this._remote = await this.client.deployments.beginUpdateAndWait(this.app.service.resourceGroup, this.app.service.name, this.app.name, this.name, {
-                //@ts-ignore
                 properties: {
                     source: {
                         type: 'Jar',
@@ -134,5 +135,19 @@ export class EnhancedDeployment {
             parseInt(resourceRequests?.memory) / 1024 :
             parseInt(resourceRequests?.memory)) : 1;
         return { cpu, memory, capacity: this.properties?.instances?.length ?? 0 };
+    }
+
+    public async getDebuggingConfig(): Promise<RemoteDebugging> {
+        return this.client.deployments.getRemoteDebuggingConfig(this.app.service.resourceGroup, this.app.service.name, this.app.name, this.name);
+    }
+
+    public async enableDebugging(port: number = 5005): Promise<RemoteDebugging> {
+        return this.client.deployments.beginEnableRemoteDebuggingAndWait(this.app.service.resourceGroup, this.app.service.name, this.app.name, this.name, {
+            remoteDebuggingPayload: { port }
+        });
+    }
+
+    public async disableDebugging(): Promise<void> {
+        await this.client.deployments.beginDisableRemoteDebuggingAndWait(this.app.service.resourceGroup, this.app.service.name, this.app.name, this.name);
     }
 }

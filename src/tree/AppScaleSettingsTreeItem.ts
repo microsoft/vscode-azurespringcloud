@@ -60,8 +60,8 @@ export class AppScaleSettingsTreeItem extends AppSettingsTreeItem {
             const wizard: AzureWizard<IScaleSettingsUpdateWizardContext> = new AzureWizard(wizardContext, { promptSteps, executeSteps, title: scaling });
             await wizard.prompt();
             await wizard.execute();
-            this.parent.refresh(context);
-            window.showInformationMessage(scaled);
+            void window.showInformationMessage(scaled);
+            void this.parent.refresh(context);
             return `${wizardContext.newSettings[key ?? 'capacity']}`;
         }
         return '';
@@ -72,7 +72,6 @@ export class AppScaleSettingsTreeItem extends AppSettingsTreeItem {
     }
 
     public async deleteSettingItem(_node: AppSettingTreeItem, _context: IActionContext): Promise<void> {
-        // tslint:disable-next-line:no-unexternalized-strings
-        throw new Error("Scale settings can not be deleted.");
+        throw new Error('Scale settings can not be deleted.');
     }
 }

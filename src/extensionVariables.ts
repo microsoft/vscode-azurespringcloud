@@ -13,7 +13,7 @@ export namespace ext {
     export let context: ExtensionContext;
     export let outputChannel: IAzExtOutputChannel;
     export let ignoreBundle: boolean | undefined;
-    export let prefix: string = 'azureSpringApps';
+    export const prefix: string = 'azureSpringApps';
 
     export let tree: AzExtTreeDataProvider;
     export let treeView: TreeView<AzExtTreeItem>;

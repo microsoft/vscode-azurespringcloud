@@ -15,7 +15,7 @@ export class InputAppNameStep extends AzureNameStep<IAppCreationWizardContext> {
     constructor(service: EnhancedService) {
         super();
         this.service = service;
-        // tslint:disable-next-line:no-unsafe-any
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         this.validateAppName = this.validateAppName.bind(this);
     }
 

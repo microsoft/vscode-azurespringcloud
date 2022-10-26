@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
+import { RemoteDebugging } from '@azure/arm-appplatform';
 import { AzExtParentTreeItem, AzExtTreeItem, AzureWizard, AzureWizardExecuteStep, IActionContext, TreeItemIconPath } from '@microsoft/vscode-azext-utils';
 import { window } from "vscode";
 import { AppCommands } from "../commands/AppCommands";
@@ -18,9 +19,9 @@ import { AppScaleSettingsTreeItem } from "./AppScaleSettingsTreeItem";
 import { ServiceTreeItem } from "./ServiceTreeItem";
 
 export class AppTreeItem extends AzExtParentTreeItem {
-    public static contextValue: RegExp = /^azureSpringApps\.app\.status-.+$/;
-    private static readonly ACCESS_PUBLIC_ENDPOINT: string = 'Access public endpoint';
-    private static readonly ACCESS_TEST_ENDPOINT: string = 'Access test endpoint';
+    public static contextValue: RegExp = /^azureSpringApps\.app;status-.+;debugging-.+;/i;
+    public static readonly ACCESS_PUBLIC_ENDPOINT: string = 'Access public endpoint';
+    public static readonly ACCESS_TEST_ENDPOINT: string = 'Access test endpoint';
     public readonly parent: ServiceTreeItem;
     public readonly app: EnhancedApp;
     private readonly _appInstancesTreeItem: AppInstancesTreeItem;
@@ -29,6 +30,7 @@ export class AppTreeItem extends AzExtParentTreeItem {
     private readonly _jvmOptionsTreeItem: AppJvmOptionsTreeItem;
     private _status: string = 'unknown';
     private deleted: boolean;
+    private _debuggingEnabled: boolean | undefined;
 
     constructor(parent: ServiceTreeItem, app: EnhancedApp, context: IActionContext) {
         super(parent);
@@ -37,7 +39,7 @@ export class AppTreeItem extends AzExtParentTreeItem {
         this._scaleSettingsTreeItem = new AppScaleSettingsTreeItem(this);
         this._envPropertiesTreeItem = new AppEnvVariablesTreeItem(this);
         this._jvmOptionsTreeItem = new AppJvmOptionsTreeItem(this);
-        this.reloadStatus(context);
+        void this.reloadStatus(context);
     }
 
     public get id(): string {
@@ -54,7 +56,8 @@ export class AppTreeItem extends AzExtParentTreeItem {
     }
 
     public get contextValue(): string {
-        return `azureSpringApps.app.status-${this.status}`;
+        const debugging: string = this._debuggingEnabled === undefined ? 'unknown' : this._debuggingEnabled ? 'enabled' : 'disabled'
+        return `azureSpringApps.app;status-${this.status};debugging-${debugging};public-${this.app.properties?.public};`;
     }
 
     public get iconPath(): TreeItemIconPath {
@@ -78,18 +81,21 @@ export class AppTreeItem extends AzExtParentTreeItem {
     }
 
     public async deleteTreeItemImpl(_context: IActionContext): Promise<void> {
-        this.app.remove();
+        await this.app.remove();
         this.deleted = true;
     }
 
     public async deployArtifact(context: IActionContext, artifactPath: string): Promise<void> {
         const deployment: EnhancedDeployment | undefined = await this.app.getActiveDeployment();
+        if (!deployment) {
+            throw new Error(`App "${this.app.name}" has no active deployment.`);
+        }
         const deploying: string = utils.localize('deploying', 'Deploying artifact to "{0}".', this.app.name);
         const deployed: string = utils.localize('deployed', 'Successfully deployed artifact to "{0}".', this.app.name);
         const wizardContext: IAppDeploymentWizardContext = Object.assign(context, this.subscription, { app: this.app });
         const executeSteps: AzureWizardExecuteStep<IAppDeploymentWizardContext>[] = [];
         executeSteps.push(new UploadArtifactStep(this.app, artifactPath));
-        executeSteps.push(new UpdateDeploymentStep(deployment!));
+        executeSteps.push(new UpdateDeploymentStep(deployment));
         const wizard: AzureWizard<IAppDeploymentWizardContext> = new AzureWizard(wizardContext, { executeSteps, title: deploying });
         await wizard.execute();
         const task: () => void = async () => {
@@ -109,6 +115,9 @@ export class AppTreeItem extends AzExtParentTreeItem {
         if (!this.deleted) {
             await this.app.refresh();
             this._status = await this.app.getStatus();
+            const deployment: EnhancedDeployment | undefined = await this.app.getActiveDeployment();
+            const config: RemoteDebugging | undefined = await deployment?.getDebuggingConfig();
+            this._debuggingEnabled = config?.enabled;
         }
     }
 

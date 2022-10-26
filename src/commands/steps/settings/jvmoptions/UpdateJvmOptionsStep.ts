@@ -19,6 +19,7 @@ export class UpdateJvmOptionsStep extends AzureWizardExecuteStep<IJvmOptionsUpda
     public async execute(context: IJvmOptionsUpdateWizardContext, progress: Progress<{ message?: string; increment?: number }>): Promise<void> {
         const message: string = localize('updatingJvmOptions', 'Updating JVM Options of "{0}"...', this.deployment.app.name);
         progress.report({ message });
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         await this.deployment.updateJvmOptions(context.newJvmOptions!);
         return Promise.resolve(undefined);
     }

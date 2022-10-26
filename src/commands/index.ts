@@ -19,7 +19,6 @@ import { showError } from '../utils';
 import { AppCommands } from "./AppCommands";
 import { ServiceCommands } from "./ServiceCommands";
 
-// tslint:disable-next-line:export-name
 export function registerCommands(): void {
     registerCommandWithTelemetryWrapper('azureSpringApps.common.loadMore', loadMore);
     registerCommandWithTelemetryWrapper('azureSpringApps.common.refresh', refreshNode);
@@ -33,7 +32,8 @@ export function registerCommands(): void {
     registerCommandWithTelemetryWrapper('azureSpringApps.apps.viewProperties', ServiceCommands.viewProperties);
     registerCommandWithTelemetryWrapper('azureSpringApps.app.openPublicEndpoint', AppCommands.openPublicEndpoint);
     registerCommandWithTelemetryWrapper('azureSpringApps.app.openTestEndpoint', AppCommands.openTestEndpoint);
-    registerCommandWithTelemetryWrapper('azureSpringApps.app.toggleEndpoint', AppCommands.toggleEndpoint);
+    registerCommandWithTelemetryWrapper('azureSpringApps.app.assignEndpoint', AppCommands.assignEndpoint);
+    registerCommandWithTelemetryWrapper('azureSpringApps.app.unassignEndpoint', AppCommands.unassignEndpoint);
     registerCommandWithTelemetryWrapper('azureSpringApps.app.start', AppCommands.startApp);
     registerCommandWithTelemetryWrapper('azureSpringApps.app.stop', AppCommands.stopApp);
     registerCommandWithTelemetryWrapper('azureSpringApps.app.restart', AppCommands.restartApp);
@@ -42,6 +42,9 @@ export function registerCommands(): void {
     registerCommandWithTelemetryWrapper('azureSpringApps.app.scale', AppCommands.scale);
     registerCommandWithTelemetryWrapper('azureSpringApps.app.openInPortal', AppCommands.openPortal);
     registerCommandWithTelemetryWrapper('azureSpringApps.app.viewProperties', AppCommands.viewProperties);
+    registerCommandWithTelemetryWrapper('azureSpringApps.app.enableRemoteDebugging', AppCommands.enableRemoteDebugging);
+    registerCommandWithTelemetryWrapper('azureSpringApps.app.disableRemoteDebugging', AppCommands.disableRemoteDebugging);
+    registerCommandWithTelemetryWrapper('azureSpringApps.app.instance.startRemoteDebugging', AppCommands.startRemoteDebugging);
     registerCommandWithTelemetryWrapper('azureSpringApps.app.instance.startStreamingLog', AppCommands.startStreamingLogs);
     registerCommandWithTelemetryWrapper('azureSpringApps.app.instance.stopStreamingLog', AppCommands.stopStreamingLogs);
     registerCommandWithTelemetryWrapper('azureSpringApps.app.instance.viewProperties', AppCommands.viewInstanceProperties);
@@ -52,10 +55,9 @@ export function registerCommands(): void {
 }
 
 function registerCommandWithTelemetryWrapper(commandId: string, callback: CommandCallback): void {
-    // tslint:disable-next-line:no-any
-    const callbackWithTroubleshooting: CommandCallback = (context: IActionContext, ...args: any[]) => instrumentOperation(commandId, async () => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    const callbackWithTroubleshooting: CommandCallback = (context: IActionContext, ...args: []) => instrumentOperation(commandId, async () => {
         try {
-            // tslint:disable-next-line: no-unsafe-any
             await callback(context, ...args);
         } catch (error) {
             const e: IParsedError = parseError(error);
