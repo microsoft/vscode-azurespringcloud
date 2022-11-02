@@ -1,5 +1,10 @@
 # Change Log
 
+## 0.5.0 - 2022-11-02
+
+### Added
+- Add support for remote debugging
+
 ## 0.4.0 - 2022-05-23
 
 ### Added
