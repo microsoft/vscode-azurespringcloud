@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 
 import { AzureWizardExecuteStep, findFreePort } from "@microsoft/vscode-azext-utils";
-import { Progress } from "vscode";
+import { Progress, window } from "vscode";
 import { ext } from "../../../extensionVariables";
 import { localize } from "../../../utils";
 import { EnhancedInstance } from "../../EnhancedInstance";
@@ -27,7 +27,7 @@ export class StartDebuggingProxyStep extends AzureWizardExecuteStep<IRemoteDebug
         const proxy: DebugProxy = new DebugProxy(this.instance, proxyPort);
         proxy.on('error', (err: Error) => {
             proxy.dispose();
-            throw err;
+            void window.showErrorMessage(err.message);
         });
         await new Promise((resolve, _reject) => {
             proxy.on('start', resolve);
