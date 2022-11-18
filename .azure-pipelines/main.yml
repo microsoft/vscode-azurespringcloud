@@ -1,9 +1,9 @@
 variables:
+  Codeql.Enabled: true
   ${{ if eq(variables['Build.Reason'], 'Schedule') }}:
     ENABLE_LONG_RUNNING_TESTS: true
     ENABLE_COMPLIANCE: true
-    Codeql.Enabled: true
-
+  
 jobs:
 - job: Windows
   pool:
