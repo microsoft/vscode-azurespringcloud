@@ -10,7 +10,11 @@ export async function init(context: vscode.ExtensionContext) {
             dark: vscode.Uri.joinPath(context.extensionUri, "resources", "dark", "app.svg"),
             light: vscode.Uri.joinPath(context.extensionUri, "resources", "light", "app.svg"),
         };
+
+        const emitter = new vscode.EventEmitter<void>();
+        vscode.commands.registerCommand("azure.springcloud.changedata", () => emitter.fire());
         const provider: RemoteBootAppDataProvider = {
+            onDidChangeData: emitter.event,
             provide() {
                 // TODO: provide a list of running spring app metadata
                 return [
@@ -23,9 +27,9 @@ export async function init(context: vscode.ExtensionContext) {
                         iconPath: iconPathForApps
                     },
                     {
-                        host: "xxxxx.azuremicroservices.io",
-                        jmxurl: "https://xxxxx.azuremicroservices.io/actuator",
-                        name: "xxxxx",
+                        host: "hanli-test-spring-app-spring-app-20230207162021.azuremicroservices.io",
+                        jmxurl: "https://hanli-test-spring-app-spring-app-20230207162021.azuremicroservices.io/actuator",
+                        name: "hanli-test-spring-app-spring-app-20230207162021",
                         description: "spring-petclinic",
                         group: "azure-spring-cloud",
                         iconPath: iconPathForApps
