@@ -239,6 +239,11 @@
                 "command": "azureSpringApps.common.loadMore",
                 "title": "%azureSpringApps.menu.common.loadMore%",
                 "category": "Azure Spring Apps"
+            },
+            {
+                "command": "azureSpringApps.app.showLiveInformation",
+                "title": "View Live Information",
+                "category": "Azure Spring Apps"
             }
         ],
         "viewsContainers": {
@@ -441,6 +446,10 @@
                     "command": "azureSpringApps.app.setting.delete",
                     "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app\\.(jvmOption|envVariable)$/",
                     "group": "1@2"
+                },
+                {
+                    "command": "azureSpringApps.app.showLiveInformation",
+                    "when": "spring.dashboard:enabled && view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app;status-running;/i"
                 }
             ],
             "commandPalette": [
@@ -474,6 +483,10 @@
                 },
                 {
                     "command": "azureSpringApps.app.setting.delete",
+                    "when": "never"
+                },
+                {
+                    "command": "azureSpringApps.app.showLiveInformation",
                     "when": "never"
                 }
             ]
