@@ -18,9 +18,21 @@ export async function init(context: vscode.ExtensionContext) {
         const options: RemoteBootAppDataProviderOptions = { iconPath: new vscode.ThemeIcon("azure") };
         api.registerRemoteBootAppDataProvider("Azure", provider, options);
 
-        vscode.commands.registerCommand("azureSpringApps.app.showLiveInformation", (appNode: any) => {
-            provider.addAppData(appNode);
-            vscode.commands.executeCommand("spring.apps.focus");
+        vscode.commands.registerCommand("azureSpringApps.app.showLiveInformation", async (appNode: AppTreeItem) => {
+            const app = appNode.app;
+            let endpoint: string | undefined = await app.getPublicEndpoint();
+            if (!endpoint || endpoint.toLowerCase() === 'none') {
+                const choice = await vscode.window.showWarningMessage(`App "${app.name}" is not publicly accessible. Do you want to assign it a public endpoint?`, { modal: true }, "YES");
+                if (!choice) {
+                    return;
+                }
+                await vscode.commands.executeCommand("azureSpringApps.app.assignEndpoint", appNode);
+                endpoint = await app.getPublicEndpoint();
+            }
+            if (endpoint) {
+                provider.addAppData(appNode);
+                vscode.commands.executeCommand("spring.apps.focus");
+            }
         });
         inited = true;
     } else {
@@ -50,7 +62,7 @@ class AzureSpringAppsProvider implements RemoteBootAppDataProvider {
         return Array.from(this.store.values());
     }
 
-    public addAppData(appNode: any) {
+    public addAppData(appNode: AppTreeItem) {
         const appData = this.toRemoteBootAppData(appNode);
         this.store.set(appData.name, appData);
         this.onDidChangeDataEmitter.fire();
@@ -61,8 +73,7 @@ class AzureSpringAppsProvider implements RemoteBootAppDataProvider {
 
         return {
             name: app.name,
-            host: app.name,
-            description: app.service.name,
+            host: app.service.properties?.fqdn ?? app.service.name,
             jmxurl: app.properties?.url + "/actuator",
             iconPath: this.iconPathForApps
         };
