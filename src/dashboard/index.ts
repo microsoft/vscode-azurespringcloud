@@ -13,6 +13,9 @@ export async function init(context: vscode.ExtensionContext) {
     if (dashboardExt) {
         await vscode.commands.executeCommand("setContext", "spring.dashboard:enabled", true);
 
+        const provider = new AzureSpringAppsProvider(context);
+        const options: RemoteBootAppDataProviderOptions = { iconPath: new vscode.ThemeIcon("azure") };
+
         // register commands
         vscode.commands.registerCommand("azureSpringApps.app.showLiveInformation", async (appNode: AppTreeItem) => {
             if (!dashboardExt.isActive) {
@@ -34,15 +37,15 @@ export async function init(context: vscode.ExtensionContext) {
                 vscode.commands.executeCommand("spring.apps.focus");
                 // connect right now
                 const appData = provider.toRemoteBootAppData(appNode);
-                api.connectRemoteApp(appData);
+                if (appData) {
+                    api.connectRemoteApp(appData);
+                }
             }
         });
 
         // APIs only available after dashboard is activated.
         await waitUntilDashboardActivated(dashboardExt, 5000);
         const api = dashboardExt.exports;
-        const provider = new AzureSpringAppsProvider(context);
-        const options: RemoteBootAppDataProviderOptions = { iconPath: new vscode.ThemeIcon("azure") };
         api.registerRemoteBootAppDataProvider("Azure", provider, options);
 
         inited = true;
@@ -75,19 +78,28 @@ class AzureSpringAppsProvider implements RemoteBootAppDataProvider {
 
     public addAppData(appNode: AppTreeItem) {
         const appData = this.toRemoteBootAppData(appNode);
-        this.store.set(appData.name, appData);
-        this.onDidChangeDataEmitter.fire();
+        if (appData) {
+            this.store.set(appData.name, appData);
+            this.onDidChangeDataEmitter.fire();
+        }
     }
 
-    public toRemoteBootAppData(appNode: AppTreeItem): RemoteBootAppData {
+    public toRemoteBootAppData(appNode: AppTreeItem): RemoteBootAppData | undefined {
         const app = appNode.app;
+        if (app.properties?.url) {
+            const uri = vscode.Uri.parse(app.properties.url);
+            const host = uri.authority;
+            const jmxurl = uri.with({ path: "/actuator" }).toString();
+            return {
+                name: app.name,
+                host,
+                jmxurl,
+                iconPath: this.iconPathForApps
+            };
+        } else {
+            return undefined;
+        }
 
-        return {
-            name: app.name,
-            host: app.service.properties?.fqdn ?? app.service.name,
-            jmxurl: app.properties?.url + "/actuator",
-            iconPath: this.iconPathForApps
-        };
     }
 }
 
