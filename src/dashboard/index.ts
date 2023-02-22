@@ -13,12 +13,12 @@ export async function init(context: vscode.ExtensionContext) {
     if (dashboardExt) {
         await vscode.commands.executeCommand("setContext", "spring.dashboard:enabled", true);
 
-        const api = await dashboardExt.activate(); // TODO: passively get API instead of forcing to activate it?
-        const provider = new AzureSpringAppsProvider(context);
-        const options: RemoteBootAppDataProviderOptions = { iconPath: new vscode.ThemeIcon("azure") };
-        api.registerRemoteBootAppDataProvider("Azure", provider, options);
-
+        // register commands
         vscode.commands.registerCommand("azureSpringApps.app.showLiveInformation", async (appNode: AppTreeItem) => {
+            if (!dashboardExt.isActive) {
+                await dashboardExt.activate();
+            }
+
             const app = appNode.app;
             let endpoint: string | undefined = await app.getPublicEndpoint();
             if (!endpoint || endpoint.toLowerCase() === 'none') {
@@ -37,6 +37,13 @@ export async function init(context: vscode.ExtensionContext) {
                 api.connectRemoteApp(appData);
             }
         });
+
+        // APIs only available after dashboard is activated.
+        await waitUntilDashboardActivated(dashboardExt, 5000);
+        const api = dashboardExt.exports;
+        const provider = new AzureSpringAppsProvider(context);
+        const options: RemoteBootAppDataProviderOptions = { iconPath: new vscode.ThemeIcon("azure") };
+        api.registerRemoteBootAppDataProvider("Azure", provider, options);
 
         inited = true;
     } else {
@@ -82,4 +89,16 @@ class AzureSpringAppsProvider implements RemoteBootAppDataProvider {
             iconPath: this.iconPathForApps
         };
     }
+}
+
+
+async function waitUntilDashboardActivated(dashboardExt: vscode.Extension<DashboardExtensionApi>, pollingIntervalMillis: number) {
+    return new Promise<void>((resolve) => {
+        const id = setInterval(() => {
+            if (dashboardExt.isActive) {
+                clearInterval(id);
+                resolve();
+            }
+        }, pollingIntervalMillis);
+    });
 }
