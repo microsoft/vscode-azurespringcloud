@@ -244,6 +244,12 @@
                 "command": "azureSpringApps.app.showLiveInformation",
                 "title": "View Live Information",
                 "category": "Azure Spring Apps"
+            },
+            {
+                "command": "azureSpringApps.focus",
+                "title": "Focus on Spring Apps View",
+                "category": "Azure Spring Apps",
+                "icon": "$(arrow-right)"
             }
         ],
         "viewsContainers": {
@@ -450,6 +456,11 @@
                 {
                     "command": "azureSpringApps.app.showLiveInformation",
                     "when": "spring.dashboard:enabled && view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app;status-running;/i"
+                },
+                {
+                    "command": "azureSpringApps.focus",
+                    "when": "view == spring.apps && viewItem == spring:remoteAppProvider+Azure",
+                    "group": "inline"
                 }
             ],
             "commandPalette": [
