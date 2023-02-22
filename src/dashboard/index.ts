@@ -32,8 +32,12 @@ export async function init(context: vscode.ExtensionContext) {
             if (endpoint) {
                 provider.addAppData(appNode);
                 vscode.commands.executeCommand("spring.apps.focus");
+                // connect right now
+                const appData = provider.toRemoteBootAppData(appNode);
+                api.connectRemoteApp(appData);
             }
         });
+
         inited = true;
     } else {
         // TODO: ask user consent to install dashboard extension?
@@ -68,7 +72,7 @@ class AzureSpringAppsProvider implements RemoteBootAppDataProvider {
         this.onDidChangeDataEmitter.fire();
     }
 
-    private toRemoteBootAppData(appNode: AppTreeItem): RemoteBootAppData {
+    public toRemoteBootAppData(appNode: AppTreeItem): RemoteBootAppData {
         const app = appNode.app;
 
         return {
