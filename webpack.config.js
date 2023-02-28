@@ -23,6 +23,9 @@ let config = dev.getDefaultWebpackConfig({
         '../build/default/validation': 'commonjs ../build/default/validation',
         '../build/Release/bufferutil': 'commonjs ../build/Release/bufferutil',
         '../build/default/bufferutil': 'commonjs ../build/default/bufferutil',
+        // Fix: Module not found
+        'applicationinsights-native-metrics': 'commonjs applicationinsights-native-metrics',
+        'diagnostic-channel-publishers': 'commonjs diagnostic-channel-publishers',
     },
 });
 
