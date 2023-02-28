@@ -1,10 +1,15 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
 import * as vscode from "vscode";
 import { AppTreeItem } from "../tree/AppTreeItem";
 import { DashboardExtensionApi, RemoteBootAppData, RemoteBootAppDataProvider, RemoteBootAppDataProviderOptions } from "./api";
 
 let inited: boolean = false;
 
-export async function init(context: vscode.ExtensionContext) {
+export async function initialize(context: vscode.ExtensionContext) {
     if (inited) {
         return;
     }
@@ -16,6 +21,15 @@ export async function init(context: vscode.ExtensionContext) {
         const provider = new AzureSpringAppsProvider(context);
         const options: RemoteBootAppDataProviderOptions = { iconPath: new vscode.ThemeIcon("azure") };
 
+        const ensureProviderRegistered = async () => {
+            await waitUntilDashboardActivated(dashboardExt, 5000);
+            if (!inited) {
+                const api = dashboardExt.exports;
+                api.registerRemoteBootAppDataProvider("Azure", provider, options);
+                inited = true;
+            }
+        }
+
         // register commands
         vscode.commands.registerCommand("azureSpringApps.app.showLiveInformation", async (appNode: AppTreeItem) => {
             if (!dashboardExt.isActive) {
@@ -25,7 +39,7 @@ export async function init(context: vscode.ExtensionContext) {
             const app = appNode.app;
             let endpoint: string | undefined = await app.getPublicEndpoint();
             if (!endpoint || endpoint.toLowerCase() === 'none') {
-                const choice = await vscode.window.showWarningMessage(`App "${app.name}" is not publicly accessible. Do you want to assign it a public endpoint?`, { modal: true }, "YES");
+                const choice = await vscode.window.showWarningMessage(`App "${app.name}" is not publicly accessible. Do you want to assign it a public endpoint?`, { modal: true }, "Yes");
                 if (!choice) {
                     return;
                 }
@@ -33,24 +47,20 @@ export async function init(context: vscode.ExtensionContext) {
                 endpoint = await app.getPublicEndpoint();
             }
             if (endpoint) {
+                await ensureProviderRegistered();
+
                 provider.addAppData(appNode);
-                vscode.commands.executeCommand("spring.apps.focus");
                 // connect right now
                 const appData = provider.toRemoteBootAppData(appNode);
                 if (appData) {
-                    api.connectRemoteApp(appData);
+                    dashboardExt.exports.connectRemoteApp(appData);
                 }
+                vscode.commands.executeCommand("spring.apps.focus");
             }
         });
 
         // APIs only available after dashboard is activated.
-        await waitUntilDashboardActivated(dashboardExt, 5000);
-        const api = dashboardExt.exports;
-        api.registerRemoteBootAppDataProvider("Azure", provider, options);
-
-        inited = true;
-    } else {
-        // TODO: ask user consent to install dashboard extension?
+        await ensureProviderRegistered();
     }
 }
 
@@ -106,6 +116,9 @@ class AzureSpringAppsProvider implements RemoteBootAppDataProvider {
 
 async function waitUntilDashboardActivated(dashboardExt: vscode.Extension<DashboardExtensionApi>, pollingIntervalMillis: number) {
     return new Promise<void>((resolve) => {
+        if (dashboardExt.isActive) {
+            return resolve();
+        }
         const id = setInterval(() => {
             if (dashboardExt.isActive) {
                 clearInterval(id);

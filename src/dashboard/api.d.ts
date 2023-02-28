@@ -1,13 +1,20 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
 /**
- * Reference: https://github.com/spring-projects/sts4/blob/392d953bd94543a2f132d51d217a0a0812eec896/headless-services/spring-boot-language-server/src/main/java/org/springframework/ide/vscode/boot/java/livehover/v2/SpringProcessConnectorRemote.java#L32
+ * Copied from https://github.com/microsoft/vscode-spring-boot-dashboard/blob/679ceed8dc7a1f45d770b8db045b6e0d0680c272/src/extension.api.d.ts
  */
+
+import { Event, ThemeIcon, Uri } from "vscode";
+
 export interface DashboardExtensionApi {
     registerRemoteBootAppDataProvider(providerName: string, provider: RemoteBootAppDataProvider, options?: RemoteBootAppDataProviderOptions);
     connectRemoteApp: (appData: RemoteBootAppData) => void;
     disconnectRemoteApp: (appData: RemoteBootAppData) => void;
 }
 
-import { Event, ThemeIcon, Uri } from "vscode";
 /**
  * Reference: https://github.com/spring-projects/sts4/blob/392d953bd94543a2f132d51d217a0a0812eec896/headless-services/spring-boot-language-server/src/main/java/org/springframework/ide/vscode/boot/java/livehover/v2/SpringProcessConnectorRemote.java#L32
  */

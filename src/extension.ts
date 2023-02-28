@@ -8,7 +8,7 @@ import { AzExtTreeDataProvider, callWithTelemetryAndErrorHandling, createApiProv
 import { AzureExtensionApiProvider } from '@microsoft/vscode-azext-utils/api';
 import * as vscode from 'vscode';
 import { registerCommands } from './commands';
-import { init as initDashboardIntegration } from './dashboard';
+import { initialize as initDashboardIntegration } from './dashboard';
 import { ext } from './extensionVariables';
 import { AzureAccountTreeItem } from './tree/AzureAccountTreeItem';
 
