@@ -1,0 +1,5 @@
+steps:
+- bash: |
+    npx json@latest -I -f package.json -e "this.version=this.version.substring(0, this.version.lastIndexOf('.'))+\".$(date -u +'%Y%m%d%H')\""
+  displayName: Update version in package.json
+
