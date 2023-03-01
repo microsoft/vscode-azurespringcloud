@@ -8,6 +8,7 @@ import { AzExtTreeDataProvider, callWithTelemetryAndErrorHandling, createApiProv
 import { AzureExtensionApiProvider } from '@microsoft/vscode-azext-utils/api';
 import * as vscode from 'vscode';
 import { registerCommands } from './commands';
+import { initialize as initDashboardIntegration } from './dashboard';
 import { ext } from './extensionVariables';
 import { AzureAccountTreeItem } from './tree/AzureAccountTreeItem';
 
@@ -34,6 +35,8 @@ export async function activateInternal(context: vscode.ExtensionContext, perfSta
 
         ext.experimentationService = await createExperimentationService(context);
     });
+
+    initDashboardIntegration(context);
     return createApiProvider([]);
 }
 
