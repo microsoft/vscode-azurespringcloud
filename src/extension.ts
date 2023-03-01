@@ -36,7 +36,7 @@ export async function activateInternal(context: vscode.ExtensionContext, perfSta
         ext.experimentationService = await createExperimentationService(context);
     });
 
-    initDashboardIntegration(context);
+    void initDashboardIntegration(context);
     return createApiProvider([]);
 }
 

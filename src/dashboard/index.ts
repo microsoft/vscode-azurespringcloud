@@ -9,7 +9,7 @@ import { DashboardExtensionApi, RemoteBootAppData, RemoteBootAppDataProvider, Re
 
 let inited: boolean = false;
 
-export async function initialize(context: vscode.ExtensionContext) {
+export async function initialize(context: vscode.ExtensionContext): Promise<void> {
     if (inited) {
         return;
     }
@@ -55,7 +55,7 @@ export async function initialize(context: vscode.ExtensionContext) {
                 if (appData) {
                     dashboardExt.exports.connectRemoteApp(appData);
                 }
-                vscode.commands.executeCommand("spring.apps.focus");
+                await vscode.commands.executeCommand("spring.apps.focus");
             }
         });
 
