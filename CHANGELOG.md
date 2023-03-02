@@ -1,5 +1,10 @@
 # Change Log
 
+## 0.6.0 - 2023-03-02
+
+### Added
+- Add support for viewing live information(beans, mappings, memory graph) from your running application with `Spring Boot Dashboard` extension.
+
 ## 0.5.0 - 2022-11-02
 
 ### Added
