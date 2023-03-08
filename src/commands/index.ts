@@ -23,10 +23,10 @@ export function registerCommands(): void {
     registerCommandWithTelemetryWrapper('azureSpringApps.common.loadMore', loadMore);
     registerCommandWithTelemetryWrapper('azureSpringApps.common.refresh', refreshNode);
     registerCommandWithTelemetryWrapper('azureSpringApps.common.toggleVisibility', AppCommands.toggleVisibility);
-    registerCommandWithTelemetryWrapper('azureSpringApps.subscription.select', selectSubscription);
-    registerCommandWithTelemetryWrapper('azureSpringApps.subscription.createServiceFromPortal', ServiceCommands.createServiceInPortal);
+    registerCommandWithTelemetryWrapper('azureSpringApps.selectSubscription', selectSubscription);
+    registerCommandWithTelemetryWrapper('azureSpringApps.apps.createInPortal', ServiceCommands.createServiceInPortal);
     registerCommandWithTelemetryWrapper('azureSpringApps.subscription.openInPortal', openPortal);
-    registerCommandWithTelemetryWrapper('azureSpringApps.apps.createApp', ServiceCommands.createApp);
+    registerCommandWithTelemetryWrapper('azureSpringApps.app.create', ServiceCommands.createApp);
     registerCommandWithTelemetryWrapper('azureSpringApps.apps.delete', ServiceCommands.deleteService);
     registerCommandWithTelemetryWrapper('azureSpringApps.apps.openInPortal', ServiceCommands.openPortal);
     registerCommandWithTelemetryWrapper('azureSpringApps.apps.viewProperties', ServiceCommands.viewProperties);

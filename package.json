@@ -34,13 +34,14 @@
         "onFileSystem:azureSpringApps",
         "onCommand:azureSpringApps.common.refresh",
         "onCommand:azureSpringApps.common.loadMore",
-        "onCommand:azureSpringApps.subscription.select",
-        "onCommand:azureSpringApps.subscription.createServiceFromPortal",
+        "onCommand:azureSpringApps.common.toggleVisibility",
         "onCommand:azureSpringApps.subscription.openInPortal",
-        "onCommand:azureSpringApps.apps.createApp",
+        "onCommand:azureSpringApps.selectSubscription",
+        "onCommand:azureSpringApps.apps.createInPortal",
         "onCommand:azureSpringApps.apps.delete",
         "onCommand:azureSpringApps.apps.openInPortal",
         "onCommand:azureSpringApps.apps.viewProperties",
+        "onCommand:azureSpringApps.app.create",
         "onCommand:azureSpringApps.app.openPublicEndpoint",
         "onCommand:azureSpringApps.app.openTestEndpoint",
         "onCommand:azureSpringApps.app.assignEndpoint",
@@ -61,7 +62,6 @@
         "onCommand:azureSpringApps.app.instance.viewProperties",
         "onCommand:azureSpringApps.app.settings.add",
         "onCommand:azureSpringApps.app.settings.edit",
-        "onCommand:azureSpringApps.common.toggleVisibility",
         "onCommand:azureSpringApps.app.setting.edit",
         "onCommand:azureSpringApps.app.setting.delete",
         "onView:azureSpringApps"
@@ -70,7 +70,7 @@
     "contributes": {
         "commands": [
             {
-                "command": "azureSpringApps.subscription.select",
+                "command": "azureSpringApps.selectSubscription",
                 "title": "Select Subscriptions...",
                 "icon": {
                     "light": "resources/light/filter.svg",
@@ -87,7 +87,7 @@
                 }
             },
             {
-                "command": "azureSpringApps.subscription.createServiceFromPortal",
+                "command": "azureSpringApps.apps.createInPortal",
                 "title": "%azureSpringApps.menu.subscription.createServiceFromPortal%",
                 "category": "Azure Spring Apps"
             },
@@ -97,7 +97,7 @@
                 "category": "Azure Spring Apps"
             },
             {
-                "command": "azureSpringApps.apps.createApp",
+                "command": "azureSpringApps.app.create",
                 "title": "%azureSpringApps.menu.service.createApp%",
                 "category": "Spring Apps"
             },
@@ -279,7 +279,7 @@
             ],
             "view/item/context": [
                 {
-                    "command": "azureSpringApps.subscription.select",
+                    "command": "azureSpringApps.selectSubscription",
                     "when": "view == azureSpringApps && viewItem == azureextensionui.azureSubscription",
                     "group": "inline"
                 },
@@ -289,7 +289,7 @@
                     "group": "1@1"
                 },
                 {
-                    "command": "azureSpringApps.subscription.createServiceFromPortal",
+                    "command": "azureSpringApps.apps.createInPortal",
                     "when": "view == azureSpringApps && viewItem == azureextensionui.azureSubscription",
                     "group": "5@1"
                 },
@@ -304,7 +304,7 @@
                     "group": "1@1"
                 },
                 {
-                    "command": "azureSpringApps.apps.createApp",
+                    "command": "azureSpringApps.app.create",
                     "when": "view == azureSpringApps && viewItem == azureSpringApps.apps",
                     "group": "5@1"
                 },
@@ -465,7 +465,7 @@
             ],
             "commandPalette": [
                 {
-                    "command": "azureSpringApps.subscription.select",
+                    "command": "azureSpringApps.selectSubscription",
                     "when": "never"
                 },
                 {
