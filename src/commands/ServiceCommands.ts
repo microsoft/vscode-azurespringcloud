@@ -1,17 +1,15 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import { openInPortal } from "@microsoft/vscode-azext-azureutils";
 import { AzExtTreeItem, DialogResponses, IActionContext, openReadOnlyJson, openUrl } from "@microsoft/vscode-azext-utils";
 import { ext } from "../extensionVariables";
 import { EnhancedService } from "../service/EnhancedService";
-import { ServiceTreeItem } from "../tree/ServiceTreeItem";
-import { SubscriptionTreeItem } from "../tree/SubscriptionTreeItem";
+import ResolvedService, { ServiceTreeItem } from "../tree/ServiceTreeItem";
 import * as utils from "../utils";
 
 export namespace ServiceCommands {
 
-    export async function createServiceInPortal(_context: IActionContext, _node?: SubscriptionTreeItem): Promise<void> {
+    export async function createServiceInPortal(_context: IActionContext): Promise<void> {
         await openUrl('https://portal.azure.com/#create/Microsoft.AppPlatform');
     }
 
@@ -37,12 +35,6 @@ export namespace ServiceCommands {
         return node;
     }
 
-    export async function openPortal(context: IActionContext, n?: AzExtTreeItem): Promise<ServiceTreeItem> {
-        const node: ServiceTreeItem = await getNode(n, context);
-        await openInPortal(node, node.fullId);
-        return node;
-    }
-
     export async function viewProperties(context: IActionContext, n?: AzExtTreeItem): Promise<ServiceTreeItem> {
         const node: ServiceTreeItem = await getNode(n, context);
         await openReadOnlyJson(node, node.service.properties ?? {});
@@ -50,9 +42,12 @@ export namespace ServiceCommands {
     }
 
     async function getNode(node: AzExtTreeItem | undefined, context: IActionContext): Promise<ServiceTreeItem> {
-        if (node && node instanceof ServiceTreeItem) {
-            return node;
+        if (!node) {
+            node = await ext.rgApi.pickAppResource<ServiceTreeItem>(context, {
+                filter: utils.springAppsFilter,
+                expectedChildContextValue: ResolvedService.contextValue
+            });
         }
-        return await ext.tree.showTreeItemPicker<ServiceTreeItem>(ServiceTreeItem.contextValue, context, node);
+        return node as ServiceTreeItem;
     }
 }

@@ -261,14 +261,20 @@ export namespace AppCommands {
         if (node && node instanceof AppTreeItem) {
             return node;
         }
-        return await ext.tree.showTreeItemPicker<AppTreeItem>(AppTreeItem.contextValue, context, node);
+        return await ext.rgApi.pickAppResource<AppTreeItem>(context, {
+            filter: utils.springAppsFilter,
+            expectedChildContextValue: AppTreeItem.contextValue
+        });
     }
 
     async function getInstanceNode(node: AzExtTreeItem | undefined, context: IActionContext): Promise<AppInstanceTreeItem> {
         if (node && node instanceof AppInstanceTreeItem) {
             return node;
         }
-        return await ext.tree.showTreeItemPicker<AppInstanceTreeItem>(AppInstanceTreeItem.contextValue, context, node);
+        return await ext.rgApi.pickAppResource<AppInstanceTreeItem>(context, {
+            filter: utils.springAppsFilter,
+            expectedChildContextValue: AppInstanceTreeItem.contextValue
+        });
     }
 
     async function getTargetOrWorkspacePath(): Promise<Uri | undefined> {

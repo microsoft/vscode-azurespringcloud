@@ -1,20 +1,12 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import { openInPortal } from '@microsoft/vscode-azext-azureutils';
-import {
-    CommandCallback,
-    IActionContext,
-    IParsedError, parseError,
-    registerCommand
-} from '@microsoft/vscode-azext-utils';
-import { commands } from 'vscode';
+import { CommandCallback, IActionContext, IParsedError, parseError, registerCommandWithTreeNodeUnwrapping } from '@microsoft/vscode-azext-utils';
 import { instrumentOperation } from 'vscode-extension-telemetry-wrapper';
 import { ext } from '../extensionVariables';
 import { AppInstanceTreeItem } from '../tree/AppInstanceTreeItem';
 import { AppTreeItem } from "../tree/AppTreeItem";
 import { ServiceTreeItem } from '../tree/ServiceTreeItem';
-import { SubscriptionTreeItem } from '../tree/SubscriptionTreeItem';
 import { showError } from '../utils';
 import { AppCommands } from "./AppCommands";
 import { ServiceCommands } from "./ServiceCommands";
@@ -23,12 +15,9 @@ export function registerCommands(): void {
     registerCommandWithTelemetryWrapper('azureSpringApps.common.loadMore', loadMore);
     registerCommandWithTelemetryWrapper('azureSpringApps.common.refresh', refreshNode);
     registerCommandWithTelemetryWrapper('azureSpringApps.common.toggleVisibility', AppCommands.toggleVisibility);
-    registerCommandWithTelemetryWrapper('azureSpringApps.selectSubscription', selectSubscription);
     registerCommandWithTelemetryWrapper('azureSpringApps.apps.createInPortal', ServiceCommands.createServiceInPortal);
-    registerCommandWithTelemetryWrapper('azureSpringApps.subscription.openInPortal', openPortal);
     registerCommandWithTelemetryWrapper('azureSpringApps.app.create', ServiceCommands.createApp);
     registerCommandWithTelemetryWrapper('azureSpringApps.apps.delete', ServiceCommands.deleteService);
-    registerCommandWithTelemetryWrapper('azureSpringApps.apps.openInPortal', ServiceCommands.openPortal);
     registerCommandWithTelemetryWrapper('azureSpringApps.apps.viewProperties', ServiceCommands.viewProperties);
     registerCommandWithTelemetryWrapper('azureSpringApps.app.openPublicEndpoint', AppCommands.openPublicEndpoint);
     registerCommandWithTelemetryWrapper('azureSpringApps.app.openTestEndpoint', AppCommands.openTestEndpoint);
@@ -68,7 +57,7 @@ function registerCommandWithTelemetryWrapper(commandId: string, callback: Comman
             throw error;
         }
     })();
-    registerCommand(commandId, callbackWithTroubleshooting);
+    registerCommandWithTreeNodeUnwrapping(commandId, callbackWithTroubleshooting);
 }
 
 type SpringCloudResourceTreeItem = ServiceTreeItem | AppTreeItem | AppInstanceTreeItem;
@@ -79,13 +68,4 @@ async function refreshNode(context: IActionContext, node: SpringCloudResourceTre
 
 async function loadMore(context: IActionContext, node: SpringCloudResourceTreeItem): Promise<void> {
     return ext.tree.loadMore(node, context);
-}
-
-async function selectSubscription(): Promise<void> {
-    return commands.executeCommand('azure-account.selectSubscriptions');
-}
-
-async function openPortal(context: IActionContext, node?: SubscriptionTreeItem): Promise<void> {
-    node = node ?? await ext.tree.showTreeItemPicker<SubscriptionTreeItem>(SubscriptionTreeItem.contextValue, context);
-    return openInPortal(node, node.fullId);
 }

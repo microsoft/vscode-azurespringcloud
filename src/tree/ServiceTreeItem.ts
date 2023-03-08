@@ -10,8 +10,10 @@ import {
     AzureWizard,
     AzureWizardExecuteStep,
     AzureWizardPromptStep, IActionContext, ICreateChildImplContext,
+    ISubscriptionContext,
     TreeItemIconPath
 } from '@microsoft/vscode-azext-utils';
+import { ResolvedAppResourceBase, ResolvedAppResourceTreeItem } from "@microsoft/vscode-azext-utils/hostapi";
 import { window } from "vscode";
 import { CreateAppDeploymentStep } from "../commands/steps/creation/CreateAppDeploymentStep";
 import { CreateAppStep } from "../commands/steps/creation/CreateAppStep";
@@ -24,18 +26,22 @@ import { EnhancedService } from '../service/EnhancedService';
 import * as utils from "../utils";
 import { AppTreeItem } from './AppTreeItem';
 
-export class ServiceTreeItem extends AzExtParentTreeItem {
+
+export type ServiceTreeItem = ResolvedAppResourceTreeItem<ResolvedService> & AzExtParentTreeItem & ResolvedService;
+
+export default class ResolvedService implements ResolvedAppResourceBase {
     public static contextValue: string = 'azureSpringApps.apps';
-    public readonly contextValue: string = ServiceTreeItem.contextValue;
+    public readonly contextValuesToAdd: string[] = [ResolvedService.contextValue];
     public readonly childTypeLabel: string = utils.localize('springCloud.app', 'Spring App');
     public service: EnhancedService;
 
+    private readonly _subscription: ISubscriptionContext;
     private _nextLink: string | undefined;
     private _appsPromise: Promise<EnhancedApp[]>;
     private deleted: boolean;
 
-    constructor(parent: AzExtParentTreeItem, service: EnhancedService) {
-        super(parent);
+    constructor(subscription: ISubscriptionContext, service: EnhancedService) {
+        this._subscription = subscription;
         this.service = service;
         void this.reinit();
     }
@@ -66,12 +72,8 @@ export class ServiceTreeItem extends AzExtParentTreeItem {
             this._nextLink = undefined;
         }
         const apps: EnhancedApp[] = await this._appsPromise;
-        return await this.createTreeItemsWithErrorHandling(
-            apps,
-            'invalidSpringCloudApp',
-            app => new AppTreeItem(this, app, context),
-            app => app.name
-        );
+        const proxyTreeItem: ServiceTreeItem = this as unknown as ServiceTreeItem;
+        return apps.map((app) => new AppTreeItem(proxyTreeItem, app, context));
     }
 
     public async deleteTreeItemImpl(_context: IActionContext): Promise<void> {
@@ -80,7 +82,7 @@ export class ServiceTreeItem extends AzExtParentTreeItem {
     }
 
     public async createChildImpl(context: ICreateChildImplContext): Promise<AzExtTreeItem> {
-        const wizardContext: IAppCreationWizardContext = Object.assign(context, this.subscription, { service: this.service });
+        const wizardContext: IAppCreationWizardContext = Object.assign(context, this._subscription, { service: this.service });
         const promptSteps: AzureWizardPromptStep<IAppCreationWizardContext>[] = [];
         const executeSteps: AzureWizardExecuteStep<IAppCreationWizardContext>[] = [];
         promptSteps.push(new InputAppNameStep(this.service));
@@ -98,7 +100,8 @@ export class ServiceTreeItem extends AzExtParentTreeItem {
         await wizard.execute();
         const created: string = utils.localize('createdSpringCouldApp', 'Successfully created Spring app "{0}".', appName);
         void window.showInformationMessage(created);
-        return new AppTreeItem(this, utils.nonNullProp(wizardContext, 'newApp'), context);
+        const proxyTreeItem: ServiceTreeItem = this as unknown as ServiceTreeItem;
+        return new AppTreeItem(proxyTreeItem, utils.nonNullProp(wizardContext, 'newApp'), context);
     }
 
     public async refreshImpl(_context: IActionContext): Promise<void> {
