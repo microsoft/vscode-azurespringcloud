@@ -555,13 +555,13 @@
     },
     "devDependencies": {
         "@microsoft/eslint-config-azuretools": "^0.1.0",
-        "@microsoft/vscode-azext-dev": "^0.1.3",
-        "@types/fs-extra": "^8.1.0",
+        "@microsoft/vscode-azext-dev": "^0.1.4",
+        "@types/fs-extra": "^8.1.1",
         "@types/gulp": "^4.0.9",
         "@types/mocha": "^8.2.2",
         "@types/node": "^14.0.0",
         "@types/request": "^2.48.4",
-        "@types/vscode": "1.63.0",
+        "@types/vscode": "1.66.0",
         "@types/websocket": "^1.0.5",
         "@typescript-eslint/eslint-plugin": "^4.28.3",
         "eslint": "^7.19.0",
@@ -579,12 +579,12 @@
         "webpack-cli": "^4.6.0"
     },
     "dependencies": {
-        "@azure/arm-appplatform": "^2.1.0-beta.3",
+        "@azure/arm-appplatform": "^2.1.0-beta.5",
         "@azure/core-client": "^1.6.1",
         "@azure/ms-rest-js": "^2.6.1",
         "@azure/storage-file-share": "^12.3.0",
-        "@microsoft/vscode-azext-azureutils": "^0.1.3",
-        "@microsoft/vscode-azext-utils": "^0.1.1",
+        "@microsoft/vscode-azext-azureutils": "^0.3.4",
+        "@microsoft/vscode-azext-utils": "^0.3.26",
         "fs-extra": "^8.1.0",
         "request": "^2.88.2",
         "vscode-extension-telemetry-wrapper": "^0.8.0",
@@ -592,7 +592,8 @@
         "websocket": "^1.0.34"
     },
     "extensionDependencies": [
-        "ms-vscode.azure-account"
+        "ms-vscode.azure-account",
+        "ms-azuretools.vscode-azureresourcegroups"
     ],
     "optionalDependencies": {
         "fsevents": "^2.3.2"
