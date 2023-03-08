@@ -1,9 +1,10 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import { AzExtTreeDataProvider, AzExtTreeItem, IAzExtOutputChannel, IExperimentationServiceAdapter } from "@microsoft/vscode-azext-utils";
+import { AzureAccountTreeItemBase } from "@microsoft/vscode-azext-azureutils";
+import { AzExtTreeDataProvider, IAzExtOutputChannel, IExperimentationServiceAdapter } from "@microsoft/vscode-azext-utils";
+import { AzureHostExtensionApi } from "@microsoft/vscode-azext-utils/hostapi";
 import { DiagnosticCollection, Disposable, ExtensionContext, TreeView } from "vscode";
-import { AzureAccountTreeItem } from "./tree/AzureAccountTreeItem";
 
 /**
  * Namespace for common variables used throughout the extension. They must be initialized in the activate() method of extension.ts
@@ -16,9 +17,11 @@ export namespace ext {
     export const prefix: string = 'azureSpringApps';
 
     export let tree: AzExtTreeDataProvider;
-    export let treeView: TreeView<AzExtTreeItem>;
-    export let azureAccountTreeItem: AzureAccountTreeItem;
+    export let treeView: TreeView<unknown>;
+    export let azureAccountTreeItem: AzureAccountTreeItemBase;
     export let diagnosticWatcher: Disposable | undefined;
     export let diagnosticCollection: DiagnosticCollection;
     export let experimentationService: IExperimentationServiceAdapter;
+
+    export let rgApi: AzureHostExtensionApi;
 }

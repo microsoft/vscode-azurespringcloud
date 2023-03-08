@@ -2,13 +2,29 @@
 // Licensed under the MIT license.
 
 // tslint:disable-next-line:no-require-imports no-implicit-dependencies
-import { TreeItemIconPath } from "@microsoft/vscode-azext-utils";
+import { AzExtTreeItem, callWithTelemetryAndErrorHandling, IActionContext, TreeItemIconPath } from "@microsoft/vscode-azext-utils";
+import { AppResourceFilter } from "@microsoft/vscode-azext-utils/hostapi";
 import * as path from 'path';
 import { ProgressLocation, window } from "vscode";
 import * as nls from 'vscode-nls';
 import { ext } from "../extensionVariables";
 
 export const localize: nls.LocalizeFunc = nls.loadMessageBundle();
+
+export const springAppsFilter: AppResourceFilter = {
+    type: 'microsoft.appplatform/spring'
+};
+
+export async function revealTreeItem(resourceId: string): Promise<void> {
+    return await callWithTelemetryAndErrorHandling('api.revealTreeItem', async (context: IActionContext) => {
+        resourceId = resourceId.toLowerCase();
+
+        const node: AzExtTreeItem | undefined = await ext.tree.findTreeItem(resourceId, { ...context, loadAll: true });
+        if (node) {
+            await ext.treeView.reveal(node, { select: true, focus: true, expand: true });
+        }
+    });
+}
 
 export async function runInBackground(doing: string, done: string | null, task: () => Promise<void>): Promise<void> {
     await window.withProgress({ location: ProgressLocation.Notification, title: doing }, async (): Promise<void> => {
