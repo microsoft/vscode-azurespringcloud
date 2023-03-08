@@ -37,7 +37,6 @@
         "onCommand:azureSpringApps.common.toggleVisibility",
         "onCommand:azureSpringApps.apps.createInPortal",
         "onCommand:azureSpringApps.apps.delete",
-        "onCommand:azureSpringApps.apps.openInPortal",
         "onCommand:azureSpringApps.apps.viewProperties",
         "onCommand:azureSpringApps.app.create",
         "onCommand:azureSpringApps.app.openPublicEndpoint",
@@ -61,8 +60,7 @@
         "onCommand:azureSpringApps.app.settings.add",
         "onCommand:azureSpringApps.app.settings.edit",
         "onCommand:azureSpringApps.app.setting.edit",
-        "onCommand:azureSpringApps.app.setting.delete",
-        "onView:azureSpringApps"
+        "onCommand:azureSpringApps.app.setting.delete"
     ],
     "main": "./main.js",
     "contributes": {
@@ -93,14 +91,6 @@
         },
         "commands": [
             {
-                "command": "azureSpringApps.selectSubscription",
-                "title": "Select Subscriptions...",
-                "icon": {
-                    "light": "resources/light/filter.svg",
-                    "dark": "resources/dark/filter.svg"
-                }
-            },
-            {
                 "command": "azureSpringApps.common.refresh",
                 "title": "%azureSpringApps.common.refresh%",
                 "category": "Azure Spring Apps",
@@ -127,11 +117,6 @@
             {
                 "command": "azureSpringApps.apps.delete",
                 "title": "%azureSpringApps.common.delete%",
-                "category": "Azure Spring Apps"
-            },
-            {
-                "command": "azureSpringApps.apps.openInPortal",
-                "title": "%azureSpringApps.common.openInPortal%",
                 "category": "Azure Spring Apps"
             },
             {
@@ -275,31 +260,7 @@
                 "icon": "$(arrow-right)"
             }
         ],
-        "viewsContainers": {
-            "activitybar": [
-                {
-                    "id": "azure",
-                    "title": "Azure",
-                    "icon": "$(azure)"
-                }
-            ]
-        },
-        "views": {
-            "azure": [
-                {
-                    "id": "azureSpringApps",
-                    "name": "Spring Apps"
-                }
-            ]
-        },
         "menus": {
-            "view/title": [
-                {
-                    "command": "azureSpringApps.common.refresh",
-                    "when": "view == azureSpringApps",
-                    "group": "navigation@2"
-                }
-            ],
             "view/item/context": [
                 {
                     "command": "azureSpringApps.apps.createInPortal",
@@ -457,10 +418,6 @@
                 }
             ],
             "commandPalette": [
-                {
-                    "command": "azureSpringApps.selectSubscription",
-                    "when": "never"
-                },
                 {
                     "command": "azureSpringApps.common.refresh",
                     "when": "never"
