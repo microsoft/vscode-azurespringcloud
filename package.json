@@ -79,7 +79,7 @@
             },
             {
                 "command": "azureSpringApps.common.refresh",
-                "title": "%azureSpringApps.menu.common.refresh%",
+                "title": "%azureSpringApps.common.refresh%",
                 "category": "Azure Spring Apps",
                 "icon": {
                     "light": "resources/light/refresh.svg",
@@ -88,137 +88,137 @@
             },
             {
                 "command": "azureSpringApps.apps.createInPortal",
-                "title": "%azureSpringApps.menu.subscription.createServiceFromPortal%",
+                "title": "%azureSpringApps.apps.createInPortal%",
                 "category": "Azure Spring Apps"
             },
             {
                 "command": "azureSpringApps.subscription.openInPortal",
-                "title": "%azureSpringApps.menu.common.openInPortal%",
+                "title": "%azureSpringApps.common.openInPortal%",
                 "category": "Azure Spring Apps"
             },
             {
                 "command": "azureSpringApps.app.create",
-                "title": "%azureSpringApps.menu.service.createApp%",
+                "title": "%azureSpringApps.app.create%",
                 "category": "Spring Apps"
             },
             {
                 "command": "azureSpringApps.apps.delete",
-                "title": "%azureSpringApps.menu.common.delete%",
+                "title": "%azureSpringApps.common.delete%",
                 "category": "Spring Apps"
             },
             {
                 "command": "azureSpringApps.apps.openInPortal",
-                "title": "%azureSpringApps.menu.common.openInPortal%",
+                "title": "%azureSpringApps.common.openInPortal%",
                 "category": "Spring Apps"
             },
             {
                 "command": "azureSpringApps.apps.viewProperties",
-                "title": "%azureSpringApps.menu.common.viewProperties%",
+                "title": "%azureSpringApps.common.viewProperties%",
                 "category": "Spring Apps"
             },
             {
                 "command": "azureSpringApps.app.openPublicEndpoint",
-                "title": "%azureSpringApps.menu.app.openPublicEndpoint%",
+                "title": "%azureSpringApps.app.openPublicEndpoint%",
                 "category": "Spring App"
             },
             {
                 "command": "azureSpringApps.app.openTestEndpoint",
-                "title": "%azureSpringApps.menu.app.openTestEndpoint%",
+                "title": "%azureSpringApps.app.openTestEndpoint%",
                 "category": "Spring App"
             },
             {
                 "command": "azureSpringApps.app.assignEndpoint",
-                "title": "%azureSpringApps.menu.app.assignEndpoint%",
+                "title": "%azureSpringApps.app.assignEndpoint%",
                 "category": "Spring App"
             },
             {
                 "command": "azureSpringApps.app.unassignEndpoint",
-                "title": "%azureSpringApps.menu.app.unassignEndpoint%",
+                "title": "%azureSpringApps.app.unassignEndpoint%",
                 "category": "Spring App"
             },
             {
                 "command": "azureSpringApps.app.start",
-                "title": "%azureSpringApps.menu.common.start%",
+                "title": "%azureSpringApps.common.start%",
                 "category": "Spring App"
             },
             {
                 "command": "azureSpringApps.app.stop",
-                "title": "%azureSpringApps.menu.common.stop%",
+                "title": "%azureSpringApps.common.stop%",
                 "category": "Spring App"
             },
             {
                 "command": "azureSpringApps.app.restart",
-                "title": "%azureSpringApps.menu.common.restart%",
+                "title": "%azureSpringApps.common.restart%",
                 "category": "Spring App"
             },
             {
                 "command": "azureSpringApps.app.delete",
-                "title": "%azureSpringApps.menu.common.delete%",
+                "title": "%azureSpringApps.common.delete%",
                 "category": "Spring App"
             },
             {
                 "command": "azureSpringApps.app.deploy",
-                "title": "%azureSpringApps.menu.app.deploy%",
+                "title": "%azureSpringApps.app.deploy%",
                 "category": "Spring App"
             },
             {
                 "command": "azureSpringApps.app.scale",
-                "title": "%azureSpringApps.menu.app.scale%",
+                "title": "%azureSpringApps.app.scale%",
                 "category": "Spring App"
             },
             {
                 "command": "azureSpringApps.app.openInPortal",
-                "title": "%azureSpringApps.menu.common.openInPortal%",
+                "title": "%azureSpringApps.common.openInPortal%",
                 "category": "Spring App"
             },
             {
                 "command": "azureSpringApps.app.viewProperties",
-                "title": "%azureSpringApps.menu.common.viewProperties%",
+                "title": "%azureSpringApps.common.viewProperties%",
                 "category": "Spring App"
             },
             {
                 "command": "azureSpringApps.app.enableRemoteDebugging",
-                "title": "%azureSpringApps.menu.app.enableRemoteDebugging%",
+                "title": "%azureSpringApps.app.enableRemoteDebugging%",
                 "category": "Spring App"
             },
             {
                 "command": "azureSpringApps.app.disableRemoteDebugging",
-                "title": "%azureSpringApps.menu.app.disableRemoteDebugging%",
+                "title": "%azureSpringApps.app.disableRemoteDebugging%",
                 "category": "Spring App"
             },
             {
                 "command": "azureSpringApps.app.instance.startRemoteDebugging",
-                "title": "%azureSpringApps.menu.app.instance.startRemoteDebugging%",
+                "title": "%azureSpringApps.app.instance.startRemoteDebugging%",
                 "category": "Spring App Instance"
             },
             {
                 "command": "azureSpringApps.app.instance.startStreamingLog",
-                "title": "%azureSpringApps.menu.app.instance.startStreamingLog%",
+                "title": "%azureSpringApps.app.instance.startStreamingLog%",
                 "category": "Spring App Instance"
             },
             {
                 "command": "azureSpringApps.app.instance.stopStreamingLog",
-                "title": "%azureSpringApps.menu.app.instance.stopStreamingLog%",
+                "title": "%azureSpringApps.app.instance.stopStreamingLog%",
                 "category": "Spring App Instance"
             },
             {
                 "command": "azureSpringApps.app.instance.viewProperties",
-                "title": "%azureSpringApps.menu.common.viewProperties%",
+                "title": "%azureSpringApps.common.viewProperties%",
                 "category": "Spring App Instance"
             },
             {
                 "command": "azureSpringApps.app.settings.add",
-                "title": "%azureSpringApps.menu.common.add%",
+                "title": "%azureSpringApps.common.add%",
                 "category": "Spring App Settings"
             },
             {
                 "command": "azureSpringApps.app.settings.edit",
-                "title": "%azureSpringApps.menu.common.edit%",
+                "title": "%azureSpringApps.common.edit%",
                 "category": "Spring App Settings"
             },
             {
                 "command": "azureSpringApps.common.toggleVisibility",
-                "title": "%azureSpringApps.menu.common.toggleVisibility%",
+                "title": "%azureSpringApps.common.toggleVisibility%",
                 "category": "Azure Spring Apps",
                 "icon": {
                     "light": "resources/light/Visible.svg",
@@ -227,17 +227,17 @@
             },
             {
                 "command": "azureSpringApps.app.setting.edit",
-                "title": "%azureSpringApps.menu.common.edit%",
+                "title": "%azureSpringApps.common.edit%",
                 "category": "Spring App"
             },
             {
                 "command": "azureSpringApps.app.setting.delete",
-                "title": "%azureSpringApps.menu.common.delete%",
+                "title": "%azureSpringApps.common.delete%",
                 "category": "Spring App"
             },
             {
                 "command": "azureSpringApps.common.loadMore",
-                "title": "%azureSpringApps.menu.common.loadMore%",
+                "title": "%azureSpringApps.common.loadMore%",
                 "category": "Azure Spring Apps"
             },
             {
