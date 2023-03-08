@@ -35,8 +35,6 @@
         "onCommand:azureSpringApps.common.refresh",
         "onCommand:azureSpringApps.common.loadMore",
         "onCommand:azureSpringApps.common.toggleVisibility",
-        "onCommand:azureSpringApps.subscription.openInPortal",
-        "onCommand:azureSpringApps.selectSubscription",
         "onCommand:azureSpringApps.apps.createInPortal",
         "onCommand:azureSpringApps.apps.delete",
         "onCommand:azureSpringApps.apps.openInPortal",
@@ -68,6 +66,31 @@
     ],
     "main": "./main.js",
     "contributes": {
+        "x-azResources": {
+            "azure": {
+                "branches": [
+                    {
+                        "type": "SpringApps"
+                    }
+                ]
+            },
+            "commands": [
+                {
+                    "command": "azureSpringApps.apps.createInPortal",
+                    "title": "%azureSpringApps.apps.createInPortal%",
+                    "type": "microsoft.appplatform/spring",
+                    "detail": "%azureSpringApps.apps.create.info%"
+                }
+            ],
+            "activation": {
+                "onFetch": [
+                    "microsoft.appplatform/spring"
+                ],
+                "onResolve": [
+                    "microsoft.appplatform/spring"
+                ]
+            }
+        },
         "commands": [
             {
                 "command": "azureSpringApps.selectSubscription",
@@ -279,183 +302,153 @@
             ],
             "view/item/context": [
                 {
-                    "command": "azureSpringApps.selectSubscription",
-                    "when": "view == azureSpringApps && viewItem == azureextensionui.azureSubscription",
-                    "group": "inline"
-                },
-                {
-                    "command": "azureSpringApps.subscription.openInPortal",
-                    "when": "view == azureSpringApps && viewItem == azureextensionui.azureSubscription",
-                    "group": "1@1"
-                },
-                {
                     "command": "azureSpringApps.apps.createInPortal",
-                    "when": "view == azureSpringApps && viewItem == azureextensionui.azureSubscription",
+                    "when": "view == azureResourceGroups && viewItem =~ /springapps/i && viewItem =~ /azureResourceTypeGroup/i",
                     "group": "5@1"
                 },
                 {
-                    "command": "azureSpringApps.common.refresh",
-                    "when": "view == azureSpringApps && viewItem == azureextensionui.azureSubscription",
-                    "group": "9@2"
-                },
-                {
-                    "command": "azureSpringApps.apps.openInPortal",
-                    "when": "view == azureSpringApps && viewItem == azureSpringApps.apps",
-                    "group": "1@1"
-                },
-                {
                     "command": "azureSpringApps.app.create",
-                    "when": "view == azureSpringApps && viewItem == azureSpringApps.apps",
+                    "when": "view == azureResourceGroups && viewItem =~ /azureSpringApps\\.apps/i",
                     "group": "5@1"
                 },
                 {
                     "command": "azureSpringApps.apps.delete",
-                    "when": "view == azureSpringApps && viewItem == azureSpringApps.apps",
+                    "when": "view == azureResourceGroups && viewItem =~ /azureSpringApps\\.apps/i",
                     "group": "5@2"
                 },
                 {
-                    "command": "azureSpringApps.apps.viewProperties",
-                    "when": "view == azureSpringApps && viewItem == azureSpringApps.apps",
-                    "group": "9@1"
-                },
-                {
-                    "command": "azureSpringApps.common.refresh",
-                    "when": "view == azureSpringApps && viewItem == azureSpringApps.apps",
-                    "group": "9@2"
-                },
-                {
                     "command": "azureSpringApps.app.openInPortal",
-                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app;status-.+;/i",
+                    "when": "view == azureResourceGroups && viewItem =~ /^azureSpringApps\\.app;status-.+;/i",
                     "group": "1@1"
                 },
                 {
                     "command": "azureSpringApps.app.openPublicEndpoint",
-                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app;status-running;/i",
+                    "when": "view == azureResourceGroups && viewItem =~ /^azureSpringApps\\.app;status-running;/i",
                     "group": "2@1"
                 },
                 {
                     "command": "azureSpringApps.app.openTestEndpoint",
-                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app;status-running;/i",
+                    "when": "view == azureResourceGroups && viewItem =~ /^azureSpringApps\\.app;status-running;/i",
                     "group": "2@2"
                 },
                 {
                     "command": "azureSpringApps.app.assignEndpoint",
-                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app;status-(running|stopped);.*;public-false;/i",
+                    "when": "view == azureResourceGroups && viewItem =~ /^azureSpringApps\\.app;status-(running|stopped);.*;public-false;/i",
                     "group": "3@1"
                 },
                 {
                     "command": "azureSpringApps.app.unassignEndpoint",
-                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app;status-(running|stopped);.*;public-true;/i",
+                    "when": "view == azureResourceGroups && viewItem =~ /^azureSpringApps\\.app;status-(running|stopped);.*;public-true;/i",
                     "group": "3@1"
                 },
                 {
                     "command": "azureSpringApps.app.start",
-                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app;status-stopped;/i",
+                    "when": "view == azureResourceGroups && viewItem =~ /^azureSpringApps\\.app;status-stopped;/i",
                     "group": "5@1"
                 },
                 {
                     "command": "azureSpringApps.app.enableRemoteDebugging",
-                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app;status-running;debugging-disabled;/i",
+                    "when": "view == azureResourceGroups && viewItem =~ /^azureSpringApps\\.app;status-running;debugging-disabled;/i",
                     "group": "4@2"
                 },
                 {
                     "command": "azureSpringApps.app.disableRemoteDebugging",
-                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app;status-running;debugging-enabled;/i",
+                    "when": "view == azureResourceGroups && viewItem =~ /^azureSpringApps\\.app;status-running;debugging-enabled;/i",
                     "group": "4@2"
                 },
                 {
                     "command": "azureSpringApps.app.stop",
-                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app;status-running;/i",
+                    "when": "view == azureResourceGroups && viewItem =~ /^azureSpringApps\\.app;status-running;/i",
                     "group": "5@2"
                 },
                 {
                     "command": "azureSpringApps.app.restart",
-                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app;status-running;/i",
+                    "when": "view == azureResourceGroups && viewItem =~ /^azureSpringApps\\.app;status-running;/i",
                     "group": "5@3"
                 },
                 {
                     "command": "azureSpringApps.app.delete",
-                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app;status-.+;/i",
+                    "when": "view == azureResourceGroups && viewItem =~ /^azureSpringApps\\.app;status-.+;/i",
                     "group": "5@4"
                 },
                 {
                     "command": "azureSpringApps.app.scale",
-                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app;status-(running|stopped);/i",
+                    "when": "view == azureResourceGroups && viewItem =~ /^azureSpringApps\\.app;status-(running|stopped);/i",
                     "group": "5@5"
                 },
                 {
                     "command": "azureSpringApps.app.deploy",
-                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app;status-(running|stopped);/i",
+                    "when": "view == azureResourceGroups && viewItem =~ /^azureSpringApps\\.app;status-(running|stopped);/i",
                     "group": "6@1"
                 },
                 {
                     "command": "azureSpringApps.app.viewProperties",
-                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app;status-.+;/i",
+                    "when": "view == azureResourceGroups && viewItem =~ /^azureSpringApps\\.app;status-.+;/i",
                     "group": "9@1"
                 },
                 {
                     "command": "azureSpringApps.common.refresh",
-                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app;status-.+;/i",
+                    "when": "view == azureResourceGroups && viewItem =~ /^azureSpringApps\\.app;status-.+;/i",
                     "group": "9@2"
                 },
                 {
                     "command": "azureSpringApps.common.refresh",
-                    "when": "view == azureSpringApps && viewItem == azureSpringApps.app.instances",
+                    "when": "view == azureResourceGroups && viewItem == azureSpringApps.app.instances",
                     "group": "9@2"
                 },
                 {
                     "command": "azureSpringApps.app.instance.startRemoteDebugging",
-                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app(\\.instance)?;status-[Rr]unning;/i",
+                    "when": "view == azureResourceGroups && viewItem =~ /^azureSpringApps\\.app(\\.instance)?;status-[Rr]unning;/i",
                     "group": "4@1"
                 },
                 {
                     "command": "azureSpringApps.app.instance.startStreamingLog",
-                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app\\.instance;status-Running;/i",
+                    "when": "view == azureResourceGroups && viewItem =~ /^azureSpringApps\\.app\\.instance;status-Running;/i",
                     "group": "6@1"
                 },
                 {
                     "command": "azureSpringApps.app.instance.stopStreamingLog",
-                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app\\.instance;status-Running;/i",
+                    "when": "view == azureResourceGroups && viewItem =~ /^azureSpringApps\\.app\\.instance;status-Running;/i",
                     "group": "6@2"
                 },
                 {
                     "command": "azureSpringApps.app.instance.viewProperties",
-                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app\\.instance;status-.+;/i",
+                    "when": "view == azureResourceGroups && viewItem =~ /^azureSpringApps\\.app\\.instance;status-.+;/i",
                     "group": "9@1"
                 },
                 {
                     "command": "azureSpringApps.app.settings.add",
-                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app\\.(jvmOptions|envVariables)$/",
+                    "when": "view == azureResourceGroups && viewItem =~ /^azureSpringApps\\.app\\.(jvmOptions|envVariables)$/",
                     "group": "1@1"
                 },
                 {
                     "command": "azureSpringApps.app.settings.edit",
-                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app\\.(jvmOptions|scaleSettings)$/",
+                    "when": "view == azureResourceGroups && viewItem =~ /^azureSpringApps\\.app\\.(jvmOptions|scaleSettings)$/",
                     "group": "1@2"
                 },
                 {
                     "command": "azureSpringApps.common.refresh",
-                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app\\.(jvmOptions|scaleSettings|envVariables)$/",
+                    "when": "view == azureResourceGroups && viewItem =~ /^azureSpringApps\\.app\\.(jvmOptions|scaleSettings|envVariables)$/",
                     "group": "2@1"
                 },
                 {
                     "command": "azureSpringApps.common.toggleVisibility",
-                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app\\.envVariable(|s)$/",
+                    "when": "view == azureResourceGroups && viewItem =~ /^azureSpringApps\\.app\\.envVariable(|s)$/",
                     "group": "inline"
                 },
                 {
                     "command": "azureSpringApps.app.setting.edit",
-                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app\\.(jvmOption|scaleSetting|envVariable)$/",
+                    "when": "view == azureResourceGroups && viewItem =~ /^azureSpringApps\\.app\\.(jvmOption|scaleSetting|envVariable)$/",
                     "group": "1@1"
                 },
                 {
                     "command": "azureSpringApps.app.setting.delete",
-                    "when": "view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app\\.(jvmOption|envVariable)$/",
+                    "when": "view == azureResourceGroups && viewItem =~ /^azureSpringApps\\.app\\.(jvmOption|envVariable)$/",
                     "group": "1@2"
                 },
                 {
                     "command": "azureSpringApps.app.showLiveInformation",
-                    "when": "spring.dashboard:enabled && view == azureSpringApps && viewItem =~ /^azureSpringApps\\.app;status-running;/i"
+                    "when": "spring.dashboard:enabled && view == azureResourceGroups && viewItem =~ /^azureSpringApps\\.app;status-running;/i"
                 },
                 {
                     "command": "azureSpringApps.focus",

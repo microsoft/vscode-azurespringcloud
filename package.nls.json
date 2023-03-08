@@ -13,6 +13,7 @@
     "azureSpringApps.common.add": "Add",
     "azureSpringApps.common.edit": "Edit",
     "azureSpringApps.apps.createInPortal": "Create Azure Spring Apps in Portal",
+    "azureSpringApps.apps.create.info": "Build and deploy Spring Boot applications with a fully managed service.",
     "azureSpringApps.app.create": "Create App",
     "azureSpringApps.app.openPublicEndpoint": "Access Public Endpoint",
     "azureSpringApps.app.openTestEndpoint": "Access Test Endpoint",
