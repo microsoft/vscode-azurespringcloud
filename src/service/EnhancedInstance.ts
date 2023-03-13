@@ -6,7 +6,7 @@ import { EnhancedDeployment } from "./EnhancedDeployment";
 
 export class EnhancedInstance implements DeploymentInstance {
 
-    public readonly name?: string;
+    public readonly name: string;
     public readonly status?: string;
     public readonly reason?: string;
     public readonly discoveryStatus?: string;
@@ -23,5 +23,15 @@ export class EnhancedInstance implements DeploymentInstance {
         this.startTime = resource.startTime;
         this.zone = resource.zone;
         this.deployment = deployment;
+    }
+
+    get id(): string {
+        return `${this.deployment.id}/instances/${this.name}`;
+    }
+
+    get properties(): {} {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { deployment: _, ...properties } = this;
+        return properties;
     }
 }

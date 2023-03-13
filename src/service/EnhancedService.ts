@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 
 import { AppPlatformManagementClient, AppResource, ClusterResourceProperties, ServiceResource, Sku } from "@azure/arm-appplatform";
-import { ISubscriptionContext } from "@microsoft/vscode-azext-utils";
+import { AzureSubscription } from '@microsoft/vscode-azureresources-api';
 import { EnhancedApp } from "./EnhancedApp";
 
 export class EnhancedService {
@@ -10,11 +10,11 @@ export class EnhancedService {
 
     public readonly name: string;
     public readonly id: string;
-    public readonly subscription: ISubscriptionContext;
+    public readonly subscription: AzureSubscription;
     private _remote: ServiceResource;
     private _resourceGroup: string;
 
-    public constructor(client: AppPlatformManagementClient, subscription: ISubscriptionContext, resource: ServiceResource) {
+    public constructor(client: AppPlatformManagementClient, subscription: AzureSubscription, resource: ServiceResource) {
         this.client = client;
         this.subscription = subscription;
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion

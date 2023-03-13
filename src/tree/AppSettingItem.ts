@@ -1,9 +1,12 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import { AzExtParentTreeItem, AzExtTreeItem, IActionContext, TreeItemIconPath } from '@microsoft/vscode-azext-utils';
+import { IActionContext } from '@microsoft/vscode-azext-utils';
+import * as vscode from "vscode";
+import { ext } from "../extensionVariables";
 import { getThemedIconPath } from "../utils";
-import { AppSettingsTreeItem } from "./AppSettingsTreeItem";
+import { AppSettingsItem } from './AppSettingsItem';
+import { ResourceItemBase } from "./SpringAppsBranchDataProvider";
 
 export interface IOptions {
     hidden?: boolean;
@@ -13,27 +16,41 @@ export interface IOptions {
     contextValue?: string;
 }
 
-export class AppSettingTreeItem extends AzExtTreeItem {
+export class AppSettingItem implements ResourceItemBase {
     public static contextValue: string = 'azureSpringApps.app.setting';
-    public readonly parent: AppSettingsTreeItem;
     public readonly key: string;
     public readonly _value: string;
 
     private readonly _options: IOptions;
 
-    public constructor(parent: AzExtParentTreeItem, key: string, value: string, options: IOptions = { deletable: true }) {
-        super(parent);
+    public constructor(public readonly parent: AppSettingsItem, key: string, value: string, options: IOptions = { deletable: true }) {
         this.key = key;
         this._value = value;
         this._options = options;
     }
 
+    getTreeItem(): vscode.TreeItem | Thenable<vscode.TreeItem> {
+        return {
+            id: this.id,
+            label: this.label,
+            iconPath: getThemedIconPath('constant'),
+            contextValue: this.contextValue,
+            description: this.description,
+            collapsibleState: vscode.TreeItemCollapsibleState.None,
+            command: this._options.hidden === undefined ? undefined : {
+                title: 'Toggle Visibility',
+                command: 'azureSpringApps.common.toggleVisibility',
+                arguments: [this]
+            },
+        };
+    }
+
     public get contextValue(): string {
-        return this._options.contextValue || AppSettingTreeItem.contextValue;
+        return this._options.contextValue || AppSettingItem.contextValue;
     }
 
     public get id(): string {
-        return this.key || this._value;
+        return `${this.parent.id}/${this.key}`;
     }
 
     public get label(): string {
@@ -58,17 +75,6 @@ export class AppSettingTreeItem extends AzExtTreeItem {
         return this._options.deletable ?? true;
     }
 
-    public get iconPath(): TreeItemIconPath {
-        return getThemedIconPath('constant');
-    }
-
-    public get commandId(): string | undefined {
-        if (this._options.hidden === undefined) {
-            return undefined;
-        }
-        return 'azureSpringApps.common.toggleVisibility';
-    }
-
     public get value(): string {
         return this._value;
     }
@@ -77,14 +83,18 @@ export class AppSettingTreeItem extends AzExtTreeItem {
         await this.parent.updateSettingValue(this, context);
     }
 
-    public async deleteTreeItemImpl(context: IActionContext): Promise<void> {
+    public async remove(context: IActionContext): Promise<void> {
         if (this.deletable) {
             await this.parent.deleteSettingItem(this, context);
         }
     }
 
-    public async toggleVisibility(context: IActionContext, hidden?: boolean): Promise<void> {
+    public async toggleVisibility(_context: IActionContext, hidden?: boolean): Promise<void> {
         this._options.hidden = hidden ?? !this._options.hidden;
-        await this.refresh(context);
+        ext.state.notifyChildrenChanged(this.id);
+    }
+
+    refresh(): Promise<void> {
+        return Promise.resolve(undefined);
     }
 }

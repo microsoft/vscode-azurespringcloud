@@ -1,11 +1,11 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import { AzExtTreeItem, DialogResponses, IActionContext, openReadOnlyJson, openUrl } from "@microsoft/vscode-azext-utils";
-import { ext } from "../extensionVariables";
+import { DialogResponses, IActionContext, openUrl } from "@microsoft/vscode-azext-utils";
 import { EnhancedService } from "../service/EnhancedService";
-import ResolvedService, { ServiceTreeItem } from "../tree/ServiceTreeItem";
+import AppsItem from "../tree/AppsItem";
 import * as utils from "../utils";
+import { pickApps } from "../utils/pickContainerApp";
 
 export namespace ServiceCommands {
 
@@ -13,41 +13,22 @@ export namespace ServiceCommands {
         await openUrl('https://portal.azure.com/#create/Microsoft.AppPlatform');
     }
 
-    export async function createApp(context: IActionContext, n?: AzExtTreeItem): Promise<void> {
-        const node: ServiceTreeItem = await getNode(n, context);
-        try {
-            await node.createChild(context);
-        } catch (e) {
-            void node.refresh(context);
-            throw e;
-        }
+    export async function createApp(context: IActionContext, n?: AppsItem): Promise<void> {
+        const item: AppsItem = await getAppsItem(context, n);
+        await item.createChild(context);
     }
 
-    export async function deleteService(context: IActionContext, n?: AzExtTreeItem): Promise<ServiceTreeItem> {
-        const node: ServiceTreeItem = await getNode(n, context);
-        const service: EnhancedService = node.service;
-        await context.ui.showWarningMessage(`Are you sure to delete "${node.service.name}"?`, { modal: true }, DialogResponses.deleteResponse);
+    export async function deleteService(context: IActionContext, n?: AppsItem): Promise<void> {
+        const item: AppsItem = await getAppsItem(context, n);
+        const service: EnhancedService = item.service;
+        await context.ui.showWarningMessage(`Are you sure to delete "${item.service.name}"?`, { modal: true }, DialogResponses.deleteResponse);
         const deleting: string = utils.localize('deletingSpringCLoudService', 'Deleting Azure Spring Apps "{0}"...', service.name);
         const deleted: string = utils.localize('deletedSpringCloudService', 'Successfully deleted Azure Spring Apps "{0}".', service.name);
-        await node.runWithTemporaryDescription(context, 'Deleting...', async () => {
-            await utils.runInBackground(deleting, deleted, () => node.deleteTreeItem(context));
-        });
-        return node;
+        await utils.runInBackground(deleting, deleted, () => item.remove(context));
     }
 
-    export async function viewProperties(context: IActionContext, n?: AzExtTreeItem): Promise<ServiceTreeItem> {
-        const node: ServiceTreeItem = await getNode(n, context);
-        await openReadOnlyJson(node, node.service.properties ?? {});
-        return node;
-    }
-
-    async function getNode(node: AzExtTreeItem | undefined, context: IActionContext): Promise<ServiceTreeItem> {
-        if (!node) {
-            node = await ext.rgApi.pickAppResource<ServiceTreeItem>(context, {
-                filter: utils.springAppsFilter,
-                expectedChildContextValue: ResolvedService.contextValue
-            });
-        }
-        return node as ServiceTreeItem;
+    async function getAppsItem(context: IActionContext, origin?: AppsItem): Promise<AppsItem> {
+        const item: AppsItem = origin ?? await pickApps(context);
+        return item as AppsItem;
     }
 }

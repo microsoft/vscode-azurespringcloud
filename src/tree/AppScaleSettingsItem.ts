@@ -1,39 +1,62 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import { AzExtTreeItem, AzureWizard, AzureWizardExecuteStep, AzureWizardPromptStep, IActionContext, TreeItemIconPath } from "@microsoft/vscode-azext-utils";
-import { window } from "vscode";
+import {
+    AzureWizard,
+    AzureWizardExecuteStep,
+    AzureWizardPromptStep,
+    callWithTelemetryAndErrorHandling,
+    createSubscriptionContext,
+    IActionContext
+} from "@microsoft/vscode-azext-utils";
+import { TreeItem, TreeItemCollapsibleState, window } from "vscode";
 import { InputScaleValueStep } from "../commands/steps/settings/scalesettings/InputScaleValueStep";
 import { IScaleSettingsUpdateWizardContext } from "../commands/steps/settings/scalesettings/IScaleSettingsUpdateWizardContext";
 import { UpdateScaleSettingsStep } from "../commands/steps/settings/scalesettings/UpdateScaleSettingsStep";
+import { ext } from "../extensionVariables";
 import { IScaleSettings } from "../model";
 import { EnhancedDeployment } from "../service/EnhancedDeployment";
 import { getThemedIconPath, localize } from "../utils";
-import { AppSettingsTreeItem } from "./AppSettingsTreeItem";
-import { AppSettingTreeItem, IOptions } from "./AppSettingTreeItem";
-import { AppTreeItem } from "./AppTreeItem";
+import { AppItem } from "./AppItem";
+import { AppSettingItem, IOptions } from "./AppSettingItem";
+import { AppSettingsItem } from "./AppSettingsItem";
 
-export class AppScaleSettingsTreeItem extends AppSettingsTreeItem {
+export class AppScaleSettingsItem extends AppSettingsItem {
     public static contextValue: string = 'azureSpringApps.app.scaleSettings';
     private static readonly _options: IOptions = {
         contextValue: 'azureSpringApps.app.scaleSetting',
     };
 
-    public readonly contextValue: string = AppScaleSettingsTreeItem.contextValue;
+    public readonly contextValue: string = AppScaleSettingsItem.contextValue;
     public readonly label: string = 'Scale Settings';
 
-    public constructor(parent: AppTreeItem) {
+    public constructor(parent: AppItem) {
         super(parent);
     }
 
-    public get iconPath(): TreeItemIconPath { return getThemedIconPath('app-scale'); }
-    public get id(): string { return AppScaleSettingsTreeItem.contextValue; }
+    async getChildren(): Promise<AppSettingItem[]> {
+        const result = await callWithTelemetryAndErrorHandling('getChildren', async (_context) => {
+            const deployment: EnhancedDeployment | undefined = await this.parent.app.getActiveDeployment();
+            const settings: IScaleSettings = deployment?.getScaleSettings() ?? {};
+            return Object.entries(settings)
+                .map(e => this.toAppSettingItem(e[0], `${e[1]}`, Object.assign({ label: IScaleSettings.LABELS[e[0]] }, AppScaleSettingsItem._options)));
+        });
 
-    public async loadMoreChildrenImpl(_clearCache: boolean, _context: IActionContext): Promise<AzExtTreeItem[]> {
-        const deployment: EnhancedDeployment | undefined = await this.parent.app.getActiveDeployment();
-        const settings: IScaleSettings = deployment?.getScaleSettings() ?? {};
-        return Object.entries(settings)
-            .map(e => this.toAppSettingItem(e[0], `${e[1]}`, Object.assign({ label: IScaleSettings.LABELS[e[0]] }, AppScaleSettingsTreeItem._options)));
+        return result ?? [];
+    }
+
+    getTreeItem(): TreeItem | Thenable<TreeItem> {
+        return {
+            id: this.id,
+            label: this.label,
+            iconPath: getThemedIconPath('app-scale'),
+            contextValue: this.contextValue,
+            collapsibleState: TreeItemCollapsibleState.Collapsed,
+        };
+    }
+
+    public get id(): string {
+        return `${this.parent.id}/scaleSettings`;
     }
 
     public async updateSettingsValue(context: IActionContext, key?: string): Promise<string> {
@@ -43,7 +66,8 @@ export class AppScaleSettingsTreeItem extends AppSettingsTreeItem {
             const scaled: string = localize('scaled', 'Successfully scaled "{0}".', deployment.app.name);
 
             const newSettings: IScaleSettings = { ...deployment.getScaleSettings() };
-            const wizardContext: IScaleSettingsUpdateWizardContext = Object.assign(context, this.subscription, { newSettings });
+            const subContext = createSubscriptionContext(this.parent.app.subscription);
+            const wizardContext: IScaleSettingsUpdateWizardContext = Object.assign(context, subContext, { newSettings });
             const steps: AzureWizardPromptStep<IScaleSettingsUpdateWizardContext>[] = [
                 new InputScaleValueStep(deployment, 'capacity'),
                 new InputScaleValueStep(deployment, 'memory'),
@@ -59,19 +83,20 @@ export class AppScaleSettingsTreeItem extends AppSettingsTreeItem {
             executeSteps.push(new UpdateScaleSettingsStep(deployment));
             const wizard: AzureWizard<IScaleSettingsUpdateWizardContext> = new AzureWizard(wizardContext, { promptSteps, executeSteps, title: scaling });
             await wizard.prompt();
-            await wizard.execute();
+            await ext.state.runWithTemporaryDescription(this.id, 'Scaling...', () => wizard.execute())
             void window.showInformationMessage(scaled);
-            void this.parent.refresh(context);
+            await this.parent.refresh();
+            ext.state.notifyChildrenChanged(this.id);
             return `${wizardContext.newSettings[key ?? 'capacity']}`;
         }
         return '';
     }
 
-    public async updateSettingValue(node: AppSettingTreeItem, context: IActionContext): Promise<string> {
+    public async updateSettingValue(node: AppSettingItem, context: IActionContext): Promise<string> {
         return this.updateSettingsValue(context, node.key);
     }
 
-    public async deleteSettingItem(_node: AppSettingTreeItem, _context: IActionContext): Promise<void> {
+    public async deleteSettingItem(_node: AppSettingItem, _context: IActionContext): Promise<void> {
         throw new Error('Scale settings can not be deleted.');
     }
 }

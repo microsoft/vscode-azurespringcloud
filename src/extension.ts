@@ -4,16 +4,15 @@
 'use strict';
 
 import { registerAzureUtilsExtensionVariables } from '@microsoft/vscode-azext-azureutils';
-import { AzExtResourceType, callWithTelemetryAndErrorHandling, createApiProvider, createAzExtOutputChannel, getExtensionExports, IActionContext, registerUIExtensionVariables } from '@microsoft/vscode-azext-utils';
-import { AzureExtensionApi, AzureExtensionApiProvider } from '@microsoft/vscode-azext-utils/api';
-import { AzureHostExtensionApi } from '@microsoft/vscode-azext-utils/hostapi';
+import { callWithTelemetryAndErrorHandling, createAzExtOutputChannel, createExperimentationService, IActionContext, registerUIExtensionVariables } from '@microsoft/vscode-azext-utils';
+import { AzExtResourceType, AzureResourcesExtensionApi, getAzureResourcesExtensionApi } from '@microsoft/vscode-azureresources-api';
 import * as vscode from 'vscode';
 import { registerCommands } from './commands';
 import { ext } from './extensionVariables';
-import { SpringAppsResolver } from './SpringAppsResolver';
-import { revealTreeItem } from './utils';
+import { SpringAppsBranchDataProvider } from './tree/SpringAppsBranchDataProvider';
+import { TreeItemStateStore } from './tree/TreeItemState';
 
-export async function activateInternal(context: vscode.ExtensionContext, perfStats: { loadStartTime: number; loadEndTime: number }, ignoreBundle?: boolean): Promise<AzureExtensionApiProvider> {
+export async function activateInternal(context: vscode.ExtensionContext, perfStats: { loadStartTime: number; loadEndTime: number }, ignoreBundle?: boolean): Promise<void> {
     ext.context = context;
     ext.ignoreBundle = ignoreBundle;
     ext.outputChannel = createAzExtOutputChannel('Azure Spring Apps', ext.prefix);
@@ -28,28 +27,21 @@ export async function activateInternal(context: vscode.ExtensionContext, perfSta
 
         registerCommands();
 
-        const rgApiProvider: AzureExtensionApiProvider | undefined = await getExtensionExports<AzureExtensionApiProvider>('ms-azuretools.vscode-azureresourcegroups');
+
+        const rgApiProvider: AzureResourcesExtensionApi = await getAzureResourcesExtensionApi(context, '2.0.0');
         if (rgApiProvider) {
-            const api = rgApiProvider.getApi<AzureHostExtensionApi>('0.0.1');
-            ext.rgApi = api;
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            ext.azureAccountTreeItem = ext.rgApi.appResourceTree._rootTreeItem as AzureAccountTreeItemBase;
-            ext.tree = ext.rgApi.appResourceTree;
-            ext.treeView = ext.rgApi.appResourceTreeView;
-            api.registerApplicationResourceResolver(AzExtResourceType.SpringApps, new SpringAppsResolver());
+            ext.experimentationService = await createExperimentationService(context);
+
+            ext.state = new TreeItemStateStore();
+            ext.rgApiV2 = await getAzureResourcesExtensionApi(context, '2.0.0');
+            ext.branchDataProvider = new SpringAppsBranchDataProvider();
+            ext.rgApiV2.resources.registerAzureResourceBranchDataProvider(AzExtResourceType.SpringApps, ext.branchDataProvider);
         } else {
             throw new Error('Could not find the Azure Resource Groups extension');
         }
     });
-
-    return createApiProvider([<AzureExtensionApi>{
-        revealTreeItem,
-        apiVersion: '1.0.0'
-    }]);
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-function
 export function deactivateInternal(): void {
-    return;
 }

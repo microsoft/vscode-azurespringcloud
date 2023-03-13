@@ -1,16 +1,30 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import { AppPlatformManagementClient, AppResource, AppResourceProperties, Build, BuildResult, BuildResultProvisioningState, DeploymentInstance, DeploymentResource, KnownSupportedRuntimeValue, ResourceUploadDefinition, TestKeys, UserSourceInfoUnion } from "@azure/arm-appplatform";
+import {
+    AppPlatformManagementClient,
+    AppResource,
+    AppResourceProperties,
+    Build,
+    BuildResult,
+    BuildResultProvisioningState,
+    DeploymentInstance,
+    DeploymentResource,
+    KnownSupportedRuntimeValue,
+    ResourceUploadDefinition,
+    TestKeys,
+    UserSourceInfoUnion
+} from "@azure/arm-appplatform";
 import { AnonymousCredential, ShareFileClient } from "@azure/storage-file-share";
 import { IActionContext } from "@microsoft/vscode-azext-utils";
 import { localize } from "../utils";
 import { EnhancedDeployment } from "./EnhancedDeployment";
 import { EnhancedService } from "./EnhancedService";
 import { startStreamingLogs, stopStreamingLogs } from "./streamlog/streamingLog";
+import { AzureSubscription } from "@microsoft/vscode-azureresources-api";
 
 export class EnhancedApp {
-    public static readonly DEFAULT_RUNTIME: KnownSupportedRuntimeValue = KnownSupportedRuntimeValue.Java8;
+    public static readonly DEFAULT_RUNTIME: KnownSupportedRuntimeValue = KnownSupportedRuntimeValue.Java11;
     public static readonly DEFAULT_DEPLOYMENT: string = 'default';
     public static readonly DEFAULT_TANZU_COMPONENT_NAME: string = 'default';
 
@@ -36,6 +50,10 @@ export class EnhancedApp {
 
     get client(): AppPlatformManagementClient {
         return this.service.client;
+    }
+
+    get subscription(): AzureSubscription {
+        return this.service.subscription;
     }
 
     public async getStatus(): Promise<string> {

@@ -3,8 +3,9 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
+import { IActionContext, registerCommandWithTreeNodeUnwrapping } from "@microsoft/vscode-azext-utils";
 import * as vscode from "vscode";
-import { AppTreeItem } from "../tree/AppTreeItem";
+import { AppItem } from "../tree/AppItem";
 import { DashboardExtensionApi, RemoteBootAppData, RemoteBootAppDataProvider, RemoteBootAppDataProviderOptions } from "./api";
 
 let inited: boolean = false;
@@ -31,7 +32,7 @@ export async function initialize(context: vscode.ExtensionContext): Promise<void
         }
 
         // register commands
-        vscode.commands.registerCommand("azureSpringApps.app.showLiveInformation", async (appNode: AppTreeItem) => {
+        registerCommandWithTreeNodeUnwrapping("azureSpringApps.app.showLiveInformation", async (_context: IActionContext, appNode: AppItem) => {
             if (!dashboardExt.isActive) {
                 await dashboardExt.activate();
             }
@@ -86,7 +87,7 @@ class AzureSpringAppsProvider implements RemoteBootAppDataProvider {
         return Array.from(this.store.values());
     }
 
-    public addAppData(appNode: AppTreeItem) {
+    public addAppData(appNode: AppItem) {
         const appData = this.toRemoteBootAppData(appNode);
         if (appData) {
             this.store.set(appData.name, appData);
@@ -94,7 +95,7 @@ class AzureSpringAppsProvider implements RemoteBootAppDataProvider {
         }
     }
 
-    public toRemoteBootAppData(appNode: AppTreeItem): RemoteBootAppData | undefined {
+    public toRemoteBootAppData(appNode: AppItem): RemoteBootAppData | undefined {
         const app = appNode.app;
         if (app.properties?.url) {
             const uri = vscode.Uri.parse(app.properties.url);

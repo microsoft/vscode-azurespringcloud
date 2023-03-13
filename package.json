@@ -33,11 +33,9 @@
     "activationEvents": [
         "onFileSystem:azureSpringApps",
         "onCommand:azureSpringApps.common.refresh",
-        "onCommand:azureSpringApps.common.loadMore",
         "onCommand:azureSpringApps.common.toggleVisibility",
         "onCommand:azureSpringApps.apps.createInPortal",
         "onCommand:azureSpringApps.apps.delete",
-        "onCommand:azureSpringApps.apps.viewProperties",
         "onCommand:azureSpringApps.app.create",
         "onCommand:azureSpringApps.app.openPublicEndpoint",
         "onCommand:azureSpringApps.app.openTestEndpoint",
@@ -49,14 +47,11 @@
         "onCommand:azureSpringApps.app.delete",
         "onCommand:azureSpringApps.app.deploy",
         "onCommand:azureSpringApps.app.scale",
-        "onCommand:azureSpringApps.app.openInPortal",
-        "onCommand:azureSpringApps.app.viewProperties",
         "onCommand:azureSpringApps.app.enableRemoteDebugging",
         "onCommand:azureSpringApps.app.disableRemoteDebugging",
         "onCommand:azureSpringApps.app.instance.startRemoteDebugging",
         "onCommand:azureSpringApps.app.instance.startStreamingLog",
         "onCommand:azureSpringApps.app.instance.stopStreamingLog",
-        "onCommand:azureSpringApps.app.instance.viewProperties",
         "onCommand:azureSpringApps.app.settings.add",
         "onCommand:azureSpringApps.app.settings.edit",
         "onCommand:azureSpringApps.app.setting.edit",
@@ -105,11 +100,6 @@
                 "category": "Azure Spring Apps"
             },
             {
-                "command": "azureSpringApps.subscription.openInPortal",
-                "title": "%azureSpringApps.common.openInPortal%",
-                "category": "Azure Spring Apps"
-            },
-            {
                 "command": "azureSpringApps.app.create",
                 "title": "%azureSpringApps.app.create%",
                 "category": "Azure Spring Apps"
@@ -117,11 +107,6 @@
             {
                 "command": "azureSpringApps.apps.delete",
                 "title": "%azureSpringApps.common.delete%",
-                "category": "Azure Spring Apps"
-            },
-            {
-                "command": "azureSpringApps.apps.viewProperties",
-                "title": "%azureSpringApps.common.viewProperties%",
                 "category": "Azure Spring Apps"
             },
             {
@@ -175,16 +160,6 @@
                 "category": "Azure Spring App"
             },
             {
-                "command": "azureSpringApps.app.openInPortal",
-                "title": "%azureSpringApps.common.openInPortal%",
-                "category": "Azure Spring App"
-            },
-            {
-                "command": "azureSpringApps.app.viewProperties",
-                "title": "%azureSpringApps.common.viewProperties%",
-                "category": "Azure Spring App"
-            },
-            {
                 "command": "azureSpringApps.app.enableRemoteDebugging",
                 "title": "%azureSpringApps.app.enableRemoteDebugging%",
                 "category": "Azure Spring App"
@@ -207,11 +182,6 @@
             {
                 "command": "azureSpringApps.app.instance.stopStreamingLog",
                 "title": "%azureSpringApps.app.instance.stopStreamingLog%",
-                "category": "Azure Spring App Instance"
-            },
-            {
-                "command": "azureSpringApps.app.instance.viewProperties",
-                "title": "%azureSpringApps.common.viewProperties%",
                 "category": "Azure Spring App Instance"
             },
             {
@@ -244,11 +214,6 @@
                 "category": "Azure Spring App"
             },
             {
-                "command": "azureSpringApps.common.loadMore",
-                "title": "%azureSpringApps.common.loadMore%",
-                "category": "Azure Spring Apps"
-            },
-            {
                 "command": "azureSpringApps.app.showLiveInformation",
                 "title": "View Live Information",
                 "category": "Azure Spring Apps"
@@ -276,11 +241,6 @@
                     "command": "azureSpringApps.apps.delete",
                     "when": "view == azureResourceGroups && viewItem =~ /azureSpringApps\\.apps/i",
                     "group": "5@2"
-                },
-                {
-                    "command": "azureSpringApps.app.openInPortal",
-                    "when": "view == azureResourceGroups && viewItem =~ /^azureSpringApps\\.app;status-.+;/i",
-                    "group": "1@1"
                 },
                 {
                     "command": "azureSpringApps.app.openPublicEndpoint",
@@ -343,11 +303,6 @@
                     "group": "6@1"
                 },
                 {
-                    "command": "azureSpringApps.app.viewProperties",
-                    "when": "view == azureResourceGroups && viewItem =~ /^azureSpringApps\\.app;status-.+;/i",
-                    "group": "9@1"
-                },
-                {
                     "command": "azureSpringApps.common.refresh",
                     "when": "view == azureResourceGroups && viewItem =~ /^azureSpringApps\\.app;status-.+;/i",
                     "group": "9@2"
@@ -371,11 +326,6 @@
                     "command": "azureSpringApps.app.instance.stopStreamingLog",
                     "when": "view == azureResourceGroups && viewItem =~ /^azureSpringApps\\.app\\.instance;status-Running;/i",
                     "group": "6@2"
-                },
-                {
-                    "command": "azureSpringApps.app.instance.viewProperties",
-                    "when": "view == azureResourceGroups && viewItem =~ /^azureSpringApps\\.app\\.instance;status-.+;/i",
-                    "group": "9@1"
                 },
                 {
                     "command": "azureSpringApps.app.settings.add",
@@ -420,10 +370,6 @@
             "commandPalette": [
                 {
                     "command": "azureSpringApps.common.refresh",
-                    "when": "never"
-                },
-                {
-                    "command": "azureSpringApps.common.loadMore",
                     "when": "never"
                 },
                 {
@@ -533,8 +479,9 @@
         "@azure/core-client": "^1.6.1",
         "@azure/ms-rest-js": "^2.6.1",
         "@azure/storage-file-share": "^12.3.0",
-        "@microsoft/vscode-azext-azureutils": "^0.3.4",
-        "@microsoft/vscode-azext-utils": "^0.3.26",
+        "@microsoft/vscode-azext-azureutils": "^0.3.8",
+        "@microsoft/vscode-azext-utils": "^0.5.1",
+        "@microsoft/vscode-azureresources-api": "^2.0.4",
         "fs-extra": "^8.1.0",
         "request": "^2.88.2",
         "vscode-extension-telemetry-wrapper": "^0.8.0",
