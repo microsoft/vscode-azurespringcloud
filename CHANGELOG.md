@@ -1,5 +1,10 @@
 # Change Log
 
+## 0.6.1 - 2023-03-14
+
+### Updated
+- Upgrade dependency `@azure/arm-appplatform` to the latest.
+
 ## 0.6.0 - 2023-03-02
 
 ### Added
