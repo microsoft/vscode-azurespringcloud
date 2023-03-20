@@ -38,7 +38,7 @@ export class SpringAppsBranchDataProvider extends vscode.Disposable implements A
     }
 
     async getChildren(element: ResourceItemBase): Promise<ResourceItemBase[] | null | undefined> {
-        return (await element.getChildren?.())?.map(c => c as AppsItem).filter(c => !c.deleted).map((child) => {
+        return (await element.getChildren?.())?.map((child) => {
             if (child.id) {
                 return ext.state.wrapItemInStateHandling(child as ResourceItemBase & { id: string }, () => this.refresh(child))
             }
