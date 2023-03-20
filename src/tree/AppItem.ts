@@ -25,20 +25,14 @@ export class AppItem implements ResourceItemBase {
     public static readonly ACCESS_PUBLIC_ENDPOINT: string = 'Access public endpoint';
     public static readonly ACCESS_TEST_ENDPOINT: string = 'Access test endpoint';
     public readonly app: EnhancedApp;
-    private readonly _appInstancesItem: AppInstancesItem;
-    private readonly _scaleSettingsItem: AppScaleSettingsItem;
-    private readonly _envPropertiesItem: AppEnvVariablesItem;
-    private readonly _jvmOptionsItem: AppJvmOptionsItem;
+    private _children: Promise<ResourceItemBase[] | undefined>;
+    private _scaleSettingsItem: AppScaleSettingsItem;
     private _status: string = 'unknown';
     private _debuggingEnabled: boolean | undefined;
     private deleted: boolean;
 
     constructor(public readonly parent: AppsItem, app: EnhancedApp) {
         this.app = app;
-        this._appInstancesItem = new AppInstancesItem(this);
-        this._scaleSettingsItem = new AppScaleSettingsItem(this);
-        this._envPropertiesItem = new AppEnvVariablesItem(this);
-        this._jvmOptionsItem = new AppJvmOptionsItem(this);
         void this.refresh();
     }
 
@@ -54,15 +48,7 @@ export class AppItem implements ResourceItemBase {
     }
 
     async getChildren(): Promise<ResourceItemBase[]> {
-        const result = await callWithTelemetryAndErrorHandling('getChildren', async (_context) => {
-            const activeDeployment: EnhancedDeployment | undefined = await this.app.getActiveDeployment();
-            if (!activeDeployment) {
-                return [];
-            }
-            return [this._appInstancesItem, this._envPropertiesItem, this._scaleSettingsItem, this._jvmOptionsItem];
-        });
-
-        return result ?? [];
+        return await this._children ?? [];
     }
 
     getTreeItem(): TreeItem {
@@ -114,13 +100,14 @@ export class AppItem implements ResourceItemBase {
     }
 
     public async scaleInstances(context: IActionContext): Promise<void> {
-        await this._scaleSettingsItem.updateSettingsValue(context);
+        await this._scaleSettingsItem?.updateSettingsValue(context);
     }
 
     public async refresh(): Promise<void> {
         if (!this.deleted) {
             await ext.state.runWithTemporaryDescription(this.app.id, utils.localize('loading', 'Loading...'), async () => {
                 await this.app.refresh();
+                void this.reload();
                 this._status = await this.app.getStatus();
                 const deployment: EnhancedDeployment | undefined = await this.app.getActiveDeployment();
                 const config: RemoteDebugging | undefined = await deployment?.getDebuggingConfig();
@@ -159,7 +146,19 @@ export class AppItem implements ResourceItemBase {
         await ext.state.runWithTemporaryDescription(this.id, description, async () => {
             await this.app.remove();
             this.deleted = true;
+            void this.parent.reloadChildren();
             ext.state.notifyChildrenChanged(this.parent.id);
         });
+    }
+
+    private async reload(): Promise<void> {
+        this._children = callWithTelemetryAndErrorHandling('getChildren', async (_context) => {
+            const activeDeployment: EnhancedDeployment | undefined = await this.app.getActiveDeployment();
+            if (!activeDeployment) {
+                return [];
+            }
+            this._scaleSettingsItem = new AppScaleSettingsItem(this);
+            return [new AppInstancesItem(this), new AppEnvVariablesItem(this), this._scaleSettingsItem, new AppJvmOptionsItem(this)];
+        })
     }
 }

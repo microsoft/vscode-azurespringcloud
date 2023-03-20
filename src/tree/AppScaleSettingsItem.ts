@@ -29,20 +29,10 @@ export class AppScaleSettingsItem extends AppSettingsItem {
 
     public readonly contextValue: string = AppScaleSettingsItem.contextValue;
     public readonly label: string = 'Scale Settings';
+    public readonly id: string = `${this.parent.id}/scaleSettings`;
 
     public constructor(parent: AppItem) {
         super(parent);
-    }
-
-    async getChildren(): Promise<AppSettingItem[]> {
-        const result = await callWithTelemetryAndErrorHandling('getChildren', async (_context) => {
-            const deployment: EnhancedDeployment | undefined = await this.parent.app.getActiveDeployment();
-            const settings: IScaleSettings = deployment?.getScaleSettings() ?? {};
-            return Object.entries(settings)
-                .map(e => this.toAppSettingItem(e[0], `${e[1]}`, Object.assign({ label: IScaleSettings.LABELS[e[0]] }, AppScaleSettingsItem._options)));
-        });
-
-        return result ?? [];
     }
 
     getTreeItem(): TreeItem | Thenable<TreeItem> {
@@ -53,10 +43,6 @@ export class AppScaleSettingsItem extends AppSettingsItem {
             contextValue: this.contextValue,
             collapsibleState: TreeItemCollapsibleState.Collapsed,
         };
-    }
-
-    public get id(): string {
-        return `${this.parent.id}/scaleSettings`;
     }
 
     public async updateSettingsValue(context: IActionContext, key?: string): Promise<string> {
@@ -85,8 +71,7 @@ export class AppScaleSettingsItem extends AppSettingsItem {
             await wizard.prompt();
             await ext.state.runWithTemporaryDescription(this.id, 'Scaling...', () => wizard.execute())
             void window.showInformationMessage(scaled);
-            await this.parent.refresh();
-            ext.state.notifyChildrenChanged(this.id);
+            void this.parent.refresh();
             return `${wizardContext.newSettings[key ?? 'capacity']}`;
         }
         return '';
@@ -98,5 +83,14 @@ export class AppScaleSettingsItem extends AppSettingsItem {
 
     public async deleteSettingItem(_node: AppSettingItem, _context: IActionContext): Promise<void> {
         throw new Error('Scale settings can not be deleted.');
+    }
+
+    protected loadChildren(): Promise<AppSettingItem[] | undefined> {
+        return callWithTelemetryAndErrorHandling('getChildren', async (_context) => {
+            const deployment: EnhancedDeployment | undefined = await this.parent.app.getActiveDeployment();
+            const settings: IScaleSettings = deployment?.getScaleSettings() ?? {};
+            return Object.entries(settings)
+                .map(e => new AppSettingItem(this, e[0].trim(), `${e[1]}`.trim(), Object.assign({ label: IScaleSettings.LABELS[e[0]] }, AppScaleSettingsItem._options)));
+        });
     }
 }

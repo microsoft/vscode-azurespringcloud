@@ -29,22 +29,16 @@ import { ResourceItemBase } from "./SpringAppsBranchDataProvider";
 
 export default class AppsItem implements ResourceItemBase {
     public static contextValue: string = 'azureSpringApps.apps';
-    public service: EnhancedService;
     private _deleted: boolean;
-    private _appListPromise: Promise<EnhancedApp[]>;
+    private _children: Promise<AppItem[] | undefined>;
 
-    constructor(service: EnhancedService) {
+    constructor(public readonly service: EnhancedService) {
         this.service = service;
-        void this.reinit();
+        void this.reloadChildren();
     }
 
     async getChildren(): Promise<AppItem[]> {
-        const result = await callWithTelemetryAndErrorHandling('getChildren', async (_context: IActionContext) => {
-            const apps: EnhancedApp[] = await this._appListPromise;
-            return apps.map(ca => new AppItem(this, ca));
-        });
-
-        return result ?? [];
+        return await this._children ?? [];
     }
 
     getTreeItem(): TreeItem {
@@ -128,13 +122,16 @@ export default class AppsItem implements ResourceItemBase {
         if (!this._deleted) {
             await ext.state.runWithTemporaryDescription(this.id, utils.localize('loading', 'Loading...'), async () => {
                 await this.service.refresh();
-                void this.reinit();
+                void this.reloadChildren();
                 ext.state.notifyChildrenChanged(this.id);
             });
         }
     }
 
-    private async reinit(): Promise<void> {
-        this._appListPromise = this.service.getApps();
+    public async reloadChildren(): Promise<void> {
+        this._children = callWithTelemetryAndErrorHandling('getChildren', async (_context: IActionContext) => {
+            const apps: EnhancedApp[] = await this.service.getApps();
+            return apps.map(ca => new AppItem(this, ca));
+        });
     }
 }

@@ -18,15 +18,11 @@ export interface IOptions {
 
 export class AppSettingItem implements ResourceItemBase {
     public static contextValue: string = 'azureSpringApps.app.setting';
-    public readonly key: string;
-    public readonly _value: string;
 
-    private readonly _options: IOptions;
-
-    public constructor(public readonly parent: AppSettingsItem, key: string, value: string, options: IOptions = { deletable: true }) {
-        this.key = key;
-        this._value = value;
-        this._options = options;
+    public constructor(public readonly parent: AppSettingsItem,
+        public readonly key: string,
+        public readonly value: string,
+        public readonly options: IOptions = { deletable: true }) {
     }
 
     getTreeItem(): vscode.TreeItem | Thenable<vscode.TreeItem> {
@@ -37,7 +33,7 @@ export class AppSettingItem implements ResourceItemBase {
             contextValue: this.contextValue,
             description: this.description,
             collapsibleState: vscode.TreeItemCollapsibleState.None,
-            command: this._options.hidden === undefined ? undefined : {
+            command: this.options.hidden === undefined ? undefined : {
                 title: 'Toggle Visibility',
                 command: 'azureSpringApps.common.toggleVisibility',
                 arguments: [this]
@@ -46,37 +42,33 @@ export class AppSettingItem implements ResourceItemBase {
     }
 
     public get contextValue(): string {
-        return this._options.contextValue || AppSettingItem.contextValue;
+        return this.options.contextValue || AppSettingItem.contextValue;
     }
 
     public get id(): string {
-        return `${this.parent.id}/${this.key}`;
+        return `${this.parent.id}/${this.key || this.value}`;
     }
 
     public get label(): string {
-        if (this._options.label) {
-            return this._options.hidden ? `${this._options.label}=***` : `${this._options.label}=${this._value}`;
+        if (this.options.label) {
+            return this.options.hidden ? `${this.options.label}=***` : `${this.options.label}=${this.value}`;
         } else if (this.key) {
-            return this._options.hidden ? `${this.key}=***` : `${this.key}=${this._value}`;
+            return this.options.hidden ? `${this.key}=***` : `${this.key}=${this.value}`;
         } else {
-            return this._options.hidden ? '***' : this._value;
+            return this.options.hidden ? '***' : this.value;
         }
     }
 
     public get hidden(): boolean {
-        return this._options.hidden ?? false;
+        return this.options.hidden ?? false;
     }
 
     public get description(): string {
-        return this._options.hidden ? `Click to view.` : ``;
+        return this.options.hidden ? `Click to view.` : ``;
     }
 
     public get deletable(): boolean {
-        return this._options.deletable ?? true;
-    }
-
-    public get value(): string {
-        return this._value;
+        return this.options.deletable ?? true;
     }
 
     public async updateValue(context: IActionContext): Promise<void> {
@@ -90,7 +82,7 @@ export class AppSettingItem implements ResourceItemBase {
     }
 
     public async toggleVisibility(_context: IActionContext, hidden?: boolean): Promise<void> {
-        this._options.hidden = hidden ?? !this._options.hidden;
+        this.options.hidden = hidden ?? !this.options.hidden;
         ext.state.notifyChildrenChanged(this.id);
     }
 

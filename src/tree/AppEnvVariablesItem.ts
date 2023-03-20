@@ -2,14 +2,14 @@
 // Licensed under the MIT license.
 
 import { callWithTelemetryAndErrorHandling, IActionContext } from "@microsoft/vscode-azext-utils";
+import * as vscode from "vscode";
+import { ext } from "../extensionVariables";
 import { EnhancedDeployment } from "../service/EnhancedDeployment";
 import * as utils from "../utils";
 import { getThemedIconPath } from "../utils";
 import { AppItem } from "./AppItem";
-import { AppSettingsItem } from "./AppSettingsItem";
 import { AppSettingItem, IOptions } from "./AppSettingItem";
-import { ext } from "../extensionVariables";
-import * as vscode from "vscode";
+import { AppSettingsItem } from "./AppSettingsItem";
 
 export class AppEnvVariablesItem extends AppSettingsItem {
     public static contextValue: string = 'azureSpringApps.app.envVariables';
@@ -20,17 +20,10 @@ export class AppEnvVariablesItem extends AppSettingsItem {
     };
     public readonly contextValue: string = AppEnvVariablesItem.contextValue;
     public readonly label: string = 'Environment Variables';
+    public readonly id: string = `${this.parent.id}/envVariables`;
 
     public constructor(public readonly parent: AppItem) {
         super(parent);
-    }
-
-    async getChildren(): Promise<AppSettingItem[]> {
-        const result = await callWithTelemetryAndErrorHandling('getChildren', async (_context) => {
-            return Object.entries(await this.variables).map(e => this.toAppSettingItem(e[0], e[1] + '', Object.assign({}, AppEnvVariablesItem._options)));
-        });
-
-        return result ?? [];
     }
 
     getTreeItem(): vscode.TreeItem | Thenable<vscode.TreeItem> {
@@ -41,10 +34,6 @@ export class AppEnvVariablesItem extends AppSettingsItem {
             contextValue: this.contextValue,
             collapsibleState: vscode.TreeItemCollapsibleState.Collapsed,
         };
-    }
-
-    public get id(): string {
-        return `${this.parent.id}/envVariables`;
     }
 
     public get variables(): Promise<{ [p: string]: string }> {
@@ -78,7 +67,7 @@ export class AppEnvVariablesItem extends AppSettingsItem {
                     ext.state.notifyChildrenChanged(this.id);
                 }
             });
-        return this.toAppSettingItem(newKey, newVal, Object.assign({}, AppEnvVariablesItem._options));
+        return new AppSettingItem(this, newKey.trim(), newVal.trim(), Object.assign({}, AppEnvVariablesItem._options));
     }
 
     public async updateSettingValue(node: AppSettingItem, context: IActionContext): Promise<string> {
@@ -100,10 +89,20 @@ export class AppEnvVariablesItem extends AppSettingsItem {
     public async updateSettingsValue(_context: IActionContext, newVars?: { [p: string]: string }): Promise<void> {
         const deployment: EnhancedDeployment | undefined = await this.parent.app.getActiveDeployment();
         if (deployment) {
-            const updating: string = utils.localize('updatingEnvVar', 'Updating environment variables of "{0}"...', deployment.app.name);
-            const updated: string = utils.localize('updatedEnvVar', 'Successfully updated environment variables of {0}.', deployment.app.name);
-            await utils.runInBackground(updating, updated, () => deployment.updateEnvironmentVariables(newVars ?? {}));
-            ext.state.notifyChildrenChanged(this.id);
+            const description = utils.localize('updating', 'Updating...');
+            await ext.state.runWithTemporaryDescription(this.id, description, async () => {
+                const updating: string = utils.localize('updatingEnvVar', 'Updating environment variables of "{0}"...', deployment.app.name);
+                const updated: string = utils.localize('updatedEnvVar', 'Successfully updated environment variables of {0}.', deployment.app.name);
+                await utils.runInBackground(updating, updated, () => deployment.updateEnvironmentVariables(newVars ?? {}));
+                void this.refresh();
+            });
         }
+    }
+
+    protected loadChildren(): Promise<AppSettingItem[] | undefined> {
+        return callWithTelemetryAndErrorHandling('getChildren', async (_context) => {
+            return Object.entries(await this.variables)
+                .map(e => new AppSettingItem(this, e[0].trim(), (e[1] + '').trim(), Object.assign({}, AppEnvVariablesItem._options)));
+        });
     }
 }

@@ -16,13 +16,13 @@ import { window } from "vscode";
 import { IJvmOptionsUpdateWizardContext } from "../commands/steps/settings/jvmoptions/IJvmOptionsUpdateWizardContext";
 import { InputJvmOptionsStep } from "../commands/steps/settings/jvmoptions/InputJvmOptionsStep";
 import { UpdateJvmOptionsStep } from "../commands/steps/settings/jvmoptions/UpdateJvmOptionsStep";
+import { ext } from "../extensionVariables";
 import { EnhancedDeployment } from "../service/EnhancedDeployment";
 import * as utils from "../utils";
 import { getThemedIconPath, localize } from "../utils";
-import { AppSettingsItem } from "./AppSettingsItem";
-import { AppSettingItem, IOptions } from "./AppSettingItem";
 import { AppItem } from "./AppItem";
-import { ext } from "../extensionVariables";
+import { AppSettingItem, IOptions } from "./AppSettingItem";
+import { AppSettingsItem } from "./AppSettingsItem";
 
 export class AppJvmOptionsItem extends AppSettingsItem {
     public static contextValue: string = 'azureSpringApps.app.jvmOptions';
@@ -32,17 +32,10 @@ export class AppJvmOptionsItem extends AppSettingsItem {
     private static readonly JVM_OPTION_PATTERN: RegExp = /^-[a-zA-Z_]+\S*$/;
     public readonly contextValue: string = AppJvmOptionsItem.contextValue;
     public readonly label: string = 'JVM Options';
+    public readonly id: string = `${this.parent.id}/jvmOptions`;
 
     public constructor(public readonly parent: AppItem) {
         super(parent);
-    }
-
-    async getChildren(): Promise<AppSettingItem[]> {
-        const result = await callWithTelemetryAndErrorHandling('getChildren', async (_context) => {
-            return (await this.options).map(option => this.toAppSettingItem('', option.trim(), Object.assign({}, AppJvmOptionsItem._options)));
-        });
-
-        return result ?? [];
     }
 
     getTreeItem(): vscode.TreeItem | Thenable<vscode.TreeItem> {
@@ -53,10 +46,6 @@ export class AppJvmOptionsItem extends AppSettingsItem {
             contextValue: this.contextValue,
             collapsibleState: vscode.TreeItemCollapsibleState.Collapsed,
         };
-    }
-
-    public get id(): string {
-        return `${this.parent.id}/jvmOptions`;
     }
 
     public get options(): Promise<string[]> {
@@ -90,7 +79,7 @@ export class AppJvmOptionsItem extends AppSettingsItem {
                     ext.state.notifyChildrenChanged(this.id);
                 }
             });
-        return this.toAppSettingItem('', newVal, Object.assign({}, AppJvmOptionsItem._options));
+        return new AppSettingItem(this, ''.trim(), newVal.trim(), Object.assign({}, AppJvmOptionsItem._options));
     }
 
     public async updateSettingValue(node: AppSettingItem, context: IActionContext | ICreateChildImplContext): Promise<string> {
@@ -131,9 +120,9 @@ export class AppJvmOptionsItem extends AppSettingsItem {
             executeSteps.push(new UpdateJvmOptionsStep(deployment));
             const wizard: AzureWizard<IJvmOptionsUpdateWizardContext> = new AzureWizard(wizardContext, { promptSteps, executeSteps, title: updating });
             await wizard.prompt();
-            await wizard.execute();
+            await ext.state.runWithTemporaryDescription(this.id, 'Updating...', () => wizard.execute());
             void window.showInformationMessage(updated);
-            ext.state.notifyChildrenChanged(this.id);
+            void this.refresh();
         }
     }
 
@@ -146,5 +135,11 @@ export class AppJvmOptionsItem extends AppSettingsItem {
             return `${v} is already set`;
         }
         return undefined;
+    }
+
+    protected loadChildren(): Promise<AppSettingItem[] | undefined> {
+        return callWithTelemetryAndErrorHandling('getChildren', async (_context) => {
+            return (await this.options).map(option => new AppSettingItem(this, ''.trim(), option.trim().trim(), Object.assign({}, AppJvmOptionsItem._options)));
+        });
     }
 }
