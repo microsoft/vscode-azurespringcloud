@@ -17,11 +17,12 @@ import {
 } from "@azure/arm-appplatform";
 import { AnonymousCredential, ShareFileClient } from "@azure/storage-file-share";
 import { IActionContext } from "@microsoft/vscode-azext-utils";
+import { AzureSubscription } from "@microsoft/vscode-azureresources-api";
+import { ext } from "../extensionVariables";
 import { localize } from "../utils";
 import { EnhancedDeployment } from "./EnhancedDeployment";
 import { EnhancedService } from "./EnhancedService";
 import { startStreamingLogs, stopStreamingLogs } from "./streamlog/streamingLog";
-import { AzureSubscription } from "@microsoft/vscode-azureresources-api";
 
 export class EnhancedApp {
     public static readonly DEFAULT_RUNTIME: KnownSupportedRuntimeValue = KnownSupportedRuntimeValue.Java11;
@@ -71,37 +72,47 @@ export class EnhancedApp {
     }
 
     public async start(): Promise<void> {
+        ext.outputChannel.appendLog(`[App] starting app ${this.name}.`);
         const activeDeploymentName: string | undefined = (await this.getActiveDeployment())?.name;
         if (!activeDeploymentName) {
             throw new Error(`app ${this.name} has no active deployment.`);
         }
         await this.client.deployments.beginStartAndWait(this.service.resourceGroup, this.service.name, this.name, activeDeploymentName);
+        ext.outputChannel.appendLog(`[App] app ${this.name} is started.`);
     }
 
     public async stop(): Promise<void> {
+        ext.outputChannel.appendLog(`[App] stopping app ${this.name}.`);
         const activeDeploymentName: string | undefined = (await this.getActiveDeployment())?.name;
         if (!activeDeploymentName) {
             throw new Error(`app ${this.name} has no active deployment.`);
         }
         await this.client.deployments.beginStopAndWait(this.service.resourceGroup, this.service.name, this.name, activeDeploymentName);
+        ext.outputChannel.appendLog(`[App] app ${this.name} is stopped.`);
     }
 
     public async restart(): Promise<void> {
+        ext.outputChannel.appendLog(`[App] restarting app ${this.name}.`);
         const activeDeploymentName: string | undefined = (await this.getActiveDeployment())?.name;
         if (!activeDeploymentName) {
             throw new Error(`app ${this.name} has no active deployment.`);
         }
         await this.client.deployments.beginRestartAndWait(this.service.resourceGroup, this.service.name, this.name, activeDeploymentName);
+        ext.outputChannel.appendLog(`[App] app ${this.name} is restarted.`);
     }
 
     public async remove(): Promise<void> {
+        ext.outputChannel.appendLog(`[App] deleting app ${this.name}.`);
         await this.client.apps.beginDeleteAndWait(this.service.resourceGroup, this.service.name, this.name);
+        ext.outputChannel.appendLog(`[App] app ${this.name} is deleted.`);
     }
 
     public async refresh(): Promise<EnhancedApp> {
+        ext.outputChannel.appendLog(`[App] refreshing app ${this.name}.`);
         this._remote = await this.client.apps.get(this.service.resourceGroup, this.service.name, this.name);
         this.activeDeployment = undefined;
         await this.getActiveDeployment(true);
+        ext.outputChannel.appendLog(`[App] app ${this.name} is refreshed.`);
         return this;
     }
 
@@ -116,19 +127,24 @@ export class EnhancedApp {
 
     public async getActiveDeployment(force: boolean = false): Promise<EnhancedDeployment | undefined> {
         if (force || !this.activeDeployment) {
+            ext.outputChannel.appendLog(`[App] loading active deployment of app (${this.name}).`);
             this.activeDeployment = (await this.getDeployments()).find(d => d.properties?.active);
+            ext.outputChannel.appendLog(`[App] active deployment(${this.activeDeployment?.name}) of app (${this.name}) is loaded.`);
         }
         return this.activeDeployment;
     }
 
     public async setActiveDeployment(deploymentName: string): Promise<void> {
+        ext.outputChannel.appendLog(`[App] setting (${deploymentName}) as the new active deployment of app (${this.name}).`);
         this._remote = await this.client.apps.beginSetActiveDeploymentsAndWait(this.service.resourceGroup, this.service.name, this.name, {
             activeDeploymentNames: [deploymentName]
         });
+        ext.outputChannel.appendLog(`[App] (${deploymentName}) is set as new active deployment of app (${this.name}).`);
     }
 
     public async createDeployment(name: string, runtime?: KnownSupportedRuntimeValue): Promise<EnhancedDeployment> {
         let source: UserSourceInfoUnion | undefined;
+        ext.outputChannel.appendLog(`[Deployment] creating deployment (${name}) of app (${this.name}).`);
         if (this.service.sku?.name?.toLowerCase().startsWith('e')) {
             source = { type: 'BuildResult', buildResultId: '<default>' };
         } else {
@@ -154,14 +170,18 @@ export class EnhancedApp {
                 name: 'S0',
             }
         });
+        ext.outputChannel.appendLog(`[Deployment] new deployment (${name}) of app (${this.name}) is created.`);
         return new EnhancedDeployment(this, deployment);
     }
 
     public async startDeployment(name: string): Promise<void> {
+        ext.outputChannel.appendLog(`[Deployment] starting deployment (${name}) of app (${this.name}).`);
         await this.client.deployments.beginStartAndWait(this.service.resourceGroup, this.service.name, this.name, name);
+        ext.outputChannel.appendLog(`[Deployment] deployment (${name}) of app (${this.name}) is started.`);
     }
 
     public async getTestKeys(): Promise<TestKeys> {
+        ext.outputChannel.appendLog(`[App] getting test keys of app (${this.name}).`);
         return await this.client.services.listTestKeys(this.service.resourceGroup, this.service.name);
     }
 
@@ -178,9 +198,11 @@ export class EnhancedApp {
     }
 
     public async setPublic(isPublic: boolean): Promise<void> {
+        ext.outputChannel.appendLog(`[App] setting app (${this.name}) public.`);
         this._remote = await this.client.apps.beginCreateOrUpdateAndWait(this.service.resourceGroup, this.service.name, this.name, {
             properties: { public: isPublic }
         });
+        ext.outputChannel.appendLog(`[App] app (${this.name}) is set public.`);
     }
 
     public async togglePublic(): Promise<void> {
@@ -189,6 +211,7 @@ export class EnhancedApp {
     }
 
     public async getUploadDefinition(): Promise<ResourceUploadDefinition> {
+        ext.outputChannel.appendLog(`[App] get uploading definition of app ${this.name}.`);
         return this.client.apps.getResourceUploadUrl(this.service.resourceGroup, this.service.name, this.name);
     }
 
@@ -197,8 +220,10 @@ export class EnhancedApp {
         if (!uploadDefinition.uploadUrl) {
             throw new Error(`faild to get upload url of app ${this.name}.`);
         }
+        ext.outputChannel.appendLog(`[App] uploading artifact (${path}) to app ${this.name}.`);
         const fileClient: ShareFileClient = new ShareFileClient(uploadDefinition.uploadUrl, new AnonymousCredential());
         await fileClient.uploadFile(path);
+        ext.outputChannel.appendLog(`[App] artifact (${path}) is uploaded to app ${this.name}.`);
         return uploadDefinition.relativePath;
     }
 
