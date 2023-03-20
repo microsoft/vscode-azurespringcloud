@@ -54,7 +54,8 @@ export class TreeItemStateStore implements vscode.Disposable {
 
                 const state = this.getState(item.id);
                 if (state.temporaryChildren) {
-                    children.unshift(...state.temporaryChildren);
+                    const newChildren = state.temporaryChildren.filter(c => !children.includes(c));
+                    children.unshift(...newChildren);
                 }
 
                 return children;
