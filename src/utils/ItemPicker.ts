@@ -16,11 +16,11 @@ import {
 import { AzExtResourceType } from "@microsoft/vscode-azureresources-api";
 import * as vscode from 'vscode';
 import { ext } from "../extensionVariables";
-import { AppItem } from "../tree/AppItem";
-import { localize } from "./index";
-import AppsItem from "../tree/AppsItem";
-import { AppInstancesItem } from "../tree/AppInstancesItem";
 import { AppInstanceItem } from "../tree/AppInstanceItem";
+import { AppInstancesItem } from "../tree/AppInstancesItem";
+import { AppItem } from "../tree/AppItem";
+import AppsItem from "../tree/AppsItem";
+import { localize } from "./index";
 
 export interface PickItemOptions {
     title?: string;
@@ -68,7 +68,7 @@ function getPickAppSteps(tdp: vscode.TreeDataProvider<unknown>): AzureWizardProm
         ...getPickAppsSteps(tdp),
         new ContextValueQuickPickStep(tdp, {
             contextValueFilter: { include: AppItem.contextValue },
-            skipIfOne: true,
+            skipIfOne: false,
         }, {
             placeHolder: localize('selectApp', 'Select Spring App'),
             noPicksMessage: localize('noApps', 'Selected Spring Apps has no apps'),
@@ -84,11 +84,11 @@ function getPickInstanceSteps(tdp: vscode.TreeDataProvider<unknown>): AzureWizar
             skipIfOne: true,
         }),
         new ContextValueQuickPickStep(tdp, {
-            contextValueFilter: { include: AppInstanceItem.contextValue },
-            skipIfOne: true,
+            contextValueFilter: { include: new RegExp("azureSpringApps\\.app\\.instance") },
+            skipIfOne: false,
         }, {
             placeHolder: localize('selectInstance', 'Select Spring App instance'),
-            noPicksMessage: localize('noInstances', 'Selected Spring App has no instances'),
+            noPicksMessage: localize('noInstances', 'Selected Spring App has no running instances'),
         })
     ];
 }

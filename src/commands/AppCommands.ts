@@ -17,7 +17,7 @@ import { AppSettingItem } from "../tree/AppSettingItem";
 import { AppSettingsItem } from "../tree/AppSettingsItem";
 import { ResourceItemBase } from "../tree/SpringAppsBranchDataProvider";
 import * as utils from "../utils";
-import { pickApp, pickAppInstance } from "../utils/pickContainerApp";
+import { pickApp, pickAppInstance } from "../utils/ItemPicker";
 
 export namespace AppCommands {
 
@@ -220,13 +220,17 @@ export namespace AppCommands {
     }
 
     async function getAppItem(context: IActionContext, item?: ResourceItemBase): Promise<AppItem> {
-        item ??= await pickApp(context);
-        return item as AppItem;
+        if (item instanceof AppItem) {
+            return item;
+        }
+        return await pickApp(context);
     }
 
     async function getInstanceItem(context: IActionContext, item?: ResourceItemBase): Promise<AppInstanceItem> {
-        item ??= await pickAppInstance(context);
-        return item as AppInstanceItem;
+        if (item instanceof AppInstanceItem) {
+            return item;
+        }
+        return await pickAppInstance(context);
     }
 
     async function getTargetOrWorkspacePath(): Promise<Uri | undefined> {

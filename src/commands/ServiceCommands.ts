@@ -4,8 +4,9 @@
 import { DialogResponses, IActionContext, openUrl } from "@microsoft/vscode-azext-utils";
 import { EnhancedService } from "../service/EnhancedService";
 import AppsItem from "../tree/AppsItem";
+import { ResourceItemBase } from "../tree/SpringAppsBranchDataProvider";
 import * as utils from "../utils";
-import { pickApps } from "../utils/pickContainerApp";
+import { pickApps } from "../utils/ItemPicker";
 
 export namespace ServiceCommands {
 
@@ -27,8 +28,10 @@ export namespace ServiceCommands {
         await utils.runInBackground(deleting, deleted, () => item.remove(context));
     }
 
-    async function getAppsItem(context: IActionContext, origin?: AppsItem): Promise<AppsItem> {
-        const item: AppsItem = origin ?? await pickApps(context);
-        return item as AppsItem;
+    async function getAppsItem(context: IActionContext, item?: ResourceItemBase): Promise<AppsItem> {
+        if (item instanceof AppsItem) {
+            return item;
+        }
+        return await pickApps(context);
     }
 }
