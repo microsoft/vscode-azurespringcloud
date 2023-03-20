@@ -218,7 +218,8 @@ export namespace AppCommands {
 
     export async function deleteSetting(context: IActionContext, item: AppSettingItem): Promise<void> {
         await context.ui.showWarningMessage(`Are you sure to delete "${item.key || item.value}"?`, { modal: true }, DialogResponses.deleteResponse);
-        await item.remove(context);
+        const description = utils.localize('deleting', 'Deleting...');
+        await ext.state.runWithTemporaryDescription(item.id, description, () => item.remove(context));
     }
 
     async function getAppItem(context: IActionContext, item?: ResourceItemBase): Promise<AppItem> {
