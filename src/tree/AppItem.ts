@@ -21,7 +21,7 @@ import AppsItem from './AppsItem';
 import { ResourceItemBase } from './SpringAppsBranchDataProvider';
 
 export class AppItem implements ResourceItemBase {
-    public static contextValue: RegExp = /^azureSpringApps\.app;status-.+;debugging-.+;/i;
+    public static contextValue: RegExp = /^azureSpringApps\.app;status-.+;debugging-.+;public-.+;/i;
     public static readonly ACCESS_PUBLIC_ENDPOINT: string = 'Access public endpoint';
     public static readonly ACCESS_TEST_ENDPOINT: string = 'Access test endpoint';
     public readonly app: EnhancedApp;
