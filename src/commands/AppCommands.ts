@@ -174,7 +174,8 @@ export namespace AppCommands {
         const done: string = `Successfully started log streaming for instance "${item.instance.name}".`;
         await utils.runInBackground(doing, done, async () => {
             const app: EnhancedApp = item.parent.parent.app;
-            return app.startStreamingLogs(context, item.instance);
+            await app.startStreamingLogs(context, item.instance);
+            ext.state.notifyChildrenChanged(item.id);
         });
     }
 
@@ -184,7 +185,8 @@ export namespace AppCommands {
         const done: string = `Successfully stopped log streaming for instance "${item.instance.name}".`;
         await utils.runInBackground(doing, done, async () => {
             const app: EnhancedApp = item.parent.parent.app;
-            return app.stopStreamingLogs(item.instance);
+            await app.stopStreamingLogs(item.instance);
+            ext.state.notifyChildrenChanged(item.id);
         });
     }
 

@@ -3,6 +3,7 @@
 
 import { DeploymentInstance } from "@azure/arm-appplatform";
 import { EnhancedDeployment } from "./EnhancedDeployment";
+import { getLogStreamId, ILogStream, logStreams } from "./streamlog/streamingLog";
 
 export class EnhancedInstance implements DeploymentInstance {
 
@@ -33,5 +34,11 @@ export class EnhancedInstance implements DeploymentInstance {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { deployment: _, ...properties } = this;
         return properties;
+    }
+
+    get streamingLogConnected(): boolean {
+        const logStreamId: string = getLogStreamId(this.deployment.app.name, this);
+        const logStream: ILogStream | undefined = logStreams.get(logStreamId);
+        return logStream?.isConnected ?? false;
     }
 }

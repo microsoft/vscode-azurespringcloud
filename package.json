@@ -319,12 +319,12 @@
                 },
                 {
                     "command": "azureSpringApps.app.instance.startStreamingLog",
-                    "when": "view == azureResourceGroups && viewItem =~ /^azureSpringApps\\.app\\.instance;status-Running;/i",
+                    "when": "view == azureResourceGroups && viewItem =~ /^azureSpringApps\\.app\\.instance;status-Running;streaming-false;/i",
                     "group": "6@1"
                 },
                 {
                     "command": "azureSpringApps.app.instance.stopStreamingLog",
-                    "when": "view == azureResourceGroups && viewItem =~ /^azureSpringApps\\.app\\.instance;status-Running;/i",
+                    "when": "view == azureResourceGroups && viewItem =~ /^azureSpringApps\\.app\\.instance;status-Running;streaming-true;/i",
                     "group": "6@2"
                 },
                 {
