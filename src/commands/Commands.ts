@@ -153,7 +153,7 @@ export namespace Commands {
                     return;
                 }
                 await deployment.enableDebugging();
-                await item.app.refresh();
+                await item.refresh();
                 ext.state.notifyChildrenChanged(item.id);
                 void (async () => {
                     const msg: string = `Successfully enabled remote debugging for app "${item.app.name}".`;
@@ -181,7 +181,7 @@ export namespace Commands {
                     return;
                 }
                 await deployment.disableDebugging();
-                await item.app.refresh();
+                await item.refresh();
                 ext.state.notifyChildrenChanged(item.id);
             });
         });
