@@ -8,6 +8,7 @@ import { MessageItem, OpenDialogOptions, TextEditor, Uri, window, workspace, Wor
 import { ext } from "../extensionVariables";
 import { EnhancedApp } from "../service/EnhancedApp";
 import { EnhancedDeployment } from "../service/EnhancedDeployment";
+import { EnhancedService } from "../service/EnhancedService";
 import { DebugController } from "../service/remotedebugging/DebugController";
 import { AppEnvVariablesItem } from "../tree/AppEnvVariablesItem";
 import { AppInstanceItem } from "../tree/AppInstanceItem";
@@ -15,11 +16,30 @@ import { AppItem } from "../tree/AppItem";
 import { AppJvmOptionsItem } from "../tree/AppJvmOptionsItem";
 import { AppSettingItem } from "../tree/AppSettingItem";
 import { AppSettingsItem } from "../tree/AppSettingsItem";
+import AppsItem from "../tree/AppsItem";
 import { ResourceItemBase } from "../tree/SpringAppsBranchDataProvider";
 import * as utils from "../utils";
-import { pickApp, pickAppInstance } from "../utils/ItemPicker";
+import { pickApp, pickAppInstance, pickApps } from "../utils/ItemPicker";
 
-export namespace AppCommands {
+export namespace Commands {
+
+    export async function createServiceInPortal(_context: IActionContext): Promise<void> {
+        await openUrl('https://portal.azure.com/#create/Microsoft.AppPlatform');
+    }
+
+    export async function createApp(context: IActionContext, n?: AppsItem): Promise<void> {
+        const item: AppsItem = await getAppsItem(context, n);
+        await item.createChild(context);
+    }
+
+    export async function deleteService(context: IActionContext, n?: AppsItem): Promise<void> {
+        const item: AppsItem = await getAppsItem(context, n);
+        const service: EnhancedService = item.service;
+        await context.ui.showWarningMessage(`Are you sure to delete "${item.service.name}"?`, { modal: true }, DialogResponses.deleteResponse);
+        const deleting: string = utils.localize('deletingSpringCLoudService', 'Deleting Azure Spring Apps "{0}"...', service.name);
+        const deleted: string = utils.localize('deletedSpringCloudService', 'Successfully deleted Azure Spring Apps "{0}".', service.name);
+        await utils.runInBackground(deleting, deleted, () => item.remove(context));
+    }
 
     export async function openPublicEndpoint(context: IActionContext, n?: AppItem): Promise<void> {
         const item: AppItem = await getAppItem(context, n);
@@ -49,7 +69,9 @@ export namespace AppCommands {
         const app: EnhancedApp = item.app;
         const doing: string = `Assigning public endpoint to "${app.name}".`;
         const done: string = `Successfully assigned public endpoint to "${app.name}".`;
-        await utils.runInBackground(doing, done, () => app.setPublic(true));
+        await ext.state.runWithTemporaryDescription(item.id, 'Updating...', () => {
+            return utils.runInBackground(doing, done, () => app.setPublic(true));
+        });
     }
 
     export async function unassignEndpoint(context: IActionContext, n?: AppItem): Promise<void> {
@@ -57,7 +79,9 @@ export namespace AppCommands {
         const app: EnhancedApp = item.app;
         const doing: string = `Unassigning public endpoint to "${app.name}".`;
         const done: string = `Successfully unassigned public endpoint to "${app.name}".`;
-        await utils.runInBackground(doing, done, () => app.setPublic(false));
+        await ext.state.runWithTemporaryDescription(item.id, 'Updating...', () => {
+            return utils.runInBackground(doing, done, () => app.setPublic(false));
+        });
     }
 
     export async function startApp(context: IActionContext, n?: AppItem): Promise<void> {
@@ -104,7 +128,9 @@ export namespace AppCommands {
 
     export async function scale(context: IActionContext, n?: AppItem): Promise<void> {
         const item: AppItem = await getAppItem(context, n);
-        await item.scaleInstances(context);
+        await ext.state.runWithTemporaryDescription(item.id, 'Updating...', () => {
+            return item.scaleInstances(context);
+        });
     }
 
     export async function enableRemoteDebugging(context: IActionContext, n?: AppItem, confirmation?: string): Promise<AppItem> {
@@ -135,7 +161,7 @@ export namespace AppCommands {
                     if (action === 'Learn More') {
                         void openUrl('https://aka.ms/asa-remotedebug');
                     } else if (action) {
-                        void AppCommands.startRemoteDebugging(context, item);
+                        void Commands.startRemoteDebugging(context, item);
                     }
                 })();
             });
@@ -220,6 +246,13 @@ export namespace AppCommands {
         await context.ui.showWarningMessage(`Are you sure to delete "${item.key || item.value}"?`, { modal: true }, DialogResponses.deleteResponse);
         const description = utils.localize('deleting', 'Deleting...');
         await ext.state.runWithTemporaryDescription(item.id, description, () => item.remove(context));
+    }
+
+    async function getAppsItem(context: IActionContext, item?: ResourceItemBase): Promise<AppsItem> {
+        if (item instanceof AppsItem) {
+            return item;
+        }
+        return await pickApps(context);
     }
 
     async function getAppItem(context: IActionContext, item?: ResourceItemBase): Promise<AppItem> {
