@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import { callWithTelemetryAndErrorHandling } from "@microsoft/vscode-azext-utils";
 import { TreeItem, TreeItemCollapsibleState } from "vscode";
 import { EnhancedDeployment } from "../service/EnhancedDeployment";
 import { EnhancedInstance } from "../service/EnhancedInstance";
@@ -20,14 +19,11 @@ export class AppInstancesItem implements ResourceItemBase {
     }
 
     async getChildren(): Promise<AppInstanceItem[]> {
-        const result = await callWithTelemetryAndErrorHandling('getChildren', async (_context) => {
-            const deployment: EnhancedDeployment | undefined = await this.parent.app.getActiveDeployment();
-            if (deployment) {
-                return deployment.properties?.instances?.map(instance => new AppInstanceItem(this, new EnhancedInstance(deployment, instance)));
-            }
-            return [];
-        });
-        return result ?? [];
+        const deployment: EnhancedDeployment | undefined = await this.parent.app.getActiveDeployment();
+        if (deployment) {
+            return deployment.properties?.instances?.map(instance => new AppInstanceItem(this, new EnhancedInstance(deployment, instance))) ?? [];
+        }
+        return [];
     }
 
     getTreeItem(): TreeItem | Thenable<TreeItem> {

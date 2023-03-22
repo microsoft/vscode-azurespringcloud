@@ -5,9 +5,7 @@ import { JarUploadedUserSourceInfo } from "@azure/arm-appplatform";
 import {
     AzureWizard,
     AzureWizardExecuteStep,
-    AzureWizardPromptStep,
-    callWithTelemetryAndErrorHandling,
-    createSubscriptionContext,
+    AzureWizardPromptStep, createSubscriptionContext,
     IActionContext,
     ICreateChildImplContext
 } from "@microsoft/vscode-azext-utils";
@@ -138,8 +136,8 @@ export class AppJvmOptionsItem extends AppSettingsItem {
     }
 
     protected loadChildren(): Promise<AppSettingItem[] | undefined> {
-        return callWithTelemetryAndErrorHandling('getChildren', async (_context) => {
+        return (async () => {
             return (await this.options).map(option => new AppSettingItem(this, ''.trim(), option.trim().trim(), Object.assign({}, AppJvmOptionsItem._options)));
-        });
+        })();
     }
 }

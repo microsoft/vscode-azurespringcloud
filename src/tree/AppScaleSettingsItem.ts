@@ -4,9 +4,7 @@
 import {
     AzureWizard,
     AzureWizardExecuteStep,
-    AzureWizardPromptStep,
-    callWithTelemetryAndErrorHandling,
-    createSubscriptionContext,
+    AzureWizardPromptStep, createSubscriptionContext,
     IActionContext
 } from "@microsoft/vscode-azext-utils";
 import { TreeItem, TreeItemCollapsibleState, window } from "vscode";
@@ -86,11 +84,11 @@ export class AppScaleSettingsItem extends AppSettingsItem {
     }
 
     protected loadChildren(): Promise<AppSettingItem[] | undefined> {
-        return callWithTelemetryAndErrorHandling('getChildren', async (_context) => {
+        return (async () => {
             const deployment: EnhancedDeployment | undefined = await this.parent.app.getActiveDeployment();
             const settings: IScaleSettings = deployment?.getScaleSettings() ?? {};
             return Object.entries(settings)
                 .map(e => new AppSettingItem(this, e[0].trim(), `${e[1]}`.trim(), Object.assign({ label: IScaleSettings.LABELS[e[0]] }, AppScaleSettingsItem._options)));
-        });
+        })();
     }
 }

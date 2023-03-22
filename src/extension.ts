@@ -4,15 +4,17 @@
 'use strict';
 
 import { registerAzureUtilsExtensionVariables } from '@microsoft/vscode-azext-azureutils';
-import { callWithTelemetryAndErrorHandling, createAzExtOutputChannel, createExperimentationService, IActionContext, registerUIExtensionVariables } from '@microsoft/vscode-azext-utils';
+import { createAzExtOutputChannel, createExperimentationService, registerUIExtensionVariables } from '@microsoft/vscode-azext-utils';
 import { AzExtResourceType, AzureResourcesExtensionApi, getAzureResourcesExtensionApi } from '@microsoft/vscode-azureresources-api';
 import * as vscode from 'vscode';
+import { dispose as disposeTelemetryWrapper, initialize, instrumentOperation } from 'vscode-extension-telemetry-wrapper';
 import { registerCommands } from './commands';
 import { ext } from './extensionVariables';
 import { SpringAppsBranchDataProvider } from './tree/SpringAppsBranchDataProvider';
 import { TreeItemStateStore } from './tree/TreeItemState';
+import { getAiKey, getExtensionId, getExtensionVersion, loadPackageInfo } from './utils';
 
-export async function activateInternal(context: vscode.ExtensionContext, perfStats: { loadStartTime: number; loadEndTime: number }, ignoreBundle?: boolean): Promise<void> {
+export async function activateInternal(context: vscode.ExtensionContext, _perfStats: { loadStartTime: number; loadEndTime: number }, ignoreBundle?: boolean): Promise<void> {
     ext.context = context;
     ext.ignoreBundle = ignoreBundle;
     ext.outputChannel = createAzExtOutputChannel('Azure Spring Apps', ext.prefix);
@@ -21,13 +23,13 @@ export async function activateInternal(context: vscode.ExtensionContext, perfSta
     registerUIExtensionVariables(ext);
     registerAzureUtilsExtensionVariables(ext);
 
-    await callWithTelemetryAndErrorHandling('azureSpringApps.activate', async (activateContext: IActionContext) => {
-        activateContext.telemetry.properties.isActivationEvent = 'true';
-        activateContext.telemetry.measurements.mainFileLoad = (perfStats.loadEndTime - perfStats.loadStartTime) / 1000;
-
+    await loadPackageInfo(context);
+    // Usage data statistics.
+    if (getAiKey()) {
+        initialize(getExtensionId(), getExtensionVersion(), getAiKey(), { firstParty: true });
+    }
+    instrumentOperation('activation', async () => {
         registerCommands();
-
-
         const rgApiProvider: AzureResourcesExtensionApi = await getAzureResourcesExtensionApi(context, '2.0.0');
         if (rgApiProvider) {
             ext.experimentationService = await createExperimentationService(context);
@@ -39,9 +41,9 @@ export async function activateInternal(context: vscode.ExtensionContext, perfSta
         } else {
             throw new Error('Could not find the Azure Resource Groups extension');
         }
-    });
+    })();
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-export function deactivateInternal(): void {
+export async function deactivateInternal(): Promise<void> {
+    await disposeTelemetryWrapper();
 }

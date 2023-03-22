@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 
 import { RemoteDebugging } from '@azure/arm-appplatform';
-import { AzureWizard, AzureWizardExecuteStep, callWithTelemetryAndErrorHandling, createSubscriptionContext, IActionContext } from '@microsoft/vscode-azext-utils';
+import { AzureWizard, AzureWizardExecuteStep, createSubscriptionContext, IActionContext } from '@microsoft/vscode-azext-utils';
 import { ViewPropertiesModel } from '@microsoft/vscode-azureresources-api';
 import { TreeItem, TreeItemCollapsibleState, Uri, window } from "vscode";
 import { Commands } from "../commands/Commands";
@@ -152,13 +152,13 @@ export class AppItem implements ResourceItemBase {
     }
 
     private async reload(): Promise<void> {
-        this._children = callWithTelemetryAndErrorHandling('getChildren', async (_context) => {
+        this._children = (async () => {
             const activeDeployment: EnhancedDeployment | undefined = await this.app.getActiveDeployment();
             if (!activeDeployment) {
                 return [];
             }
             this._scaleSettingsItem = new AppScaleSettingsItem(this);
             return [new AppInstancesItem(this), new AppEnvVariablesItem(this), this._scaleSettingsItem, new AppJvmOptionsItem(this)];
-        })
+        })();
     }
 }

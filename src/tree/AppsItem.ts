@@ -7,9 +7,7 @@ import { VerifyProvidersStep } from "@microsoft/vscode-azext-azureutils";
 import {
     AzureWizard,
     AzureWizardExecuteStep,
-    AzureWizardPromptStep,
-    callWithTelemetryAndErrorHandling,
-    createSubscriptionContext,
+    AzureWizardPromptStep, createSubscriptionContext,
     IActionContext
 } from '@microsoft/vscode-azext-utils';
 import { ViewPropertiesModel } from "@microsoft/vscode-azureresources-api";
@@ -129,9 +127,9 @@ export default class AppsItem implements ResourceItemBase {
     }
 
     public async reloadChildren(): Promise<void> {
-        this._children = callWithTelemetryAndErrorHandling('getChildren', async (_context: IActionContext) => {
+        this._children = (async () => {
             const apps: EnhancedApp[] = await this.service.getApps();
             return apps.map(ca => new AppItem(this, ca));
-        });
+        })();
     }
 }

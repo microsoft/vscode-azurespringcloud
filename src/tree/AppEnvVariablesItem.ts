@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import { callWithTelemetryAndErrorHandling, IActionContext } from "@microsoft/vscode-azext-utils";
+import { IActionContext } from "@microsoft/vscode-azext-utils";
 import * as vscode from "vscode";
 import { ext } from "../extensionVariables";
 import { EnhancedDeployment } from "../service/EnhancedDeployment";
@@ -99,10 +99,8 @@ export class AppEnvVariablesItem extends AppSettingsItem {
         }
     }
 
-    protected loadChildren(): Promise<AppSettingItem[] | undefined> {
-        return callWithTelemetryAndErrorHandling('getChildren', async (_context) => {
-            return Object.entries(await this.variables)
-                .map(e => new AppSettingItem(this, e[0].trim(), (e[1] + '').trim(), Object.assign({}, AppEnvVariablesItem._options)));
-        });
+    protected async loadChildren(): Promise<AppSettingItem[] | undefined> {
+        return Object.entries(await this.variables)
+            .map(e => new AppSettingItem(this, e[0].trim(), (e[1] + '').trim(), Object.assign({}, AppEnvVariablesItem._options)));
     }
 }
