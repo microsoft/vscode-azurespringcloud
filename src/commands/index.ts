@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import { CommandCallback, IActionContext, IParsedError, parseError, registerCommandWithTreeNodeUnwrapping } from '@microsoft/vscode-azext-utils';
+import { CommandCallback, IActionContext, IParsedError, parseError, registerCommandWithTreeNodeUnwrapping, registerErrorHandler, registerReportIssueCommand } from '@microsoft/vscode-azext-utils';
 import { instrumentOperation } from 'vscode-extension-telemetry-wrapper';
 import { ResourceItemBase } from "../tree/SpringAppsBranchDataProvider";
 import { showError } from '../utils';
@@ -32,6 +32,9 @@ export function registerCommands(): void {
     registerCommandWithTelemetryWrapper('azureSpringApps.app.settings.edit', Commands.editSettings);
     registerCommandWithTelemetryWrapper('azureSpringApps.app.setting.edit', Commands.editSetting);
     registerCommandWithTelemetryWrapper('azureSpringApps.app.setting.delete', Commands.deleteSetting);
+    // Suppress "Report an Issue" button for all errors in favor of the command
+    registerErrorHandler(c => c.errorHandling.suppressReportIssue = true);
+    registerReportIssueCommand('springApps.reportIssue');
 }
 
 function registerCommandWithTelemetryWrapper(commandId: string, callback: CommandCallback): void {

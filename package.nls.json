@@ -1,4 +1,5 @@
 {
+    "springApps.reportIssue": "Report Issue...",
     "azureSpringApps.description": "An Azure Spring Apps extension for Visual Studio Code.",
     "azureSpringApps.enableOutputTimestamps": "Prepends each line displayed in the output channel with a timestamp.",
     "azureSpringApps.common.refresh": "Refresh",
