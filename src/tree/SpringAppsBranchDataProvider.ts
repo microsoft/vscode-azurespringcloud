@@ -3,9 +3,9 @@
 *  Licensed under the MIT License. See License.txt in the project root for license information.
 *--------------------------------------------------------------------------------------------*/
 
-import { AppPlatformManagementClient, ServiceResource } from '@azure/arm-appplatform';
+import { AppPlatformManagementClient } from '@azure/arm-appplatform';
 import { createAzureClient } from '@microsoft/vscode-azext-azureutils';
-import { callWithTelemetryAndErrorHandling, createSubscriptionContext, IActionContext, nonNullProp } from '@microsoft/vscode-azext-utils';
+import { callWithTelemetryAndErrorHandling, createSubscriptionContext, IActionContext } from '@microsoft/vscode-azext-utils';
 import { AzureResource, AzureResourceBranchDataProvider, AzureSubscription, ResourceModelBase } from '@microsoft/vscode-azureresources-api';
 import * as vscode from 'vscode';
 import { ext } from '../extensionVariables';
@@ -53,8 +53,7 @@ export class SpringAppsBranchDataProvider extends vscode.Disposable implements A
                 context.errorHandling.rethrow = true;
                 const subContext = createSubscriptionContext(element.subscription);
                 const client: AppPlatformManagementClient = createAzureClient([context, subContext], AppPlatformManagementClient);
-                const service: ServiceResource = await client.services.get(nonNullProp(element, 'resourceGroup'), element.name);
-                const apps: EnhancedService = new EnhancedService(client, element.subscription, service);
+                const apps: EnhancedService = new EnhancedService(client, element.subscription, element);
                 return new AppsItem(apps);
             });
 
