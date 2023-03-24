@@ -1,6 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
-import { DeploymentResource, TestKeys } from '@azure/arm-appplatform';
+import { DeploymentInstance, TestKeys } from '@azure/arm-appplatform';
 import { BasicAuthenticationCredentials, WebResource } from "@azure/ms-rest-js";
 import { IActionContext, parseError } from '@microsoft/vscode-azext-utils';
 import * as request from 'request';
@@ -14,9 +14,9 @@ export interface ILogStream extends vscode.Disposable {
 }
 
 const primaryName: string = 'primary';
-const logStreams: Map<string, ILogStream> = new Map();
+export const logStreams: Map<string, ILogStream> = new Map();
 
-export async function startStreamingLogs(context: IActionContext, app: string, testKey: TestKeys, instance: DeploymentResource): Promise<ILogStream> {
+export async function startStreamingLogs(context: IActionContext, app: string, testKey: TestKeys, instance: DeploymentInstance): Promise<ILogStream> {
     const logStreamId: string = getLogStreamId(app, instance);
     const logStream: ILogStream | undefined = logStreams.get(logStreamId);
     if (logStream && logStream.isConnected) {
@@ -45,13 +45,13 @@ export async function startStreamingLogs(context: IActionContext, app: string, t
     }
 }
 
-export async function stopStreamingLogs(app: string, instance: DeploymentResource): Promise<void> {
+export async function stopStreamingLogs(app: string, instance: DeploymentInstance): Promise<void> {
     const logStreamId: string = getLogStreamId(app, instance);
     const logStream: ILogStream | undefined = logStreams.get(logStreamId);
     if (logStream && logStream.isConnected) {
         logStream.dispose();
     } else {
-        await vscode.window.showWarningMessage(localize('alreadyDisconnected', 'The log-streaming service is already disconnected.'));
+        await vscode.window.showWarningMessage(localize('alreadyDisconnected', 'The log streaming service is not connected.'));
     }
 }
 
@@ -77,7 +77,7 @@ async function getLogRequest(testKey: TestKeys, app: string, instance: string): 
     return requestApi(`${(testKey.primaryTestEndpoint ?? '').replace('.test', '')}/api/logstream/apps/${app}/instances/${instance}?follow=true&tailLines=10`);
 }
 
-function getLogStreamId(app: string, instance: DeploymentResource): string {
+export function getLogStreamId(app: string, instance: DeploymentInstance): string {
     return `${app}-${instance.name}`;
 }
 

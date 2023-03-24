@@ -4,15 +4,17 @@
 'use strict';
 
 import { registerAzureUtilsExtensionVariables } from '@microsoft/vscode-azext-azureutils';
-import { AzExtTreeDataProvider, callWithTelemetryAndErrorHandling, createApiProvider, createAzExtOutputChannel, createExperimentationService, IActionContext, registerUIExtensionVariables } from '@microsoft/vscode-azext-utils';
-import { AzureExtensionApiProvider } from '@microsoft/vscode-azext-utils/api';
+import { createAzExtOutputChannel, createExperimentationService, registerUIExtensionVariables } from '@microsoft/vscode-azext-utils';
+import { AzExtResourceType, AzureResourcesExtensionApi, getAzureResourcesExtensionApi } from '@microsoft/vscode-azureresources-api';
 import * as vscode from 'vscode';
+import { dispose as disposeTelemetryWrapper, initialize, instrumentOperation } from 'vscode-extension-telemetry-wrapper';
 import { registerCommands } from './commands';
-import { initialize as initDashboardIntegration } from './dashboard';
 import { ext } from './extensionVariables';
-import { AzureAccountTreeItem } from './tree/AzureAccountTreeItem';
+import { SpringAppsBranchDataProvider } from './tree/SpringAppsBranchDataProvider';
+import { TreeItemStateStore } from './tree/TreeItemState';
+import { getAiKey, getExtensionId, getExtensionVersion, loadPackageInfo } from './utils';
 
-export async function activateInternal(context: vscode.ExtensionContext, perfStats: { loadStartTime: number; loadEndTime: number }, ignoreBundle?: boolean): Promise<AzureExtensionApiProvider> {
+export async function activateInternal(context: vscode.ExtensionContext, _perfStats: { loadStartTime: number; loadEndTime: number }, ignoreBundle?: boolean): Promise<void> {
     ext.context = context;
     ext.ignoreBundle = ignoreBundle;
     ext.outputChannel = createAzExtOutputChannel('Azure Spring Apps', ext.prefix);
@@ -21,25 +23,27 @@ export async function activateInternal(context: vscode.ExtensionContext, perfSta
     registerUIExtensionVariables(ext);
     registerAzureUtilsExtensionVariables(ext);
 
-    // tslint:disable-next-line: no-unsafe-any
-    await callWithTelemetryAndErrorHandling('azureSpringApps.activate', async (activateContext: IActionContext) => {
-        activateContext.telemetry.properties.isActivationEvent = 'true';
-        activateContext.telemetry.measurements.mainFileLoad = (perfStats.loadEndTime - perfStats.loadStartTime) / 1000;
-
-        ext.azureAccountTreeItem = new AzureAccountTreeItem();
-        context.subscriptions.push(ext.azureAccountTreeItem);
-        ext.tree = new AzExtTreeDataProvider(ext.azureAccountTreeItem, 'azureSpringApps.common.loadMore');
-        ext.treeView = vscode.window.createTreeView('azureSpringApps', { treeDataProvider: ext.tree, showCollapseAll: true, canSelectMany: true });
-        context.subscriptions.push(ext.treeView);
+    await loadPackageInfo(context);
+    // Usage data statistics.
+    if (getAiKey()) {
+        initialize(getExtensionId(), getExtensionVersion(), getAiKey(), { firstParty: true });
+    }
+    instrumentOperation('activation', async () => {
         registerCommands();
+        const rgApiProvider: AzureResourcesExtensionApi = await getAzureResourcesExtensionApi(context, '2.0.0');
+        if (rgApiProvider) {
+            ext.experimentationService = await createExperimentationService(context);
 
-        ext.experimentationService = await createExperimentationService(context);
-    });
-
-    void initDashboardIntegration(context);
-    return createApiProvider([]);
+            ext.state = new TreeItemStateStore();
+            ext.rgApiV2 = await getAzureResourcesExtensionApi(context, '2.0.0');
+            ext.branchDataProvider = new SpringAppsBranchDataProvider();
+            ext.rgApiV2.resources.registerAzureResourceBranchDataProvider(AzExtResourceType.SpringApps, ext.branchDataProvider);
+        } else {
+            throw new Error('Could not find the Azure Resource Groups extension');
+        }
+    })();
 }
 
-export function deactivateInternal(): void {
-    ext.diagnosticWatcher?.dispose();
+export async function deactivateInternal(): Promise<void> {
+    await disposeTelemetryWrapper();
 }

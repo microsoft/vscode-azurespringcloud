@@ -2,7 +2,8 @@
 // Licensed under the MIT license.
 
 import { AppPlatformManagementClient, AppResource, ClusterResourceProperties, ServiceResource, Sku } from "@azure/arm-appplatform";
-import { ISubscriptionContext } from "@microsoft/vscode-azext-utils";
+import { AzureSubscription } from '@microsoft/vscode-azureresources-api';
+import { ext } from "../extensionVariables";
 import { EnhancedApp } from "./EnhancedApp";
 
 export class EnhancedService {
@@ -10,11 +11,11 @@ export class EnhancedService {
 
     public readonly name: string;
     public readonly id: string;
-    public readonly subscription: ISubscriptionContext;
+    public readonly subscription: AzureSubscription;
     private _remote: ServiceResource;
     private _resourceGroup: string;
 
-    public constructor(client: AppPlatformManagementClient, subscription: ISubscriptionContext, resource: ServiceResource) {
+    public constructor(client: AppPlatformManagementClient, subscription: AzureSubscription, resource: ServiceResource) {
         this.client = client;
         this.subscription = subscription;
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -41,31 +42,39 @@ export class EnhancedService {
     }
 
     public async createApp(name: string): Promise<EnhancedApp> {
+        ext.outputChannel.appendLog(`[App] creating app (${this.name}).`);
         const app: AppResource = await this.client.apps.beginCreateOrUpdateAndWait(this.resourceGroup, this.name, name, {
             properties: {
                 public: false
             }
         });
+        ext.outputChannel.appendLog(`[App] app (${this.name}) is created.`);
         return new EnhancedApp(this, app);
     }
 
     public async getApps(): Promise<EnhancedApp[]> {
         const apps: AppResource[] = [];
+        ext.outputChannel.appendLog(`[Apps] loading apps of (${this.name}).`);
         const pagedApps: AsyncIterable<AppResource> = this.client.apps.list(this.resourceGroup, this.name);
         for await (const app of pagedApps) {
             apps.push(app);
         }
+        ext.outputChannel.appendLog(`[Apps] apps of (${this.name}) is loaded.`);
         return apps.map(app => new EnhancedApp(this, app));
     }
 
     public async refresh(): Promise<EnhancedService> {
+        ext.outputChannel.appendLog(`[Apps] refreshing apps (${this.name}).`);
         const remote: ServiceResource = await this.client.services.get(this.resourceGroup, this.name);
+        ext.outputChannel.appendLog(`[Apps] apps (${this.name}) is refreshed.`);
         this.setRemote(remote);
         return this;
     }
 
     public async remove(): Promise<void> {
+        ext.outputChannel.appendLog(`[Apps] deleting apps (${this.name}).`);
         await this.client.services.beginDeleteAndWait(this.resourceGroup, this.name);
+        ext.outputChannel.appendLog(`[Apps] apps (${this.name}) is deleted.`);
     }
 
     public isEnterpriseTier(): boolean {

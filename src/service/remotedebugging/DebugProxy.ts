@@ -9,6 +9,7 @@ import * as websocket from 'websocket';
 import { ext } from '../../extensionVariables';
 import { EnhancedDeployment } from '../EnhancedDeployment';
 import { EnhancedInstance } from '../EnhancedInstance';
+import { createSubscriptionContext } from "@microsoft/vscode-azext-utils";
 
 export class DebugProxy extends EventEmitter {
     public readonly port: number;
@@ -141,7 +142,8 @@ export class DebugProxy extends EventEmitter {
 
     private async connect(serverPort: number): Promise<void> {
         const deployment: EnhancedDeployment = this._instance.deployment;
-        const credential: { accessToken: string } = <{ accessToken: string }>await deployment.app.service.subscription.credentials.getToken();
+        const subContext = createSubscriptionContext(deployment.app.service.subscription);
+        const credential: { accessToken: string } = <{ accessToken: string }>await subContext.credentials.getToken();
         const appName: string = deployment.app.name;
         const deploymentName: string = deployment.name;
         const instanceName: string = this._instance.name ?? 'unknown-instance';

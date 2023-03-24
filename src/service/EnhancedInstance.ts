@@ -3,10 +3,11 @@
 
 import { DeploymentInstance } from "@azure/arm-appplatform";
 import { EnhancedDeployment } from "./EnhancedDeployment";
+import { getLogStreamId, ILogStream, logStreams } from "./streamlog/streamingLog";
 
 export class EnhancedInstance implements DeploymentInstance {
 
-    public readonly name?: string;
+    public readonly name: string;
     public readonly status?: string;
     public readonly reason?: string;
     public readonly discoveryStatus?: string;
@@ -23,5 +24,21 @@ export class EnhancedInstance implements DeploymentInstance {
         this.startTime = resource.startTime;
         this.zone = resource.zone;
         this.deployment = deployment;
+    }
+
+    get id(): string {
+        return `${this.deployment.id}/instances/${this.name}`;
+    }
+
+    get properties(): {} {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { deployment: _, ...properties } = this;
+        return properties;
+    }
+
+    get streamingLogConnected(): boolean {
+        const logStreamId: string = getLogStreamId(this.deployment.app.name, this);
+        const logStream: ILogStream | undefined = logStreams.get(logStreamId);
+        return logStream?.isConnected ?? false;
     }
 }

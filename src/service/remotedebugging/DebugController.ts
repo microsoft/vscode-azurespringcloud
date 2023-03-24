@@ -4,11 +4,11 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { RemoteDebugging } from "@azure/arm-appplatform";
-import { AzureWizard, AzureWizardExecuteStep, IActionContext } from "@microsoft/vscode-azext-utils";
+import { AzureWizard, AzureWizardExecuteStep, createSubscriptionContext, IActionContext } from "@microsoft/vscode-azext-utils";
 import { window } from "vscode";
-import { AppCommands } from "../../commands/AppCommands";
-import { AppInstanceTreeItem } from "../../tree/AppInstanceTreeItem";
-import { AppTreeItem } from "../../tree/AppTreeItem";
+import { Commands } from "../../commands/Commands";
+import { AppInstanceItem } from "../../tree/AppInstanceItem";
+import { AppItem } from "../../tree/AppItem";
 import { localize } from "../../utils";
 import { EnhancedInstance } from "../EnhancedInstance";
 import { IRemoteDebuggingContext } from "./steps/IRemoteDebuggingContext";
@@ -17,18 +17,19 @@ import { StartDebuggingProxyStep } from "./steps/StartDebuggingProxyStep";
 
 // tslint:disable-next-line:no-unnecessary-class
 export class DebugController {
-    public static async attachDebugger(context: IActionContext, node: AppInstanceTreeItem): Promise<void> {
+    public static async attachDebugger(context: IActionContext, node: AppInstanceItem): Promise<void> {
         const instance: EnhancedInstance = node.instance;
         const attaching: string = localize('attachDebugger', 'Attaching debugger to app instance "{0}".', instance.name);
         const attached: string = localize('attachDebuggerSuccess', 'Successfully attached debugger to app instance "{0}".', instance.name);
 
         const config: RemoteDebugging = await instance.deployment.getDebuggingConfig();
-        const wizardContext: IRemoteDebuggingContext = Object.assign(context, instance.deployment.app.service.subscription, { config });
+        const subContext = createSubscriptionContext(instance.deployment.app.service.subscription);
+        const wizardContext: IRemoteDebuggingContext = Object.assign(context, subContext, { config });
         const executeSteps: AzureWizardExecuteStep<IRemoteDebuggingContext>[] = [];
 
         if (!config?.enabled) {
             const confirmMsg: string = localize('confirmRemoteDebug', 'Remote debugging should be enabled first before debugging. Do you want to enable it?');
-            void AppCommands.enableRemoteDebugging(context, node.parent.parent, confirmMsg);
+            void Commands.enableRemoteDebugging(context, node.parent.parent, confirmMsg);
             return;
         }
         executeSteps.push(new StartDebuggingProxyStep(instance));
@@ -36,10 +37,10 @@ export class DebugController {
         const wizard: AzureWizard<IRemoteDebuggingContext> = new AzureWizard(wizardContext, { executeSteps, title: attaching });
         await wizard.execute();
         const task: () => void = async () => {
-            const action: string | undefined = await window.showInformationMessage(attached, AppTreeItem.ACCESS_PUBLIC_ENDPOINT, AppTreeItem.ACCESS_TEST_ENDPOINT);
+            const action: string | undefined = await window.showInformationMessage(attached, AppItem.ACCESS_PUBLIC_ENDPOINT, AppItem.ACCESS_TEST_ENDPOINT);
             if (action) {
-                const appTreeItem: AppTreeItem = node.parent.parent;
-                action === AppTreeItem.ACCESS_PUBLIC_ENDPOINT ? void AppCommands.openPublicEndpoint(context, appTreeItem) : void AppCommands.openTestEndpoint(context, appTreeItem);
+                const appTreeItem: AppItem = node.parent.parent;
+                action === AppItem.ACCESS_PUBLIC_ENDPOINT ? void Commands.openPublicEndpoint(context, appTreeItem) : void Commands.openTestEndpoint(context, appTreeItem);
             }
         };
         setTimeout(task, 0);
