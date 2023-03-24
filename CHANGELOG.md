@@ -1,5 +1,8 @@
 # Change Log
 
+## 0.7.0 - 2023-03-24
+- Integrate with `Azure Resources` extension.
+
 ## 0.6.1 - 2023-03-14
 
 ### Updated
