@@ -252,21 +252,21 @@ export namespace Commands {
         if (item instanceof AppsItem) {
             return item;
         }
-        return await pickApps(context);
+        return await pickApps(context, item);
     }
 
     async function getAppItem(context: IActionContext, item?: ResourceItemBase): Promise<AppItem> {
         if (item instanceof AppItem) {
             return item;
         }
-        return await pickApp(context);
+        return await pickApp(context, item);
     }
 
     async function getInstanceItem(context: IActionContext, item?: ResourceItemBase): Promise<AppInstanceItem> {
         if (item instanceof AppInstanceItem) {
             return item;
         }
-        return await pickAppInstance(context);
+        return await pickAppInstance(context, item);
     }
 
     async function getTargetOrWorkspacePath(): Promise<Uri | undefined> {
