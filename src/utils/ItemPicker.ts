@@ -27,18 +27,18 @@ export interface PickItemOptions {
     title?: string;
 }
 
-export async function pickApps(context: IActionContext, startingNode?: ResourceItemBase, options?: PickItemOptions): Promise<AppsItem> {
+export async function pickApps(context: IActionContext, options?: PickItemOptions): Promise<AppsItem> {
     return await runQuickPickWizard(context, {
         promptSteps: getPickAppsSteps(ext.rgApiV2.resources.azureResourceTreeDataProvider),
         title: options?.title,
-    }, startingNode);
+    });
 }
 
-export async function pickApp(context: IActionContext, startingNode?: ResourceItemBase, options?: PickItemOptions): Promise<AppItem> {
+export async function pickApp(context: IActionContext, options?: PickItemOptions): Promise<AppItem> {
     return await runQuickPickWizard(context, {
         promptSteps: getPickAppSteps(ext.rgApiV2.resources.azureResourceTreeDataProvider),
         title: options?.title,
-    }, startingNode);
+    });
 }
 
 export async function pickAppInstance(context: IActionContext, startingNode?: ResourceItemBase, options?: PickItemOptions): Promise<AppInstanceItem> {
