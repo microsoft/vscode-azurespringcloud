@@ -266,7 +266,7 @@ export namespace Commands {
         if (item instanceof AppInstanceItem) {
             return item;
         }
-        return await pickAppInstance(context);
+        return await pickAppInstance(context, item);
     }
 
     async function getTargetOrWorkspacePath(): Promise<Uri | undefined> {

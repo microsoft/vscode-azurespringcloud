@@ -461,7 +461,7 @@
         "@azure/ms-rest-js": "^2.6.1",
         "@azure/storage-file-share": "^12.3.0",
         "@microsoft/vscode-azext-azureutils": "^0.3.8",
-        "@microsoft/vscode-azext-utils": "^0.5.1",
+        "@microsoft/vscode-azext-utils": "^0.5.2",
         "@microsoft/vscode-azureresources-api": "^2.0.4",
         "fs-extra": "^8.1.0",
         "request": "^2.88.2",

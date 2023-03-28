@@ -20,31 +20,32 @@ import { AppInstanceItem } from "../tree/AppInstanceItem";
 import { AppInstancesItem } from "../tree/AppInstancesItem";
 import { AppItem } from "../tree/AppItem";
 import AppsItem from "../tree/AppsItem";
+import { ResourceItemBase } from "../tree/SpringAppsBranchDataProvider";
 import { localize } from "./index";
 
 export interface PickItemOptions {
     title?: string;
 }
 
-export async function pickApps(context: IActionContext, options?: PickItemOptions): Promise<AppsItem> {
+export async function pickApps(context: IActionContext, startingNode?: ResourceItemBase, options?: PickItemOptions): Promise<AppsItem> {
     return await runQuickPickWizard(context, {
         promptSteps: getPickAppsSteps(ext.rgApiV2.resources.azureResourceTreeDataProvider),
         title: options?.title,
-    });
+    }, startingNode);
 }
 
-export async function pickApp(context: IActionContext, options?: PickItemOptions): Promise<AppItem> {
+export async function pickApp(context: IActionContext, startingNode?: ResourceItemBase, options?: PickItemOptions): Promise<AppItem> {
     return await runQuickPickWizard(context, {
         promptSteps: getPickAppSteps(ext.rgApiV2.resources.azureResourceTreeDataProvider),
         title: options?.title,
-    });
+    }, startingNode);
 }
 
-export async function pickAppInstance(context: IActionContext, options?: PickItemOptions): Promise<AppInstanceItem> {
+export async function pickAppInstance(context: IActionContext, startingNode?: ResourceItemBase, options?: PickItemOptions): Promise<AppInstanceItem> {
     return await runQuickPickWizard(context, {
-        promptSteps: getPickInstanceSteps(ext.rgApiV2.resources.azureResourceTreeDataProvider),
+        promptSteps: getPickInstanceSteps(ext.rgApiV2.resources.azureResourceTreeDataProvider, startingNode),
         title: options?.title,
-    });
+    }, startingNode);
 }
 
 function getPickAppsSteps(tdp: vscode.TreeDataProvider<unknown>): AzureWizardPromptStep<AzureResourceQuickPickWizardContext>[] {
@@ -76,9 +77,9 @@ function getPickAppSteps(tdp: vscode.TreeDataProvider<unknown>): AzureWizardProm
     ];
 }
 
-function getPickInstanceSteps(tdp: vscode.TreeDataProvider<unknown>): AzureWizardPromptStep<AzureResourceQuickPickWizardContext>[] {
+function getPickInstanceSteps(tdp: vscode.TreeDataProvider<unknown>, startingNode?: ResourceItemBase): AzureWizardPromptStep<AzureResourceQuickPickWizardContext>[] {
     return [
-        ...getPickAppSteps(tdp),
+        ...(startingNode ? [] : getPickAppSteps(tdp)),
         new ContextValueQuickPickStep(tdp, {
             contextValueFilter: { include: AppInstancesItem.contextValue },
             skipIfOne: true,
