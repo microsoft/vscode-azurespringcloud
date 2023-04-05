@@ -7,6 +7,7 @@ import { registerAzureUtilsExtensionVariables } from '@microsoft/vscode-azext-az
 import { createAzExtOutputChannel, createExperimentationService, registerUIExtensionVariables } from '@microsoft/vscode-azext-utils';
 import { AzExtResourceType, AzureResourcesExtensionApi, getAzureResourcesExtensionApi } from '@microsoft/vscode-azureresources-api';
 import * as vscode from 'vscode';
+import { initialize as initializeDashboardIntegration } from './dashboard';
 import { dispose as disposeTelemetryWrapper, initialize, instrumentOperation } from 'vscode-extension-telemetry-wrapper';
 import { registerCommands } from './commands';
 import { ext } from './extensionVariables';
@@ -30,6 +31,7 @@ export async function activateInternal(context: vscode.ExtensionContext, _perfSt
     }
     instrumentOperation('activation', async () => {
         registerCommands();
+        void initializeDashboardIntegration(context);
         const rgApiProvider: AzureResourcesExtensionApi = await getAzureResourcesExtensionApi(context, '2.0.0');
         if (rgApiProvider) {
             ext.experimentationService = await createExperimentationService(context);
