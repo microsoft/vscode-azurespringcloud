@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.7.1 - 2023-04-05
+- Fix: [#54](https://github.com/microsoft/vscode-azurespringcloud/issues/54) Entry "view live information" is missing from context menu of app node 
+- Fix: user have to select instance starting from Spring Apps but not current selected Spring App when `Attach Debugger`.
+
 ## 0.7.0 - 2023-03-24
 - Integrate with `Azure Resources` extension.
 
