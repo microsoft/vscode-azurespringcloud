@@ -145,7 +145,7 @@ export class EnhancedApp {
     public async createDeployment(name: string, runtime?: KnownSupportedRuntimeValue): Promise<EnhancedDeployment> {
         let source: UserSourceInfoUnion | undefined;
         ext.outputChannel.appendLog(`[Deployment] creating deployment (${name}) of app (${this.name}).`);
-        if (this.service.sku?.name?.toLowerCase().startsWith('e')) {
+        if (this.service.isEnterpriseTier()) {
             source = { type: 'BuildResult', buildResultId: '<default>' };
         } else {
             source = { type: 'Jar', relativePath: '<default>', runtimeVersion: runtime ?? EnhancedApp.DEFAULT_RUNTIME };
