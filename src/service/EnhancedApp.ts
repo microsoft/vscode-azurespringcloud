@@ -156,7 +156,7 @@ export class EnhancedApp {
                 source,
                 deploymentSettings: {
                     resourceRequests: {
-                        memory: '1Gi',
+                        memory: this.service.isConsumptionTier() ? '2Gi' : '1Gi',
                         cpu: '1'
                     }
                 },

@@ -81,6 +81,10 @@ export class EnhancedService {
         return this.sku?.tier === 'Enterprise';
     }
 
+    public isConsumptionTier(): boolean {
+        return this.sku?.tier === 'StandardGen2';
+    }
+
     private setRemote(resource: ServiceResource): void {
         this._remote = resource;
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
