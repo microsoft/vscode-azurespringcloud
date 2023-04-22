@@ -31,7 +31,8 @@
     ],
     "preview": true,
     "activationEvents": [
-        "onFileSystem:azureSpringApps"
+        "onView:azureResourceGroups",
+        "onView:azureResourceGroupsV2"
     ],
     "main": "./main.js",
     "contributes": {
