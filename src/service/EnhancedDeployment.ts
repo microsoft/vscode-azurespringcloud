@@ -148,7 +148,11 @@ export class EnhancedDeployment {
         return { cpu, memory, capacity: this.properties?.instances?.length ?? 0 };
     }
 
-    public async getDebuggingConfig(): Promise<RemoteDebugging> {
+    public async getDebuggingConfig(): Promise<RemoteDebugging | undefined> {
+        if (this.app.service.isConsumptionTier()) {
+            ext.outputChannel.appendLog(`[Deployment] remote debugging is not supported for apps of consumption plan.`);
+            return undefined;
+        }
         ext.outputChannel.appendLog(`[Deployment] getting remote debugging config of deployment (${this.name}).`);
         return this.client.deployments.getRemoteDebuggingConfig(this.app.service.resourceGroup, this.app.service.name, this.app.name, this.name);
     }

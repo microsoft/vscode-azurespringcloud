@@ -22,7 +22,11 @@ export class DebugController {
         const attaching: string = localize('attachDebugger', 'Attaching debugger to app instance "{0}".', instance.name);
         const attached: string = localize('attachDebuggerSuccess', 'Successfully attached debugger to app instance "{0}".', instance.name);
 
-        const config: RemoteDebugging = await instance.deployment.getDebuggingConfig();
+        const config: RemoteDebugging | undefined = await instance.deployment.getDebuggingConfig();
+        if (!config) {
+            void window.showErrorMessage(`Remote debugging is not supported for Azure Spring apps of consumption plan for now.`);
+            return;
+        }
         const subContext = createSubscriptionContext(instance.deployment.app.service.subscription);
         const wizardContext: IRemoteDebuggingContext = Object.assign(context, subContext, { config });
         const executeSteps: AzureWizardExecuteStep<IRemoteDebuggingContext>[] = [];
