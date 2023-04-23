@@ -18,9 +18,9 @@ export class SelectAppStackStep extends AzureWizardPromptStep<IAppCreationWizard
 
     public async prompt(context: IAppCreationWizardContext): Promise<void> {
         const picks: IAzureQuickPickItem<KnownSupportedRuntimeValue>[] = [
+            { label: 'Java 17', description: 'Java 17', data: KnownSupportedRuntimeValue.Java17 },
             { label: 'Java 11', description: 'Java 11', data: KnownSupportedRuntimeValue.Java11 },
-            { label: 'Java 8', description: 'Java 8', data: KnownSupportedRuntimeValue.Java8 },
-            { label: 'Java 17', description: 'Java 17', data: KnownSupportedRuntimeValue.Java17 }
+            { label: 'Java 8', description: 'Java 8', data: KnownSupportedRuntimeValue.Java8 }
         ];
         const placeHolder: string = localize('selectRuntime', 'Select a Java runtime version');
         context.newAppRuntime = (await context.ui.showQuickPick(picks, { placeHolder })).data;

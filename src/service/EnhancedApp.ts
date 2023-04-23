@@ -25,7 +25,7 @@ import { EnhancedService } from "./EnhancedService";
 import { startStreamingLogs, stopStreamingLogs } from "./streamlog/streamingLog";
 
 export class EnhancedApp {
-    public static readonly DEFAULT_RUNTIME: KnownSupportedRuntimeValue = KnownSupportedRuntimeValue.Java11;
+    public static readonly DEFAULT_RUNTIME: KnownSupportedRuntimeValue = KnownSupportedRuntimeValue.Java17;
     public static readonly DEFAULT_DEPLOYMENT: string = 'default';
     public static readonly DEFAULT_TANZU_COMPONENT_NAME: string = 'default';
 
