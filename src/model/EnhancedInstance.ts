@@ -2,7 +2,9 @@
 // Licensed under the MIT license.
 
 import { DeploymentInstance } from "@azure/arm-appplatform";
-import { getLogStreamId, ILogStream, logStreams } from "../workflows/streamlog/streamingLog";
+import { IActionContext } from "@microsoft/vscode-azext-utils";
+import { localize } from "vscode-nls";
+import { getLogStreamId, ILogStream, logStreams, startStreamingLogs, stopStreamingLogs } from "../workflows/streamlog/streamingLog";
 import { EnhancedDeployment } from "./EnhancedDeployment";
 
 export class EnhancedInstance implements DeploymentInstance {
@@ -37,8 +39,19 @@ export class EnhancedInstance implements DeploymentInstance {
     }
 
     get streamingLogConnected(): boolean {
-        const logStreamId: string = getLogStreamId(this.deployment.app.name, this);
+        const logStreamId: string = getLogStreamId(this);
         const logStream: ILogStream | undefined = logStreams.get(logStreamId);
         return logStream?.isConnected ?? false;
+    }
+
+    public async startStreamingLogs(context: IActionContext): Promise<void> {
+        if (this.status !== 'Running') {
+            throw new Error(localize('instanceNotRunning', 'Selected instance is not running.'));
+        }
+        await startStreamingLogs(context, this);
+    }
+
+    public async stopStreamingLogs(): Promise<void> {
+        await stopStreamingLogs(this);
     }
 }

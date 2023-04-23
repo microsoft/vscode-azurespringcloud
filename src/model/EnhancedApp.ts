@@ -8,7 +8,6 @@ import {
     Build,
     BuildResult,
     BuildResultProvisioningState,
-    DeploymentInstance,
     DeploymentResource,
     KnownSupportedRuntimeValue,
     ResourceUploadDefinition,
@@ -16,11 +15,8 @@ import {
     UserSourceInfoUnion
 } from "@azure/arm-appplatform";
 import { AnonymousCredential, ShareFileClient } from "@azure/storage-file-share";
-import { IActionContext } from "@microsoft/vscode-azext-utils";
 import { AzureSubscription } from "@microsoft/vscode-azureresources-api";
 import { ext } from "../extensionVariables";
-import { localize } from "../utils";
-import { startStreamingLogs, stopStreamingLogs } from "../workflows/streamlog/streamingLog";
 import { EnhancedDeployment } from "./EnhancedDeployment";
 import { EnhancedService } from "./EnhancedService";
 
@@ -257,17 +253,5 @@ export class EnhancedApp {
             }
         }
         return build.properties?.triggeredBuildResult?.id;
-    }
-
-    public async startStreamingLogs(context: IActionContext, instance: DeploymentInstance): Promise<void> {
-        if (instance.status !== 'Running') {
-            throw new Error(localize('instanceNotRunning', 'Selected instance is not running.'));
-        }
-        const testKey: TestKeys = await this.getTestKeys();
-        await startStreamingLogs(context, this.name, testKey, instance);
-    }
-
-    public async stopStreamingLogs(instance: DeploymentInstance): Promise<void> {
-        await stopStreamingLogs(this.name, instance);
     }
 }

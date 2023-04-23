@@ -20,7 +20,7 @@ export class OpenLogStreamStep extends AzureWizardExecuteStep<IAppDeploymentWiza
     public async execute(context: IAppDeploymentWizardContext, progress: Progress<{ message?: string; increment?: number }>): Promise<void> {
         const message: string = localize('openLogStream', 'Opening application log stream...');
         progress.report({ message });
-        await this.deployment.app.startStreamingLogs(context, this.deployment.latestInstance);
+        await this.deployment.latestInstance.startStreamingLogs(context);
     }
 
     public shouldExecute(_context: IAppDeploymentWizardContext): boolean {

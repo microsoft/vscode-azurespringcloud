@@ -247,8 +247,7 @@ export async function startStreamingLogs(context: IActionContext, n?: AppInstanc
     const doing: string = `Starting log streaming for instance "${item.instance.name}".`;
     const done: string = `Successfully started log streaming for instance "${item.instance.name}".`;
     await utils.runInBackground(doing, done, async () => {
-        const app: EnhancedApp = item.parent.parent.app;
-        await app.startStreamingLogs(context, item.instance);
+        await item.instance.startStreamingLogs(context);
         ext.state.notifyChildrenChanged(item.id);
     });
 }
@@ -258,8 +257,7 @@ export async function stopStreamingLogs(context: IActionContext, n?: AppInstance
     const doing: string = `Stopping log streaming for instance "${item.instance.name}".`;
     const done: string = `Successfully stopped log streaming for instance "${item.instance.name}".`;
     await utils.runInBackground(doing, done, async () => {
-        const app: EnhancedApp = item.parent.parent.app;
-        await app.stopStreamingLogs(item.instance);
+        await item.instance.stopStreamingLogs();
         ext.state.notifyChildrenChanged(item.id);
     });
 }
