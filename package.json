@@ -32,7 +32,8 @@
     "preview": true,
     "activationEvents": [
         "onView:azureResourceGroups",
-        "onView:azureResourceGroupsV2"
+        "onView:azureResourceGroupsV2",
+        "onCommand:azureSpringApps.file.deploy"
     ],
     "main": "./main.js",
     "contributes": {
@@ -66,6 +67,12 @@
                 "command": "springApps.reportIssue",
                 "title": "%springApps.reportIssue%",
                 "category": "Azure Spring Apps"
+            },
+            {
+                "command": "azureSpringApps.file.deploy",
+                "title": "%azureSpringApps.file.deploy%",
+                "category": "Azure Spring Apps",
+                "icon": "$(cloud-upload)"
             },
             {
                 "command": "azureSpringApps.common.refresh",
@@ -377,6 +384,18 @@
                 {
                     "command": "azureSpringApps.app.showLiveInformation",
                     "when": "never"
+                }
+            ],
+            "explorer/context": [
+                {
+                    "command": "azureSpringApps.file.deploy",
+                    "when": "explorerResourceIsFolder == true",
+                    "group": "zzz_azuretools_deploy@1"
+                },
+                {
+                    "command": "azureSpringApps.file.deploy",
+                    "when": "explorerResourceIsFolder == false && resourceExtname =~ /.jar$/",
+                    "group": "zzz_azuretools_deploy@1"
                 }
             ]
         },

@@ -49,6 +49,7 @@ export function registerCommands(): void {
     // Suppress "Report an Issue" button for all errors in favor of the command
     registerErrorHandler(c => c.errorHandling.suppressReportIssue = true);
     registerReportIssueCommand('springApps.reportIssue');
+    registerCommandWithTelemetryWrapper('azureSpringApps.file.deploy', deployFromFile);
 }
 
 function registerCommandWithTelemetryWrapper(commandId: string, callback: CommandCallback): void {
@@ -170,6 +171,31 @@ export async function deploy(context: IActionContext, n?: AppItem): Promise<void
     const fileUri: Uri[] | undefined = await window.showOpenDialog(options);
     if (fileUri && fileUri[0] !== undefined) {
         const artifactPath: string = fileUri[0].fsPath;
+        await item.deployArtifact(context, artifactPath);
+    }
+}
+
+export async function deployFromFile(context: IActionContext, defaultUri?: Uri, _arg2?: Uri[]): Promise<void> {
+    let jarFile: Uri | undefined = undefined;
+    defaultUri = defaultUri ?? await getTargetOrWorkspacePath();
+    if (!defaultUri || !defaultUri.fsPath.endsWith(".jar")) {
+        const options: OpenDialogOptions = {
+            defaultUri,
+            canSelectMany: false,
+            openLabel: 'Select',
+            filters: {
+                'Jar files': ['jar']
+            }
+        };
+        const fileUri: Uri[] | undefined = await window.showOpenDialog(options);
+        jarFile = fileUri ? fileUri[0] : undefined;
+    } else {
+        jarFile = defaultUri;
+    }
+
+    if (jarFile) {
+        const item: AppItem = await getAppItem(context, undefined);
+        const artifactPath: string = jarFile.fsPath;
         await item.deployArtifact(context, artifactPath);
     }
 }
