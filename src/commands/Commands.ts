@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { DialogResponses, IActionContext, openReadOnlyJson, openUrl } from "@microsoft/vscode-azext-utils";
-import { MessageItem, OpenDialogOptions, TextEditor, Uri, window, workspace, WorkspaceFolder } from "vscode";
+import { MessageItem, OpenDialogOptions, TextEditor, Uri, WorkspaceFolder, window, workspace } from "vscode";
 import { ext } from "../extensionVariables";
 import { EnhancedApp } from "../service/EnhancedApp";
 import { EnhancedDeployment } from "../service/EnhancedDeployment";
@@ -44,13 +44,12 @@ export namespace Commands {
     export async function openPublicEndpoint(context: IActionContext, n?: AppItem): Promise<void> {
         const item: AppItem = await getAppItem(context, n);
         const app: EnhancedApp = item.app;
-        let endpoint: string | undefined = await app.getPublicEndpoint();
-        if (!endpoint || endpoint.toLowerCase() === 'none') {
+        if (!app.properties?.public) {
             await context.ui.showWarningMessage(`App "${app.name}" is not publicly accessible. Do you want to assign it a public endpoint?`, { modal: true }, DialogResponses.yes);
             await assignEndpoint(context, item);
-            endpoint = await app.getPublicEndpoint();
         }
-        if (endpoint) {
+        const endpoint: string | undefined = await app.getPublicEndpoint();
+        if (endpoint && endpoint.toLowerCase() !== 'none') {
             await openUrl(endpoint);
         }
     }
@@ -59,7 +58,7 @@ export namespace Commands {
         const item: AppItem = await getAppItem(context, n);
         const app: EnhancedApp = item.app;
         const endpoint: string | undefined = await app.getTestEndpoint();
-        if (endpoint) {
+        if (endpoint && endpoint.toLowerCase() !== 'none') {
             await openUrl(endpoint);
         }
     }

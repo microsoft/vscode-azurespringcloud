@@ -39,7 +39,7 @@ export async function initialize(context: vscode.ExtensionContext): Promise<void
 
             const app = appNode.app;
             let endpoint: string | undefined = await app.getPublicEndpoint();
-            if (!endpoint || endpoint.toLowerCase() === 'none') {
+            if (!app.properties?.public || !endpoint || endpoint.toLowerCase() === 'none') {
                 const choice = await vscode.window.showWarningMessage(`App "${app.name}" is not publicly accessible. Do you want to assign it a public endpoint?`, { modal: true }, "Yes");
                 if (!choice) {
                     return;
