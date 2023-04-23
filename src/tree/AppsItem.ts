@@ -17,7 +17,6 @@ import { CreateAppStep } from "../commands/steps/creation/CreateAppStep";
 import { IAppCreationWizardContext } from "../commands/steps/creation/IAppCreationWizardContext";
 import { InputAppNameStep } from "../commands/steps/creation/InputAppNameStep";
 import { SelectAppStackStep } from "../commands/steps/creation/SelectAppStackStep";
-import { UpdateAppStep } from "../commands/steps/creation/UpdateAppStep";
 import { ext } from "../extensionVariables";
 import { EnhancedApp } from '../service/EnhancedApp';
 import { EnhancedService } from '../service/EnhancedService';
@@ -93,7 +92,6 @@ export default class AppsItem implements ResourceItemBase {
         executeSteps.push(new VerifyProvidersStep(['Microsoft.AppPlatform']));
         executeSteps.push(new CreateAppStep(this.service));
         executeSteps.push(new CreateAppDeploymentStep());
-        executeSteps.push(new UpdateAppStep());
         const creating: string = utils.localize('creatingSpringCouldApp', 'Creating new Spring app in Azure');
         const wizard: AzureWizard<IAppCreationWizardContext> = new AzureWizard(wizardContext, { promptSteps, executeSteps, title: creating });
 

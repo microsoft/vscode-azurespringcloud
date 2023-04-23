@@ -153,6 +153,7 @@ export class EnhancedApp {
         // refer: https://dev.azure.com/msazure/AzureDMSS/_git/AzureDMSS-PortalExtension?path=%2Fsrc%2FSpringCloudPortalExt%2FClient%2FShared%2FAppsApi.ts&version=GBdev&_a=contents
         const deployment: DeploymentResource = await this.client.deployments.beginCreateOrUpdateAndWait(this.service.resourceGroup, this.service.name, this.name, name, {
             properties: {
+                active: true,
                 source,
                 deploymentSettings: {
                     resourceRequests: {

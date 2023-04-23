@@ -20,7 +20,6 @@ export class CreateAppDeploymentStep extends AzureWizardExecuteStep<IAppCreation
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const app: EnhancedApp = context.newApp!;
         context.newDeployment = await app.createDeployment(EnhancedApp.DEFAULT_DEPLOYMENT, appRuntime);
-        await app.startDeployment(EnhancedApp.DEFAULT_DEPLOYMENT);
         return Promise.resolve(undefined);
     }
 
