@@ -6,7 +6,7 @@
 import { RemoteDebugging } from "@azure/arm-appplatform";
 import { AzureWizard, AzureWizardExecuteStep, createSubscriptionContext, IActionContext } from "@microsoft/vscode-azext-utils";
 import { window } from "vscode";
-import { Commands } from "../../commands/Commands";
+import { enableRemoteDebugging, openPublicEndpoint, openTestEndpoint } from "../../commands";
 import { EnhancedInstance } from "../../model/EnhancedInstance";
 import { AppInstanceItem } from "../../tree/AppInstanceItem";
 import { AppItem } from "../../tree/AppItem";
@@ -33,7 +33,7 @@ export class DebugController {
 
         if (!config?.enabled) {
             const confirmMsg: string = localize('confirmRemoteDebug', 'Remote debugging should be enabled first before debugging. Do you want to enable it?');
-            void Commands.enableRemoteDebugging(context, node.parent.parent, confirmMsg);
+            void enableRemoteDebugging(context, node.parent.parent, confirmMsg);
             return;
         }
         executeSteps.push(new StartDebuggingProxyStep(instance));
@@ -44,7 +44,7 @@ export class DebugController {
             const action: string | undefined = await window.showInformationMessage(attached, AppItem.ACCESS_PUBLIC_ENDPOINT, AppItem.ACCESS_TEST_ENDPOINT);
             if (action) {
                 const appTreeItem: AppItem = node.parent.parent;
-                action === AppItem.ACCESS_PUBLIC_ENDPOINT ? void Commands.openPublicEndpoint(context, appTreeItem) : void Commands.openTestEndpoint(context, appTreeItem);
+                action === AppItem.ACCESS_PUBLIC_ENDPOINT ? void openPublicEndpoint(context, appTreeItem) : void openTestEndpoint(context, appTreeItem);
             }
         };
         setTimeout(task, 0);

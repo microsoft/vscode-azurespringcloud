@@ -5,7 +5,7 @@ import { RemoteDebugging } from '@azure/arm-appplatform';
 import { AzureWizard, AzureWizardExecuteStep, createSubscriptionContext, IActionContext } from '@microsoft/vscode-azext-utils';
 import { ViewPropertiesModel } from '@microsoft/vscode-azureresources-api';
 import { TreeItem, TreeItemCollapsibleState, Uri, window } from "vscode";
-import { Commands } from "../commands/Commands";
+import { openPublicEndpoint, openTestEndpoint } from '../commands';
 import { ext } from '../extensionVariables';
 import { EnhancedApp } from "../model/EnhancedApp";
 import { EnhancedDeployment } from "../model/EnhancedDeployment";
@@ -93,7 +93,7 @@ export class AppItem implements ResourceItemBase {
         const task: () => void = async () => {
             const action: string | undefined = await window.showInformationMessage(deployed, AppItem.ACCESS_PUBLIC_ENDPOINT, AppItem.ACCESS_TEST_ENDPOINT);
             if (action) {
-                return action === AppItem.ACCESS_PUBLIC_ENDPOINT ? Commands.openPublicEndpoint(context, this) : Commands.openTestEndpoint(context, this);
+                return action === AppItem.ACCESS_PUBLIC_ENDPOINT ? openPublicEndpoint(context, this) : openTestEndpoint(context, this);
             }
         };
         setTimeout(task, 0);
