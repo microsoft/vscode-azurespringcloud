@@ -6,13 +6,13 @@ import { AzureWizard, AzureWizardExecuteStep, createSubscriptionContext, IAction
 import { ViewPropertiesModel } from '@microsoft/vscode-azureresources-api';
 import { TreeItem, TreeItemCollapsibleState, Uri, window } from "vscode";
 import { Commands } from "../commands/Commands";
-import { IAppDeploymentWizardContext } from "../commands/steps/deployment/IAppDeploymentWizardContext";
-import { UpdateDeploymentStep } from "../commands/steps/deployment/UpdateDeploymentStep";
-import { UploadArtifactStep } from "../commands/steps/deployment/UploadArtifactStep";
 import { ext } from '../extensionVariables';
-import { EnhancedApp } from "../service/EnhancedApp";
-import { EnhancedDeployment } from "../service/EnhancedDeployment";
+import { EnhancedApp } from "../model/EnhancedApp";
+import { EnhancedDeployment } from "../model/EnhancedDeployment";
 import * as utils from "../utils";
+import { IAppDeploymentWizardContext } from "../workflows/deploy/IAppDeploymentWizardContext";
+import { UpdateDeploymentStep } from "../workflows/deploy/UpdateDeploymentStep";
+import { UploadArtifactStep } from "../workflows/deploy/UploadArtifactStep";
 import { AppEnvVariablesItem } from "./AppEnvVariablesItem";
 import { AppInstancesItem } from "./AppInstancesItem";
 import { AppJvmOptionsItem } from "./AppJvmOptionsItem";

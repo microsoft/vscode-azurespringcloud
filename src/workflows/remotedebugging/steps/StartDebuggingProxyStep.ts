@@ -4,8 +4,8 @@
 import { AzureWizardExecuteStep, findFreePort } from "@microsoft/vscode-azext-utils";
 import { Progress, window } from "vscode";
 import { ext } from "../../../extensionVariables";
+import { EnhancedInstance } from "../../../model/EnhancedInstance";
 import { localize } from "../../../utils";
-import { EnhancedInstance } from "../../EnhancedInstance";
 import { DebugProxy } from "../DebugProxy";
 import { IRemoteDebuggingContext } from "./IRemoteDebuggingContext";
 

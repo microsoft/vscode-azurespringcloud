@@ -21,7 +21,7 @@ import { AppInstancesItem } from "../tree/AppInstancesItem";
 import { AppItem } from "../tree/AppItem";
 import AppsItem from "../tree/AppsItem";
 import { ResourceItemBase } from "../tree/SpringAppsBranchDataProvider";
-import { localize } from "./index";
+import { localize } from "../utils";
 
 export interface PickItemOptions {
     title?: string;

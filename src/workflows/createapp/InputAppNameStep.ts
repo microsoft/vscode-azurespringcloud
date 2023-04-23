@@ -2,9 +2,9 @@
 // Licensed under the MIT license.
 
 import { AzureNameStep } from "@microsoft/vscode-azext-utils";
-import { EnhancedApp } from "../../../service/EnhancedApp";
-import { EnhancedService } from "../../../service/EnhancedService";
-import { localize } from "../../../utils";
+import { EnhancedApp } from "../../model/EnhancedApp";
+import { EnhancedService } from "../../model/EnhancedService";
+import { localize } from "../../utils";
 import { IAppCreationWizardContext } from "./IAppCreationWizardContext";
 
 export class InputAppNameStep extends AzureNameStep<IAppCreationWizardContext> {

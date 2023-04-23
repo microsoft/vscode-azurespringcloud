@@ -4,8 +4,8 @@
 import { AzureWizardExecuteStep } from "@microsoft/vscode-azext-utils";
 import { debug, DebugSession, Disposable, Progress } from "vscode";
 import { ext } from "../../../extensionVariables";
+import { EnhancedInstance } from "../../../model/EnhancedInstance";
 import { localize } from "../../../utils";
-import { EnhancedInstance } from "../../EnhancedInstance";
 import { IRemoteDebuggingContext } from "./IRemoteDebuggingContext";
 
 export class StartDebugConfigurationStep extends AzureWizardExecuteStep<IRemoteDebuggingContext> {

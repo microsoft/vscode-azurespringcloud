@@ -3,13 +3,13 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
+import { createSubscriptionContext } from "@microsoft/vscode-azext-utils";
 import { EventEmitter } from 'events';
 import { createServer, Server, Socket } from 'net';
 import * as websocket from 'websocket';
 import { ext } from '../../extensionVariables';
-import { EnhancedDeployment } from '../EnhancedDeployment';
-import { EnhancedInstance } from '../EnhancedInstance';
-import { createSubscriptionContext } from "@microsoft/vscode-azext-utils";
+import { EnhancedDeployment } from '../../model/EnhancedDeployment';
+import { EnhancedInstance } from '../../model/EnhancedInstance';
 
 export class DebugProxy extends EventEmitter {
     public readonly port: number;

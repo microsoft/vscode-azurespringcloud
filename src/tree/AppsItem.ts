@@ -12,15 +12,15 @@ import {
 } from '@microsoft/vscode-azext-utils';
 import { ViewPropertiesModel } from "@microsoft/vscode-azureresources-api";
 import { TreeItem, TreeItemCollapsibleState, Uri, window } from "vscode";
-import { CreateAppDeploymentStep } from "../commands/steps/creation/CreateAppDeploymentStep";
-import { CreateAppStep } from "../commands/steps/creation/CreateAppStep";
-import { IAppCreationWizardContext } from "../commands/steps/creation/IAppCreationWizardContext";
-import { InputAppNameStep } from "../commands/steps/creation/InputAppNameStep";
-import { SelectAppStackStep } from "../commands/steps/creation/SelectAppStackStep";
 import { ext } from "../extensionVariables";
-import { EnhancedApp } from '../service/EnhancedApp';
-import { EnhancedService } from '../service/EnhancedService';
+import { EnhancedApp } from '../model/EnhancedApp';
+import { EnhancedService } from '../model/EnhancedService';
 import * as utils from "../utils";
+import { CreateAppDeploymentStep } from "../workflows/createapp/CreateAppDeploymentStep";
+import { CreateAppStep } from "../workflows/createapp/CreateAppStep";
+import { IAppCreationWizardContext } from "../workflows/createapp/IAppCreationWizardContext";
+import { InputAppNameStep } from "../workflows/createapp/InputAppNameStep";
+import { SelectAppStackStep } from "../workflows/createapp/SelectAppStackStep";
 import { AppItem } from "./AppItem";
 import { ResourceItemBase } from "./SpringAppsBranchDataProvider";
 

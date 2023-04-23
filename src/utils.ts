@@ -11,8 +11,8 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { ExtensionContext, ProgressLocation, window } from 'vscode';
 import * as nls from 'vscode-nls';
-import { ext } from "../extensionVariables";
-import { ResourceItemBase } from '../tree/SpringAppsBranchDataProvider';
+import { ext } from "./extensionVariables";
+import { ResourceItemBase } from './tree/SpringAppsBranchDataProvider';
 
 let EXTENSION_PUBLISHER: string;
 let EXTENSION_NAME: string;

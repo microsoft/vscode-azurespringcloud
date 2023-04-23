@@ -20,9 +20,9 @@ import { IActionContext } from "@microsoft/vscode-azext-utils";
 import { AzureSubscription } from "@microsoft/vscode-azureresources-api";
 import { ext } from "../extensionVariables";
 import { localize } from "../utils";
+import { startStreamingLogs, stopStreamingLogs } from "../workflows/streamlog/streamingLog";
 import { EnhancedDeployment } from "./EnhancedDeployment";
 import { EnhancedService } from "./EnhancedService";
-import { startStreamingLogs, stopStreamingLogs } from "./streamlog/streamingLog";
 
 export class EnhancedApp {
     public static readonly DEFAULT_RUNTIME: KnownSupportedRuntimeValue = KnownSupportedRuntimeValue.Java17;

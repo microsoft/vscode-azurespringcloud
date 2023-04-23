@@ -3,8 +3,8 @@
 
 import { AzureWizardExecuteStep } from "@microsoft/vscode-azext-utils";
 import { Progress } from "vscode";
-import { EnhancedApp } from "../../../service/EnhancedApp";
-import { localize } from "../../../utils";
+import { EnhancedApp } from "../../model/EnhancedApp";
+import { localize } from "../../utils";
 import { IAppDeploymentWizardContext } from "./IAppDeploymentWizardContext";
 
 export class UploadArtifactStep extends AzureWizardExecuteStep<IAppDeploymentWizardContext> {

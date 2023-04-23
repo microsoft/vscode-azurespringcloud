@@ -2,8 +2,8 @@
 // Licensed under the MIT license.
 
 import { AzureWizardPromptStep } from "@microsoft/vscode-azext-utils";
-import { EnhancedDeployment } from "../../../../service/EnhancedDeployment";
-import { localize } from "../../../../utils";
+import { EnhancedDeployment } from "../../../model/EnhancedDeployment";
+import { localize } from "../../../utils";
 import { IJvmOptionsUpdateWizardContext } from "./IJvmOptionsUpdateWizardContext";
 
 export class InputJvmOptionsStep extends AzureWizardPromptStep<IJvmOptionsUpdateWizardContext> {

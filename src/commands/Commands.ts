@@ -6,10 +6,9 @@
 import { DialogResponses, IActionContext, openReadOnlyJson, openUrl } from "@microsoft/vscode-azext-utils";
 import { MessageItem, OpenDialogOptions, TextEditor, Uri, WorkspaceFolder, window, workspace } from "vscode";
 import { ext } from "../extensionVariables";
-import { EnhancedApp } from "../service/EnhancedApp";
-import { EnhancedDeployment } from "../service/EnhancedDeployment";
-import { EnhancedService } from "../service/EnhancedService";
-import { DebugController } from "../service/remotedebugging/DebugController";
+import { EnhancedApp } from "../model/EnhancedApp";
+import { EnhancedDeployment } from "../model/EnhancedDeployment";
+import { EnhancedService } from "../model/EnhancedService";
 import { AppEnvVariablesItem } from "../tree/AppEnvVariablesItem";
 import { AppInstanceItem } from "../tree/AppInstanceItem";
 import { AppItem } from "../tree/AppItem";
@@ -17,9 +16,10 @@ import { AppJvmOptionsItem } from "../tree/AppJvmOptionsItem";
 import { AppSettingItem } from "../tree/AppSettingItem";
 import { AppSettingsItem } from "../tree/AppSettingsItem";
 import AppsItem from "../tree/AppsItem";
+import { pickApp, pickAppInstance, pickApps } from "../tree/ItemPicker";
 import { ResourceItemBase } from "../tree/SpringAppsBranchDataProvider";
 import * as utils from "../utils";
-import { pickApp, pickAppInstance, pickApps } from "../utils/ItemPicker";
+import { DebugController } from "../workflows/remotedebugging/DebugController";
 
 export namespace Commands {
 

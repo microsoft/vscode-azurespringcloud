@@ -2,9 +2,9 @@
 // Licensed under the MIT license.
 
 import { AzureWizardPromptStep } from "@microsoft/vscode-azext-utils";
-import { IScaleSettings } from "../../../../model";
-import { EnhancedDeployment } from "../../../../service/EnhancedDeployment";
-import { localize } from "../../../../utils";
+import { IScaleSettings } from "../../../model";
+import { EnhancedDeployment } from "../../../model/EnhancedDeployment";
+import { localize } from "../../../utils";
 import { IScaleSettingsUpdateWizardContext } from "./IScaleSettingsUpdateWizardContext";
 
 export class InputScaleValueStep extends AzureWizardPromptStep<IScaleSettingsUpdateWizardContext> {

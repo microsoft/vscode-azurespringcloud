@@ -3,8 +3,8 @@
 
 import { AzureWizardExecuteStep } from "@microsoft/vscode-azext-utils";
 import { Progress } from "vscode";
-import { EnhancedService } from "../../../service/EnhancedService";
-import { localize, nonNullProp } from "../../../utils";
+import { EnhancedService } from "../../model/EnhancedService";
+import { localize, nonNullProp } from "../../utils";
 import { IAppCreationWizardContext } from "./IAppCreationWizardContext";
 
 export class CreateAppStep extends AzureWizardExecuteStep<IAppCreationWizardContext> {

@@ -3,8 +3,8 @@
 
 import { KnownSupportedRuntimeValue } from "@azure/arm-appplatform";
 import { AzureWizardPromptStep, IAzureQuickPickItem } from "@microsoft/vscode-azext-utils";
-import { EnhancedService } from "../../../service/EnhancedService";
-import { localize } from "../../../utils";
+import { EnhancedService } from "../../model/EnhancedService";
+import { localize } from "../../utils";
 import { IAppCreationWizardContext } from "./IAppCreationWizardContext";
 
 export class SelectAppStackStep extends AzureWizardPromptStep<IAppCreationWizardContext> {

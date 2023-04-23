@@ -8,13 +8,13 @@ import {
     IActionContext
 } from "@microsoft/vscode-azext-utils";
 import { TreeItem, TreeItemCollapsibleState, window } from "vscode";
-import { InputScaleValueStep } from "../commands/steps/settings/scalesettings/InputScaleValueStep";
-import { IScaleSettingsUpdateWizardContext } from "../commands/steps/settings/scalesettings/IScaleSettingsUpdateWizardContext";
-import { UpdateScaleSettingsStep } from "../commands/steps/settings/scalesettings/UpdateScaleSettingsStep";
 import { ext } from "../extensionVariables";
 import { IScaleSettings } from "../model";
-import { EnhancedDeployment } from "../service/EnhancedDeployment";
+import { EnhancedDeployment } from "../model/EnhancedDeployment";
 import { getThemedIconPath, localize } from "../utils";
+import { InputScaleValueStep } from "../workflows/updatesettings/scalesettings/InputScaleValueStep";
+import { IScaleSettingsUpdateWizardContext } from "../workflows/updatesettings/scalesettings/IScaleSettingsUpdateWizardContext";
+import { UpdateScaleSettingsStep } from "../workflows/updatesettings/scalesettings/UpdateScaleSettingsStep";
 import { AppItem } from "./AppItem";
 import { AppSettingItem, IOptions } from "./AppSettingItem";
 import { AppSettingsItem } from "./AppSettingsItem";

@@ -2,8 +2,8 @@
 // Licensed under the MIT license.
 
 import { DeploymentInstance } from "@azure/arm-appplatform";
+import { getLogStreamId, ILogStream, logStreams } from "../workflows/streamlog/streamingLog";
 import { EnhancedDeployment } from "./EnhancedDeployment";
-import { getLogStreamId, ILogStream, logStreams } from "./streamlog/streamingLog";
 
 export class EnhancedInstance implements DeploymentInstance {
 

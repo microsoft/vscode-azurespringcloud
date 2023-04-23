@@ -2,8 +2,8 @@
 // Licensed under the MIT license.
 
 import { TreeItem, TreeItemCollapsibleState } from "vscode";
-import { EnhancedDeployment } from "../service/EnhancedDeployment";
-import { EnhancedInstance } from "../service/EnhancedInstance";
+import { EnhancedDeployment } from "../model/EnhancedDeployment";
+import { EnhancedInstance } from "../model/EnhancedInstance";
 import { getThemedIconPath, localize } from "../utils";
 import { AppInstanceItem } from "./AppInstanceItem";
 import { AppItem } from './AppItem';

@@ -9,7 +9,7 @@ import { callWithTelemetryAndErrorHandling, createSubscriptionContext, IActionCo
 import { AzureResource, AzureResourceBranchDataProvider, AzureSubscription, ResourceModelBase } from '@microsoft/vscode-azureresources-api';
 import * as vscode from 'vscode';
 import { ext } from '../extensionVariables';
-import { EnhancedService } from '../service/EnhancedService';
+import { EnhancedService } from '../model/EnhancedService';
 import AppsItem from './AppsItem';
 
 export interface ResourceItemBase extends ResourceModelBase {
