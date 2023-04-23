@@ -11,6 +11,7 @@ import { EnhancedApp } from "../model/EnhancedApp";
 import { EnhancedDeployment } from "../model/EnhancedDeployment";
 import * as utils from "../utils";
 import { IAppDeploymentWizardContext } from "../workflows/deploy/IAppDeploymentWizardContext";
+import { OpenLogStreamStep } from '../workflows/deploy/OpenLogStreamStep';
 import { UpdateDeploymentStep } from "../workflows/deploy/UpdateDeploymentStep";
 import { UploadArtifactStep } from "../workflows/deploy/UploadArtifactStep";
 import { AppEnvVariablesItem } from "./AppEnvVariablesItem";
@@ -87,6 +88,7 @@ export class AppItem implements ResourceItemBase {
         const executeSteps: AzureWizardExecuteStep<IAppDeploymentWizardContext>[] = [];
         executeSteps.push(new UploadArtifactStep(this.app, artifactPath));
         executeSteps.push(new UpdateDeploymentStep(deployment));
+        executeSteps.push(new OpenLogStreamStep(deployment));
         const wizard: AzureWizard<IAppDeploymentWizardContext> = new AzureWizard(wizardContext, { executeSteps, title: deploying });
         const description = utils.localize('deploying', 'Deploying...');
         await ext.state.runWithTemporaryDescription(this.id, description, () => wizard.execute());

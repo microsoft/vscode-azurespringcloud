@@ -6,6 +6,7 @@ import { ext } from "../extensionVariables";
 import { IScaleSettings } from "../model";
 import { localize } from "../utils";
 import { EnhancedApp } from "./EnhancedApp";
+import { EnhancedInstance } from "./EnhancedInstance";
 
 export class EnhancedDeployment {
     private static readonly VALID_ENV_VAR_KEY: RegExp = /^[a-zA-Z_][\w.-]*$/;
@@ -54,6 +55,15 @@ export class EnhancedDeployment {
 
     private get client(): AppPlatformManagementClient {
         return this.app.client;
+    }
+
+    public get instances(): EnhancedInstance[] {
+        return this.properties?.instances?.map(instance => new EnhancedInstance(this, instance)) ?? [];
+    }
+
+    public get latestInstance(): EnhancedInstance {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        return this.instances.reduce((prev, current) => (prev.startTime! > current.startTime!) ? prev : current)
     }
 
     public async refresh(): Promise<EnhancedDeployment> {

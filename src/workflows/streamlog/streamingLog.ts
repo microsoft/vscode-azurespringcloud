@@ -74,7 +74,7 @@ async function getLogRequest(testKey: TestKeys, app: string, instance: string): 
     const httpRequest: WebResource = new WebResource();
     await signRequest(testKey.primaryKey ?? '', httpRequest);
     const requestApi: request.RequestAPI<request.Request, request.CoreOptions, {}> = request.defaults(httpRequest);
-    return requestApi(`${(testKey.primaryTestEndpoint ?? '').replace('.test', '')}/api/logstream/apps/${app}/instances/${instance}?follow=true&tailLines=10`);
+    return requestApi(`${(testKey.primaryTestEndpoint ?? '').replace('.test', '')}/api/logstream/apps/${app}/instances/${instance}?follow=true&tailLines=500`);
 }
 
 export function getLogStreamId(app: string, instance: DeploymentInstance): string {
