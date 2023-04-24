@@ -1,13 +1,15 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 import { TestKeys } from "@azure/arm-appplatform";
-import { BasicAuthenticationCredentials, WebResource } from "@azure/ms-rest-js";
-import { IActionContext, parseError } from '@microsoft/vscode-azext-utils';
-import * as request from 'request';
+import { IActionContext, createSubscriptionContext, parseError } from '@microsoft/vscode-azext-utils';
+import { AzureSubscription } from "@microsoft/vscode-azureresources-api";
+import axios, { AxiosResponse } from 'axios';
+import { IncomingMessage } from "http";
 import * as vscode from 'vscode';
 import { ext } from '../../extensionVariables';
 import { EnhancedApp } from "../../model/EnhancedApp";
 import { EnhancedInstance } from '../../model/EnhancedInstance';
+import { EnhancedService } from "../../model/EnhancedService";
 import { localize } from '../../utils';
 
 export interface ILogStream extends vscode.Disposable {
@@ -30,16 +32,18 @@ export async function startStreamingLogs(context: IActionContext, instance: Enha
         ext.context.subscriptions.push(outputChannel);
         outputChannel.show();
         outputChannel.appendLine(localize('connectingToLogStream', 'Connecting to log-streaming service...'));
-        const logsRequest: request.Request = await getLogRequest(instance);
-        const newLogStream: ILogStream = createLogStream(outputChannel, logsRequest);
-        logsRequest.on('data', (chunk: Buffer | string) => {
+        const response: IncomingMessage = await getLogRequest(instance);
+        const newLogStream: ILogStream = createLogStream(outputChannel, response);
+        response.on('data', (chunk: Buffer | string) => {
             outputChannel.append(chunk.toString());
         }).on('error', (err: Error) => {
             newLogStream.isConnected = false;
             outputChannel.show();
             outputChannel.appendLine(localize('logStreamError', 'Error connecting to log-streaming service:'));
             outputChannel.appendLine(parseError(err).message);
-        }).on('complete', () => {
+        }).on('close', () => {
+            newLogStream.dispose();
+        }).on('end', () => {
             newLogStream.dispose();
         });
         logStreams.set(logStreamId, newLogStream);
@@ -57,11 +61,11 @@ export async function stopStreamingLogs(instance: EnhancedInstance): Promise<voi
     }
 }
 
-function createLogStream(outputChannel: vscode.OutputChannel, logsRequest: request.Request): ILogStream {
+function createLogStream(outputChannel: vscode.OutputChannel, response: IncomingMessage): ILogStream {
     const newLogStream: ILogStream = {
         dispose: (): void => {
-            logsRequest.removeAllListeners();
-            logsRequest.destroy();
+            response.removeAllListeners();
+            response.destroy()
             outputChannel.show();
             outputChannel.appendLine(localize('logStreamDisconnected', 'Disconnected from log-streaming service.'));
             newLogStream.isConnected = false;
@@ -72,20 +76,37 @@ function createLogStream(outputChannel: vscode.OutputChannel, logsRequest: reque
     return newLogStream;
 }
 
-async function getLogRequest(instance: EnhancedInstance): Promise<request.Request> {
+async function getLogRequest(instance: EnhancedInstance): Promise<IncomingMessage> {
     const app: EnhancedApp = instance.deployment.app;
-    const httpRequest: WebResource = new WebResource();
-    const testKeys: TestKeys = await app.getTestKeys();
-    await signRequest(testKeys.primaryKey ?? '', httpRequest);
-    const requestApi: request.RequestAPI<request.Request, request.CoreOptions, {}> = request.defaults(httpRequest);
-    return requestApi(`${(testKeys.primaryTestEndpoint ?? '').replace('.test', '')}/api/logstream/apps/${app.name}/instances/${instance.name}?follow=true&tailLines=500`);
+    const service: EnhancedService = app.service;
+    if (app.service.isConsumptionTier()) {
+        const subscription: AzureSubscription = service.subscription;
+        const subContext = createSubscriptionContext(subscription);
+        const token: { token: string } = <{ token: string }>await subContext.credentials.getToken();
+        // refer to https://github.com/Azure/azure-cli-extensions/blob/main/src/spring/azext_spring/custom.py#L511
+        const url = `https://${service.properties?.fqdn}/proxy/logstream${instance.id}?tailLines=300&tenantId=${subscription.tenantId}`;
+        const response: AxiosResponse<IncomingMessage> = await axios.get(url, {
+            headers: {
+                Authorization: `Bearer ${token.token}`
+            },
+            responseType: 'stream'
+        });
+        return response.data;
+    } else {
+        const testKeys: TestKeys = await app.getTestKeys();
+        const credentials = `${primaryName}:${testKeys.primaryKey ?? ''}`;
+        const encodedCredentials = Buffer.from(credentials).toString("base64");
+        const url = `${(testKeys.primaryTestEndpoint ?? '').replace('.test', '')}/api/logstream/apps/${app.name}/instances/${instance.name}?follow=true&tailLines=300`;
+        const response: AxiosResponse<IncomingMessage> = await axios.get(url, {
+            headers: {
+                Authorization: `Basic ${encodedCredentials}`
+            },
+            responseType: 'stream'
+        });
+        return response.data;
+    }
 }
 
 export function getLogStreamId(instance: EnhancedInstance): string {
     return `${instance.deployment.app.name}-${instance.name}`;
-}
-
-async function signRequest(primaryKey: string, httpRequest: WebResource): Promise<void> {
-    const credential: BasicAuthenticationCredentials = new BasicAuthenticationCredentials(primaryName, primaryKey);
-    await credential.signRequest(httpRequest);
 }

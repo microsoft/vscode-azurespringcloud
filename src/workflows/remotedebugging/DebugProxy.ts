@@ -143,7 +143,7 @@ export class DebugProxy extends EventEmitter {
     private async connect(serverPort: number): Promise<void> {
         const deployment: EnhancedDeployment = this._instance.deployment;
         const subContext = createSubscriptionContext(deployment.app.service.subscription);
-        const credential: { accessToken: string } = <{ accessToken: string }>await subContext.credentials.getToken();
+        const credential: { token: string } = <{ token: string }>await subContext.credentials.getToken();
         const appName: string = deployment.app.name;
         const deploymentName: string = deployment.name;
         const instanceName: string = this._instance.name ?? 'unknown-instance';
@@ -158,7 +158,7 @@ export class DebugProxy extends EventEmitter {
             {
                 Upgrade: 'websocket',
                 Connection: 'Upgrade',
-                Authorization: `Bearer ${credential.accessToken}`
+                Authorization: `Bearer ${credential.token}`
             }
         );
         ext.outputChannel.appendLog(`[Proxy Server] connected server "${url}"`);
