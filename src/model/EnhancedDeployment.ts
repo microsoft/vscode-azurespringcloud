@@ -26,6 +26,10 @@ export class EnhancedDeployment {
         this._remote = resource;
     }
 
+    get runtimeVersion(): string | undefined {
+        return (this.properties?.source as JarUploadedUserSourceInfo)?.runtimeVersion;
+    }
+
     public static validateKey(v: string): string | undefined {
         if (!v.trim()) {
             return localize("emptyEnvVarKey", `The key can not be empty.`);
