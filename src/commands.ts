@@ -19,13 +19,15 @@ import { pickApp, pickAppInstance, pickApps } from "./tree/ItemPicker";
 import { ResourceItemBase } from "./tree/SpringAppsBranchDataProvider";
 import * as utils from "./utils";
 import { showError } from './utils';
+import { createApp } from './workflows/createapp/createApp';
+import { deployArtifact } from './workflows/deploy/deployArtifact';
 import { DebugController } from "./workflows/remotedebugging/DebugController";
 
 export function registerCommands(): void {
     registerCommandWithTelemetryWrapper('azureSpringApps.common.refresh', refreshNode);
     registerCommandWithTelemetryWrapper('azureSpringApps.common.toggleVisibility', toggleVisibility);
     registerCommandWithTelemetryWrapper('azureSpringApps.apps.createInPortal', createServiceInPortal);
-    registerCommandWithTelemetryWrapper('azureSpringApps.app.create', createApp);
+    registerCommandWithTelemetryWrapper('azureSpringApps.app.create', createSpringApp);
     registerCommandWithTelemetryWrapper('azureSpringApps.apps.delete', deleteService);
     registerCommandWithTelemetryWrapper('azureSpringApps.app.openPublicEndpoint', openPublicEndpoint);
     registerCommandWithTelemetryWrapper('azureSpringApps.app.openTestEndpoint', openTestEndpoint);
@@ -77,9 +79,9 @@ export async function createServiceInPortal(_context: IActionContext): Promise<v
     await openUrl('https://portal.azure.com/#create/Microsoft.AppPlatform');
 }
 
-export async function createApp(context: IActionContext, n?: AppsItem): Promise<void> {
+export async function createSpringApp(context: IActionContext, n?: AppsItem): Promise<void> {
     const item: AppsItem = await getAppsItem(context, n);
-    await item.createChild(context);
+    await createApp(context, item);
 }
 
 export async function deleteService(context: IActionContext, n?: AppsItem): Promise<void> {
@@ -171,7 +173,7 @@ export async function deploy(context: IActionContext, n?: AppItem): Promise<void
     const fileUri: Uri[] | undefined = await window.showOpenDialog(options);
     if (fileUri && fileUri[0] !== undefined) {
         const artifactPath: string = fileUri[0].fsPath;
-        await item.deployArtifact(context, artifactPath);
+        await deployArtifact(context, item, artifactPath);
     }
 }
 
@@ -196,7 +198,7 @@ export async function deployFromFile(context: IActionContext, defaultUri?: Uri, 
     if (jarFile) {
         const item: AppItem = await getAppItem(context, undefined);
         const artifactPath: string = jarFile.fsPath;
-        await item.deployArtifact(context, artifactPath);
+        await deployArtifact(context, item, artifactPath);
     }
 }
 

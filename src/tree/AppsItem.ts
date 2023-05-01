@@ -3,24 +3,13 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { VerifyProvidersStep } from "@microsoft/vscode-azext-azureutils";
-import {
-    AzureWizard,
-    AzureWizardExecuteStep,
-    AzureWizardPromptStep, createSubscriptionContext,
-    IActionContext
-} from '@microsoft/vscode-azext-utils';
+import { IActionContext } from '@microsoft/vscode-azext-utils';
 import { ViewPropertiesModel } from "@microsoft/vscode-azureresources-api";
-import { TreeItem, TreeItemCollapsibleState, Uri, window } from "vscode";
+import { TreeItem, TreeItemCollapsibleState, Uri } from "vscode";
 import { ext } from "../extensionVariables";
 import { EnhancedApp } from '../model/EnhancedApp';
 import { EnhancedService } from '../model/EnhancedService';
 import * as utils from "../utils";
-import { CreateAppDeploymentStep } from "../workflows/createapp/CreateAppDeploymentStep";
-import { CreateAppStep } from "../workflows/createapp/CreateAppStep";
-import { IAppCreationWizardContext } from "../workflows/createapp/IAppCreationWizardContext";
-import { InputAppNameStep } from "../workflows/createapp/InputAppNameStep";
-import { SelectAppStackStep } from "../workflows/createapp/SelectAppStackStep";
 import { AppItem } from "./AppItem";
 import { ResourceItemBase } from "./SpringAppsBranchDataProvider";
 
@@ -80,38 +69,6 @@ export default class AppsItem implements ResourceItemBase {
             this._deleted = true;
             ext.branchDataProvider.refresh();
         });
-    }
-
-    public async createChild(context: IActionContext): Promise<AppItem> {
-        const subContext = createSubscriptionContext(this.service.subscription);
-        const wizardContext: IAppCreationWizardContext = Object.assign(context, subContext, { service: this.service });
-        const promptSteps: AzureWizardPromptStep<IAppCreationWizardContext>[] = [];
-        const executeSteps: AzureWizardExecuteStep<IAppCreationWizardContext>[] = [];
-        promptSteps.push(new InputAppNameStep(this.service));
-        promptSteps.push(new SelectAppStackStep(this.service));
-        executeSteps.push(new VerifyProvidersStep(['Microsoft.AppPlatform']));
-        executeSteps.push(new CreateAppStep(this.service));
-        executeSteps.push(new CreateAppDeploymentStep());
-        const creating: string = utils.localize('creatingSpringCouldApp', 'Creating new Spring app in Azure');
-        const wizard: AzureWizard<IAppCreationWizardContext> = new AzureWizard(wizardContext, { promptSteps, executeSteps, title: creating });
-
-        await wizard.prompt();
-        const appName: string = utils.nonNullProp(wizardContext, 'newAppName');
-        await ext.state.showCreatingChild(
-            this.id,
-            utils.localize('createApp', 'Create App "{0}"...', appName),
-            async () => {
-                try {
-                    await wizard.execute();
-                } finally {
-                    // refresh this node even if create fails because container app provision failure throws an error, but still creates a container app
-                    await this.refresh();
-                    ext.state.notifyChildrenChanged(this.id);
-                }
-            });
-        const created: string = utils.localize('createdSpringCouldApp', 'Successfully created Spring app "{0}".', appName);
-        void window.showInformationMessage(created);
-        return new AppItem(this, utils.nonNullProp(wizardContext, 'newApp'));
     }
 
     public async refresh(): Promise<void> {
