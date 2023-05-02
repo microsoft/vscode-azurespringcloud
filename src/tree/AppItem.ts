@@ -64,7 +64,7 @@ export class AppItem implements ResourceItemBase {
 
     public get description(): string | undefined {
         const state: string | undefined = this.app.properties?.provisioningState;
-        return state?.toLowerCase() === 'succeeded' ? undefined : state;
+        return state?.toLowerCase() === 'succeeded' ? this.app.activeDeployment?.runtimeVersion?.split(/[\s\_]/).join(" ") : state;
     }
 
     public get contextValue(): string {

@@ -29,7 +29,7 @@ export class EnhancedApp {
     public readonly id: string;
     public readonly service: EnhancedService;
     private _remote: AppResource;
-    private activeDeployment: EnhancedDeployment | undefined;
+    private _activeDeployment: EnhancedDeployment | undefined;
 
     public constructor(service: EnhancedService, resource: AppResource) {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -51,6 +51,10 @@ export class EnhancedApp {
 
     get subscription(): AzureSubscription {
         return this.service.subscription;
+    }
+
+    get activeDeployment(): EnhancedDeployment | undefined {
+        return this._activeDeployment;
     }
 
     public async getStatus(): Promise<string> {
@@ -106,7 +110,7 @@ export class EnhancedApp {
     public async refresh(): Promise<EnhancedApp> {
         ext.outputChannel.appendLog(`[App] refreshing app ${this.name}.`);
         this._remote = await this.client.apps.get(this.service.resourceGroup, this.service.name, this.name);
-        this.activeDeployment = undefined;
+        this._activeDeployment = undefined;
         await this.getActiveDeployment(true);
         ext.outputChannel.appendLog(`[App] app ${this.name} is refreshed.`);
         return this;
@@ -122,12 +126,12 @@ export class EnhancedApp {
     }
 
     public async getActiveDeployment(force: boolean = false): Promise<EnhancedDeployment | undefined> {
-        if (force || !this.activeDeployment) {
+        if (force || !this._activeDeployment) {
             ext.outputChannel.appendLog(`[App] loading active deployment of app (${this.name}).`);
-            this.activeDeployment = (await this.getDeployments()).find(d => d.properties?.active);
-            ext.outputChannel.appendLog(`[App] active deployment(${this.activeDeployment?.name}) of app (${this.name}) is loaded.`);
+            this._activeDeployment = (await this.getDeployments()).find(d => d.properties?.active);
+            ext.outputChannel.appendLog(`[App] active deployment(${this._activeDeployment?.name}) of app (${this.name}) is loaded.`);
         }
-        return this.activeDeployment;
+        return this._activeDeployment;
     }
 
     public async setActiveDeployment(deploymentName: string): Promise<void> {
