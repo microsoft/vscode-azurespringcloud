@@ -187,6 +187,9 @@ export class EnhancedApp {
     }
 
     public async getTestEndpoint(): Promise<string | undefined> {
+        if (this.service.isConsumptionTier()) {
+            throw new Error(`Test endpoint is not supported for apps of consumption plan.`);
+        }
         const testKeys: TestKeys | undefined = await this.getTestKeys();
         return `${testKeys.primaryTestEndpoint}/${this.name}/default`;
     }

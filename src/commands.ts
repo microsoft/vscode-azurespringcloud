@@ -109,6 +109,10 @@ export async function openPublicEndpoint(context: IActionContext, n?: AppItem): 
 export async function openTestEndpoint(context: IActionContext, n?: AppItem): Promise<void> {
     const item: AppItem = await getAppItem(context, n);
     const app: EnhancedApp = item.app;
+    if (!app.service.isConsumptionTier()) {
+        void window.showErrorMessage(`Test endpoint is not supported for Azure Spring apps of consumption plan for now.`);
+        return;
+    }
     const endpoint: string | undefined = await app.getTestEndpoint();
     if (endpoint && endpoint.toLowerCase() !== 'none') {
         await openUrl(endpoint);
