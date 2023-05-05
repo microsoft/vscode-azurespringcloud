@@ -41,6 +41,10 @@ export class EnhancedService {
         return this._remote.location;
     }
 
+    public get remote(): ServiceResource {
+        return this._remote;
+    }
+
     public async createApp(name: string): Promise<EnhancedApp> {
         ext.outputChannel.appendLog(`[App] creating app (${this.name}).`);
         const app: AppResource = await this.client.apps.beginCreateOrUpdateAndWait(this.resourceGroup, this.name, name, {

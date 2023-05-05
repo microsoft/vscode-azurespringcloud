@@ -35,7 +35,7 @@ export class AppItem implements ResourceItemBase {
     get viewProperties(): ViewPropertiesModel {
         return {
             label: this.app.name,
-            data: this.app.properties ?? {},
+            data: this.app.remote
         };
     }
 

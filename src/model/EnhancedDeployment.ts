@@ -70,6 +70,10 @@ export class EnhancedDeployment {
         return this.instances.reduce((prev, current) => (prev.startTime! > current.startTime!) ? prev : current)
     }
 
+    public get remote(): DeploymentResource {
+        return this._remote;
+    }
+
     public async refresh(): Promise<EnhancedDeployment> {
         ext.outputChannel.appendLog(`[Deployment] refreshing deployment ${this.name}.`);
         this._remote = await this.client.deployments.get(this.app.service.resourceGroup, this.app.service.name, this.app.name, this.name);

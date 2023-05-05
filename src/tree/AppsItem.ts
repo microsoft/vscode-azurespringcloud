@@ -50,7 +50,7 @@ export default class AppsItem implements ResourceItemBase {
     get viewProperties(): ViewPropertiesModel {
         return {
             label: this.service.name,
-            data: this.service.properties ?? {},
+            data: this.service.remote
         };
     }
 

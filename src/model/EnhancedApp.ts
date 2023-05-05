@@ -57,6 +57,10 @@ export class EnhancedApp {
         return this._activeDeployment;
     }
 
+    public get remote(): AppResource {
+        return this._remote;
+    }
+
     public async getStatus(): Promise<string> {
         const activeDeployment: EnhancedDeployment | undefined = await this.getActiveDeployment();
         let _status: string = ((activeDeployment?.properties?.status ||
