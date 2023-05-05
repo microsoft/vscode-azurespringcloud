@@ -20,7 +20,7 @@ export class InputConsumptionPlanScaleOutValueStep extends AzureWizardPromptStep
     }
 
     public async prompt(context: IScaleSettingsUpdateWizardContext): Promise<void> {
-        const prompt: string = `Enter new value of "Max replicas" that'll be deployed in response to a trigger event. Use scale rules to determine the type of events that trigger scaling.`;
+        const prompt: string = `Enter new value of "Max replicas" that'll be deployed in response to a trigger event.`;
         const settings: IScaleSettings = this.deployment.getScaleSettings();
         const value: string = `${settings.capacity}`;
         context.newSettings.capacity = Number((await context.ui.showInputBox({ prompt, value, validateInput: this.validateInput })).trim());

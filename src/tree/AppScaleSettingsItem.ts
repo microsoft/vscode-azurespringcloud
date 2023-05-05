@@ -93,12 +93,14 @@ export class AppScaleSettingsItem extends AppSettingsItem {
         throw new Error('Scale settings can not be deleted.');
     }
 
-    protected loadChildren(): Promise<AppSettingItem[] | undefined> {
-        return (async () => {
-            const deployment: EnhancedDeployment | undefined = await this.parent.app.getActiveDeployment();
-            const settings: IScaleSettings = deployment?.getScaleSettings() ?? {};
-            return Object.entries(settings)
-                .map(e => new AppSettingItem(this, e[0].trim(), `${e[1]}`.trim(), Object.assign({ label: IScaleSettings.LABELS[e[0]] }, AppScaleSettingsItem._options)));
-        })();
+    protected async loadChildren(): Promise<AppSettingItem[] | undefined> {
+        const deployment: EnhancedDeployment | undefined = await this.parent.app.getActiveDeployment();
+        const settings: IScaleSettings = deployment?.getScaleSettings() ?? {};
+        const capacityLabel: string = this.parent.app.service.isConsumptionTier() ? 'Max replicas' : 'Instance count';
+        return [
+            new AppSettingItem(this, 'capacity', `${settings.capacity}`.trim(), Object.assign({ label: capacityLabel }, AppScaleSettingsItem._options)),
+            new AppSettingItem(this, 'cpu', `${settings.cpu}`.trim(), Object.assign({ label: 'vCPU' }, AppScaleSettingsItem._options)),
+            new AppSettingItem(this, 'memory', `${settings.memory}`.trim(), Object.assign({ label: 'Memory/GB' }, AppScaleSettingsItem._options))
+        ];
     }
 }

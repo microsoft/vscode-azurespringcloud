@@ -10,7 +10,7 @@ export class InputConsumptionPlanScaleUpValueStep extends AzureWizardPromptStep<
     // refer https://github.com/microsoft/vscode-azuretools/issues/789
     public supportsDuplicateSteps: boolean = true;
     private readonly deployment: EnhancedDeployment;
-    private static picks: IAzureQuickPickItem<[number, number]>[] = [
+    private picks: IAzureQuickPickItem<[number, number]>[] = [
         { label: 'vCPU: 0.25, Memory: 512Mi', data: [0.25, 0.5] },
         { label: 'vCPU: 0.50, Memory: 1.0Gi', data: [0.5, 1] },
         { label: 'vCPU: 0.75, Memory: 1.5Gi', data: [0.75, 1.5] },
@@ -24,16 +24,15 @@ export class InputConsumptionPlanScaleUpValueStep extends AzureWizardPromptStep<
     constructor(deployment: EnhancedDeployment) {
         super();
         this.deployment = deployment;
+        const settings: IScaleSettings = this.deployment.getScaleSettings();
+        const current = this.picks.find(p => p.data[1] === settings.memory);
+        current && (current.description = 'current');
     }
 
     public async prompt(context: IScaleSettingsUpdateWizardContext): Promise<void> {
-        const prompt: string = `Scale your application by adjusting the amount of vCPU and memory.`;
-        const settings: IScaleSettings = this.deployment.getScaleSettings();
-        const options: IAzureQuickPickOptions = {
-            placeHolder: prompt,
-            isPickSelected: (i: IAzureQuickPickItem<[number, number]>) => settings.memory === i[1]
-        };
-        const selection: [number, number] = (await context.ui.showQuickPick(InputConsumptionPlanScaleUpValueStep.picks, options)).data;
+        const placeHolder: string = `Scale your application by selecting one of the following combinations of the vCPU and memory allocation.`;
+        const options: IAzureQuickPickOptions = { placeHolder };
+        const selection: [number, number] = (await context.ui.showQuickPick(this.picks, options)).data;
         context.newSettings.cpu = selection[0];
         context.newSettings.memory = selection[1];
         return Promise.resolve(undefined);
