@@ -3,7 +3,7 @@
 
 import { ViewPropertiesModel } from "@microsoft/vscode-azureresources-api";
 import { TreeItem } from "vscode";
-import { EnhancedInstance } from "../service/EnhancedInstance";
+import { EnhancedInstance } from "../model/EnhancedInstance";
 import { getThemedIconPath } from "../utils";
 import { AppInstancesItem } from "./AppInstancesItem";
 import { ResourceItemBase } from "./SpringAppsBranchDataProvider";

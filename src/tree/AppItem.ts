@@ -2,16 +2,12 @@
 // Licensed under the MIT license.
 
 import { RemoteDebugging } from '@azure/arm-appplatform';
-import { AzureWizard, AzureWizardExecuteStep, createSubscriptionContext, IActionContext } from '@microsoft/vscode-azext-utils';
+import { IActionContext } from '@microsoft/vscode-azext-utils';
 import { ViewPropertiesModel } from '@microsoft/vscode-azureresources-api';
-import { TreeItem, TreeItemCollapsibleState, Uri, window } from "vscode";
-import { Commands } from "../commands/Commands";
-import { IAppDeploymentWizardContext } from "../commands/steps/deployment/IAppDeploymentWizardContext";
-import { UpdateDeploymentStep } from "../commands/steps/deployment/UpdateDeploymentStep";
-import { UploadArtifactStep } from "../commands/steps/deployment/UploadArtifactStep";
+import { TreeItem, TreeItemCollapsibleState, Uri } from "vscode";
 import { ext } from '../extensionVariables';
-import { EnhancedApp } from "../service/EnhancedApp";
-import { EnhancedDeployment } from "../service/EnhancedDeployment";
+import { EnhancedApp } from "../model/EnhancedApp";
+import { EnhancedDeployment } from "../model/EnhancedDeployment";
 import * as utils from "../utils";
 import { AppEnvVariablesItem } from "./AppEnvVariablesItem";
 import { AppInstancesItem } from "./AppInstancesItem";
@@ -39,7 +35,7 @@ export class AppItem implements ResourceItemBase {
     get viewProperties(): ViewPropertiesModel {
         return {
             label: this.app.name,
-            data: this.app.properties ?? {},
+            data: this.app.remote
         };
     }
 
@@ -68,35 +64,12 @@ export class AppItem implements ResourceItemBase {
 
     public get description(): string | undefined {
         const state: string | undefined = this.app.properties?.provisioningState;
-        return state?.toLowerCase() === 'succeeded' ? undefined : state;
+        return state?.toLowerCase() === 'succeeded' ? this.app.activeDeployment?.runtimeVersion?.split(/[\s\_]/).join(" ") : state;
     }
 
     public get contextValue(): string {
         const debugging: string = this._debuggingEnabled === undefined ? 'unknown' : this._debuggingEnabled ? 'enabled' : 'disabled'
         return `azureSpringApps.app;status-${this._status};debugging-${debugging};public-${this.app.properties?.public};`;
-    }
-
-    public async deployArtifact(context: IActionContext, artifactPath: string): Promise<void> {
-        const deployment: EnhancedDeployment | undefined = await this.app.getActiveDeployment();
-        if (!deployment) {
-            throw new Error(`App "${this.app.name}" has no active deployment.`);
-        }
-        const deploying: string = utils.localize('deploying', 'Deploying artifact to "{0}".', this.app.name);
-        const deployed: string = utils.localize('deployed', 'Successfully deployed artifact to "{0}".', this.app.name);
-        const wizardContext: IAppDeploymentWizardContext = Object.assign(context, createSubscriptionContext(this.app.service.subscription), { app: this.app });
-        const executeSteps: AzureWizardExecuteStep<IAppDeploymentWizardContext>[] = [];
-        executeSteps.push(new UploadArtifactStep(this.app, artifactPath));
-        executeSteps.push(new UpdateDeploymentStep(deployment));
-        const wizard: AzureWizard<IAppDeploymentWizardContext> = new AzureWizard(wizardContext, { executeSteps, title: deploying });
-        const description = utils.localize('deploying', 'Deploying...');
-        await ext.state.runWithTemporaryDescription(this.id, description, () => wizard.execute());
-        const task: () => void = async () => {
-            const action: string | undefined = await window.showInformationMessage(deployed, AppItem.ACCESS_PUBLIC_ENDPOINT, AppItem.ACCESS_TEST_ENDPOINT);
-            if (action) {
-                return action === AppItem.ACCESS_PUBLIC_ENDPOINT ? Commands.openPublicEndpoint(context, this) : Commands.openTestEndpoint(context, this);
-            }
-        };
-        setTimeout(task, 0);
     }
 
     public async scaleInstances(context: IActionContext): Promise<void> {

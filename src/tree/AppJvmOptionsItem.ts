@@ -11,13 +11,13 @@ import {
 } from "@microsoft/vscode-azext-utils";
 import * as vscode from "vscode";
 import { window } from "vscode";
-import { IJvmOptionsUpdateWizardContext } from "../commands/steps/settings/jvmoptions/IJvmOptionsUpdateWizardContext";
-import { InputJvmOptionsStep } from "../commands/steps/settings/jvmoptions/InputJvmOptionsStep";
-import { UpdateJvmOptionsStep } from "../commands/steps/settings/jvmoptions/UpdateJvmOptionsStep";
 import { ext } from "../extensionVariables";
-import { EnhancedDeployment } from "../service/EnhancedDeployment";
+import { EnhancedDeployment } from "../model/EnhancedDeployment";
 import * as utils from "../utils";
 import { getThemedIconPath, localize } from "../utils";
+import { IJvmOptionsUpdateWizardContext } from "../workflows/updatesettings/jvmoptions/IJvmOptionsUpdateWizardContext";
+import { InputJvmOptionsStep } from "../workflows/updatesettings/jvmoptions/InputJvmOptionsStep";
+import { UpdateJvmOptionsStep } from "../workflows/updatesettings/jvmoptions/UpdateJvmOptionsStep";
 import { AppItem } from "./AppItem";
 import { AppSettingItem, IOptions } from "./AppSettingItem";
 import { AppSettingsItem } from "./AppSettingsItem";

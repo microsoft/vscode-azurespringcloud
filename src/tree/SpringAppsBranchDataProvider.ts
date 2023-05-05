@@ -9,7 +9,7 @@ import { callWithTelemetryAndErrorHandling, createSubscriptionContext, IActionCo
 import { AzureResource, AzureResourceBranchDataProvider, AzureSubscription, ResourceModelBase } from '@microsoft/vscode-azureresources-api';
 import * as vscode from 'vscode';
 import { ext } from '../extensionVariables';
-import { EnhancedService } from '../service/EnhancedService';
+import { EnhancedService } from '../model/EnhancedService';
 import AppsItem from './AppsItem';
 
 export interface ResourceItemBase extends ResourceModelBase {
@@ -54,6 +54,7 @@ export class SpringAppsBranchDataProvider extends vscode.Disposable implements A
                 const subContext = createSubscriptionContext(element.subscription);
                 const client: AppPlatformManagementClient = createAzureClient([context, subContext], AppPlatformManagementClient);
                 const apps: EnhancedService = new EnhancedService(client, element.subscription, element);
+                await apps.refresh();
                 return new AppsItem(apps);
             });
 

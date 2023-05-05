@@ -8,13 +8,15 @@ import {
     IActionContext
 } from "@microsoft/vscode-azext-utils";
 import { TreeItem, TreeItemCollapsibleState, window } from "vscode";
-import { InputScaleValueStep } from "../commands/steps/settings/scalesettings/InputScaleValueStep";
-import { IScaleSettingsUpdateWizardContext } from "../commands/steps/settings/scalesettings/IScaleSettingsUpdateWizardContext";
-import { UpdateScaleSettingsStep } from "../commands/steps/settings/scalesettings/UpdateScaleSettingsStep";
 import { ext } from "../extensionVariables";
 import { IScaleSettings } from "../model";
-import { EnhancedDeployment } from "../service/EnhancedDeployment";
+import { EnhancedDeployment } from "../model/EnhancedDeployment";
 import { getThemedIconPath, localize } from "../utils";
+import { InputConsumptionPlanScaleOutValueStep } from "../workflows/updatesettings/scalesettings/InputConsumptionPlanScaleOutValueStep";
+import { InputConsumptionPlanScaleUpValueStep } from "../workflows/updatesettings/scalesettings/InputConsumptionPlanScaleUpValueStep";
+import { InputScaleValueStep } from "../workflows/updatesettings/scalesettings/InputScaleValueStep";
+import { IScaleSettingsUpdateWizardContext } from "../workflows/updatesettings/scalesettings/IScaleSettingsUpdateWizardContext";
+import { UpdateScaleSettingsStep } from "../workflows/updatesettings/scalesettings/UpdateScaleSettingsStep";
 import { AppItem } from "./AppItem";
 import { AppSettingItem, IOptions } from "./AppSettingItem";
 import { AppSettingsItem } from "./AppSettingsItem";
@@ -52,17 +54,25 @@ export class AppScaleSettingsItem extends AppSettingsItem {
             const newSettings: IScaleSettings = { ...deployment.getScaleSettings() };
             const subContext = createSubscriptionContext(this.parent.app.subscription);
             const wizardContext: IScaleSettingsUpdateWizardContext = Object.assign(context, subContext, { newSettings });
-            const steps: AzureWizardPromptStep<IScaleSettingsUpdateWizardContext>[] = [
-                new InputScaleValueStep(deployment, 'capacity'),
-                new InputScaleValueStep(deployment, 'memory'),
-                new InputScaleValueStep(deployment, 'cpu')
-            ];
+            const steps: AzureWizardPromptStep<IScaleSettingsUpdateWizardContext>[] = this.parent.app.service.isConsumptionTier() ?
+                [
+                    new InputConsumptionPlanScaleOutValueStep(deployment),
+                    new InputConsumptionPlanScaleUpValueStep(deployment),
+                ] : [
+                    new InputScaleValueStep(deployment, 'capacity'),
+                    new InputScaleValueStep(deployment, 'memory'),
+                    new InputScaleValueStep(deployment, 'cpu')
+                ];
             const promptSteps: AzureWizardPromptStep<IScaleSettingsUpdateWizardContext>[] = [];
             const executeSteps: AzureWizardExecuteStep<IScaleSettingsUpdateWizardContext>[] = [];
             if (!key) {
                 promptSteps.push(...steps);
             } else {
-                promptSteps.push(steps[['capacity', 'memory', 'cpu'].indexOf(key)]);
+                if (this.parent.app.service.isConsumptionTier()) {
+                    promptSteps.push(steps[key === 'capacity' ? 0 : 1]);
+                } else {
+                    promptSteps.push(steps[['capacity', 'memory', 'cpu'].indexOf(key)]);
+                }
             }
             executeSteps.push(new UpdateScaleSettingsStep(deployment));
             const wizard: AzureWizard<IScaleSettingsUpdateWizardContext> = new AzureWizard(wizardContext, { promptSteps, executeSteps, title: scaling });
@@ -83,12 +93,14 @@ export class AppScaleSettingsItem extends AppSettingsItem {
         throw new Error('Scale settings can not be deleted.');
     }
 
-    protected loadChildren(): Promise<AppSettingItem[] | undefined> {
-        return (async () => {
-            const deployment: EnhancedDeployment | undefined = await this.parent.app.getActiveDeployment();
-            const settings: IScaleSettings = deployment?.getScaleSettings() ?? {};
-            return Object.entries(settings)
-                .map(e => new AppSettingItem(this, e[0].trim(), `${e[1]}`.trim(), Object.assign({ label: IScaleSettings.LABELS[e[0]] }, AppScaleSettingsItem._options)));
-        })();
+    protected async loadChildren(): Promise<AppSettingItem[] | undefined> {
+        const deployment: EnhancedDeployment | undefined = await this.parent.app.getActiveDeployment();
+        const settings: IScaleSettings = deployment?.getScaleSettings() ?? {};
+        const capacityLabel: string = this.parent.app.service.isConsumptionTier() ? 'Max replicas' : 'Instance count';
+        return [
+            new AppSettingItem(this, 'capacity', `${settings.capacity}`.trim(), Object.assign({ label: capacityLabel }, AppScaleSettingsItem._options)),
+            new AppSettingItem(this, 'cpu', `${settings.cpu}`.trim(), Object.assign({ label: 'vCPU' }, AppScaleSettingsItem._options)),
+            new AppSettingItem(this, 'memory', `${settings.memory}`.trim(), Object.assign({ label: 'Memory/GB' }, AppScaleSettingsItem._options))
+        ];
     }
 }

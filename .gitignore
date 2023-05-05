@@ -67,3 +67,6 @@ testWorkspace
 test-results.xml
 dist
 stats.json
+
+.idea
+vscode-azurespringcloud.iml

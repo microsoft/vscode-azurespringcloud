@@ -4,7 +4,7 @@
 import { IActionContext } from "@microsoft/vscode-azext-utils";
 import * as vscode from "vscode";
 import { ext } from "../extensionVariables";
-import { EnhancedDeployment } from "../service/EnhancedDeployment";
+import { EnhancedDeployment } from "../model/EnhancedDeployment";
 import * as utils from "../utils";
 import { getThemedIconPath } from "../utils";
 import { AppItem } from "./AppItem";

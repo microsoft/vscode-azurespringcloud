@@ -26,5 +26,6 @@
     "azureSpringApps.app.instance.stopStreamingLog": "Stop Streaming Logs",
     "azureSpringApps.deleteConfirmation": "The behavior to use when confirming delete of a Azure Spring Apps.",
     "azureSpringApps.deleteConfirmation.EnterName": "Prompts with an input box where you enter the Azure Spring Apps name to delete.",
-    "azureSpringApps.deleteConfirmation.ClickButton": "Prompts with a warning dialog where you click a button to delete."
+    "azureSpringApps.deleteConfirmation.ClickButton": "Prompts with a warning dialog where you click a button to delete.",
+    "azureSpringApps.file.deploy": "Deploy to Azure Spring Apps..."
 }
