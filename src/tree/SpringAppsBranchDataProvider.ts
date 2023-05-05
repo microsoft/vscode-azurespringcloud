@@ -54,7 +54,7 @@ export class SpringAppsBranchDataProvider extends vscode.Disposable implements A
                 const subContext = createSubscriptionContext(element.subscription);
                 const client: AppPlatformManagementClient = createAzureClient([context, subContext], AppPlatformManagementClient);
                 const apps: EnhancedService = new EnhancedService(client, element.subscription, element);
-                void apps.refresh();
+                await apps.refresh();
                 return new AppsItem(apps);
             });
 
