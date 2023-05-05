@@ -41,6 +41,6 @@ export class AppInstancesItem implements ResourceItemBase {
     }
 
     public async refresh(): Promise<void> {
-        await this.parent.app.refresh();
+        await this.parent.refresh();
     }
 }
