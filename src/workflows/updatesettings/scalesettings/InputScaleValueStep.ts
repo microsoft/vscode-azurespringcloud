@@ -30,7 +30,7 @@ export class InputScaleValueStep extends AzureWizardPromptStep<IScaleSettingsUpd
     }
 
     public shouldPrompt(_context: IScaleSettingsUpdateWizardContext): boolean {
-        return true;
+        return !this.deployment.app.service.isConsumptionTier();
     }
 
     private async validateInput(val: string): Promise<string | undefined> {

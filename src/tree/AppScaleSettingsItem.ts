@@ -12,6 +12,8 @@ import { ext } from "../extensionVariables";
 import { IScaleSettings } from "../model";
 import { EnhancedDeployment } from "../model/EnhancedDeployment";
 import { getThemedIconPath, localize } from "../utils";
+import { InputConsumptionPlanScaleOutValueStep } from "../workflows/updatesettings/scalesettings/InputConsumptionPlanScaleOutValueStep";
+import { InputConsumptionPlanScaleUpValueStep } from "../workflows/updatesettings/scalesettings/InputConsumptionPlanScaleUpValueStep";
 import { InputScaleValueStep } from "../workflows/updatesettings/scalesettings/InputScaleValueStep";
 import { IScaleSettingsUpdateWizardContext } from "../workflows/updatesettings/scalesettings/IScaleSettingsUpdateWizardContext";
 import { UpdateScaleSettingsStep } from "../workflows/updatesettings/scalesettings/UpdateScaleSettingsStep";
@@ -52,17 +54,25 @@ export class AppScaleSettingsItem extends AppSettingsItem {
             const newSettings: IScaleSettings = { ...deployment.getScaleSettings() };
             const subContext = createSubscriptionContext(this.parent.app.subscription);
             const wizardContext: IScaleSettingsUpdateWizardContext = Object.assign(context, subContext, { newSettings });
-            const steps: AzureWizardPromptStep<IScaleSettingsUpdateWizardContext>[] = [
-                new InputScaleValueStep(deployment, 'capacity'),
-                new InputScaleValueStep(deployment, 'memory'),
-                new InputScaleValueStep(deployment, 'cpu')
-            ];
+            const steps: AzureWizardPromptStep<IScaleSettingsUpdateWizardContext>[] = this.parent.app.service.isConsumptionTier() ?
+                [
+                    new InputConsumptionPlanScaleOutValueStep(deployment),
+                    new InputConsumptionPlanScaleUpValueStep(deployment),
+                ] : [
+                    new InputScaleValueStep(deployment, 'capacity'),
+                    new InputScaleValueStep(deployment, 'memory'),
+                    new InputScaleValueStep(deployment, 'cpu')
+                ];
             const promptSteps: AzureWizardPromptStep<IScaleSettingsUpdateWizardContext>[] = [];
             const executeSteps: AzureWizardExecuteStep<IScaleSettingsUpdateWizardContext>[] = [];
             if (!key) {
                 promptSteps.push(...steps);
             } else {
-                promptSteps.push(steps[['capacity', 'memory', 'cpu'].indexOf(key)]);
+                if (this.parent.app.service.isConsumptionTier()) {
+                    promptSteps.push(steps[key === 'capacity' ? 0 : 1]);
+                } else {
+                    promptSteps.push(steps[['capacity', 'memory', 'cpu'].indexOf(key)]);
+                }
             }
             executeSteps.push(new UpdateScaleSettingsStep(deployment));
             const wizard: AzureWizard<IScaleSettingsUpdateWizardContext> = new AzureWizard(wizardContext, { promptSteps, executeSteps, title: scaling });
