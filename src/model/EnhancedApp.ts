@@ -112,11 +112,9 @@ export class EnhancedApp {
     }
 
     public async refresh(): Promise<EnhancedApp> {
-        ext.outputChannel.appendLog(`[App] refreshing app ${this.name}.`);
         this._remote = await this.client.apps.get(this.service.resourceGroup, this.service.name, this.name);
         this._activeDeployment = undefined;
         await this.getActiveDeployment(true);
-        ext.outputChannel.appendLog(`[App] app ${this.name} is refreshed.`);
         return this;
     }
 
@@ -131,9 +129,7 @@ export class EnhancedApp {
 
     public async getActiveDeployment(force: boolean = false): Promise<EnhancedDeployment | undefined> {
         if (force || !this._activeDeployment) {
-            ext.outputChannel.appendLog(`[App] loading active deployment of app (${this.name}).`);
             this._activeDeployment = (await this.getDeployments()).find(d => d.properties?.active);
-            ext.outputChannel.appendLog(`[App] active deployment(${this._activeDeployment?.name}) of app (${this.name}) is loaded.`);
         }
         return this._activeDeployment;
     }
@@ -186,7 +182,6 @@ export class EnhancedApp {
     }
 
     public async getTestKeys(): Promise<TestKeys> {
-        ext.outputChannel.appendLog(`[App] getting test keys of app (${this.name}).`);
         return await this.client.services.listTestKeys(this.service.resourceGroup, this.service.name);
     }
 
@@ -219,7 +214,6 @@ export class EnhancedApp {
     }
 
     public async getUploadDefinition(): Promise<ResourceUploadDefinition> {
-        ext.outputChannel.appendLog(`[App] get uploading definition of app ${this.name}.`);
         return this.client.apps.getResourceUploadUrl(this.service.resourceGroup, this.service.name, this.name);
     }
 

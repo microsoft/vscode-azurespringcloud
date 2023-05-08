@@ -58,19 +58,15 @@ export class EnhancedService {
 
     public async getApps(): Promise<EnhancedApp[]> {
         const apps: AppResource[] = [];
-        ext.outputChannel.appendLog(`[Apps] loading apps of (${this.name}).`);
         const pagedApps: AsyncIterable<AppResource> = this.client.apps.list(this.resourceGroup, this.name);
         for await (const app of pagedApps) {
             apps.push(app);
         }
-        ext.outputChannel.appendLog(`[Apps] apps of (${this.name}) is loaded.`);
         return apps.map(app => new EnhancedApp(this, app));
     }
 
     public async refresh(): Promise<EnhancedService> {
-        ext.outputChannel.appendLog(`[Apps] refreshing apps (${this.name}).`);
         const remote: ServiceResource = await this.client.services.get(this.resourceGroup, this.name);
-        ext.outputChannel.appendLog(`[Apps] apps (${this.name}) is refreshed.`);
         this.setRemote(remote);
         return this;
     }

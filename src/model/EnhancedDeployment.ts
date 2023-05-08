@@ -75,9 +75,7 @@ export class EnhancedDeployment {
     }
 
     public async refresh(): Promise<EnhancedDeployment> {
-        ext.outputChannel.appendLog(`[Deployment] refreshing deployment ${this.name}.`);
         this._remote = await this.client.deployments.get(this.app.service.resourceGroup, this.app.service.name, this.app.name, this.name);
-        ext.outputChannel.appendLog(`[Deployment] deployment ${this.name} is refreshed.`);
         return this;
     }
 
@@ -171,7 +169,6 @@ export class EnhancedDeployment {
             ext.outputChannel.appendLog(`[Deployment] remote debugging is not supported for apps of consumption plan.`);
             return undefined;
         }
-        ext.outputChannel.appendLog(`[Deployment] getting remote debugging config of deployment (${this.name}).`);
         return this.client.deployments.getRemoteDebuggingConfig(this.app.service.resourceGroup, this.app.service.name, this.app.name, this.name);
     }
 
