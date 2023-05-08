@@ -29,6 +29,7 @@ export function registerCommands(): void {
     registerCommandWithTelemetryWrapper('azureSpringApps.apps.createInPortal', createServiceInPortal);
     registerCommandWithTelemetryWrapper('azureSpringApps.app.create', createSpringApp);
     registerCommandWithTelemetryWrapper('azureSpringApps.apps.delete', deleteService);
+    registerCommandWithTelemetryWrapper('azureSpringApps.apps.openLiveView', openAppsLiveView);
     registerCommandWithTelemetryWrapper('azureSpringApps.app.openPublicEndpoint', openPublicEndpoint);
     registerCommandWithTelemetryWrapper('azureSpringApps.app.openTestEndpoint', openTestEndpoint);
     registerCommandWithTelemetryWrapper('azureSpringApps.app.assignEndpoint', assignEndpoint);
@@ -39,6 +40,7 @@ export function registerCommands(): void {
     registerCommandWithTelemetryWrapper('azureSpringApps.app.delete', deleteApp);
     registerCommandWithTelemetryWrapper('azureSpringApps.app.deploy', deploy);
     registerCommandWithTelemetryWrapper('azureSpringApps.app.scale', scale);
+    registerCommandWithTelemetryWrapper('azureSpringApps.app.openLiveView', openAppLiveView);
     registerCommandWithTelemetryWrapper('azureSpringApps.app.enableRemoteDebugging', enableRemoteDebugging);
     registerCommandWithTelemetryWrapper('azureSpringApps.app.disableRemoteDebugging', disableRemoteDebugging);
     registerCommandWithTelemetryWrapper('azureSpringApps.app.instance.startRemoteDebugging', startRemoteDebugging);
@@ -93,12 +95,44 @@ export async function deleteService(context: IActionContext, n?: AppsItem): Prom
     await utils.runInBackground(deleting, deleted, () => item.remove(context));
 }
 
+export async function openAppsLiveView(context: IActionContext, n?: AppsItem): Promise<void> {
+    const item: AppsItem = await getAppsItem(context, n);
+    const service: EnhancedService = item.service;
+    if (!(await service.isDevToolsPublic()) || !(await service.isLiveViewEnabled())) {
+        await context.ui.showWarningMessage(`Live View is not enabled or publicly accessible for Apps ${service.name}. Do you want to enable it and make it publicly accessible?`, { modal: true }, DialogResponses.yes);
+        const enabling: string = `enabling Live View for Apps ${service.name}`;
+        const enabled: string = `Live View for Apps ${service.name} is successfully enabled.`;
+        await utils.runInBackground(enabling, enabled, () => service.enableLiveView())
+    }
+    const endpoint: string | undefined = await service.getLiveViewUrl();
+    if (endpoint && endpoint.toLowerCase() !== 'none') {
+        await openUrl(endpoint);
+    }
+}
+
+export async function openAppLiveView(context: IActionContext, n?: AppItem): Promise<void> {
+    const item: AppItem = await getAppItem(context, n);
+    const app: EnhancedApp = item.app;
+    if (!(await app.service.isDevToolsPublic()) || !(await app.service.isLiveViewEnabled())) {
+        await context.ui.showWarningMessage(`Live View is not enabled or publicly accessible for Apps ${app.service.name}. Do you want to enable it and make it publicly accessible?`, { modal: true }, DialogResponses.yes);
+        const enabling: string = `enabling Live View for Apps ${app.service.name}`;
+        const enabled: string = `Live View for Apps ${app.service.name} is successfully enabled.`;
+        await utils.runInBackground(enabling, enabled, () => app.service.enableLiveView())
+    }
+    const endpoint: string | undefined = await app.getLiveViewUrl();
+    if (endpoint && endpoint.toLowerCase() !== 'none') {
+        await openUrl(endpoint);
+    }
+}
+
 export async function openPublicEndpoint(context: IActionContext, n?: AppItem): Promise<void> {
     const item: AppItem = await getAppItem(context, n);
     const app: EnhancedApp = item.app;
     if (!app.properties?.public) {
         await context.ui.showWarningMessage(`App "${app.name}" is not publicly accessible. Do you want to assign it a public endpoint?`, { modal: true }, DialogResponses.yes);
-        await assignEndpoint(context, item);
+        const enabling: string = `assigning public endpoint to App ${app.name}`;
+        const enabled: string = `Public endpoint is successfully assigned to App ${app.name}.`;
+        await utils.runInBackground(enabling, enabled, () => assignEndpoint(context, item))
     }
     const endpoint: string | undefined = await app.getPublicEndpoint();
     if (endpoint && endpoint.toLowerCase() !== 'none') {
