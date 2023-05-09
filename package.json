@@ -254,7 +254,7 @@
                 {
                     "command": "azureSpringApps.apps.openLiveView",
                     "when": "view == azureResourceGroups && viewItem =~ /^azureSpringApps\\.apps;tier-enterprise;/i",
-                    "group": "8@1"
+                    "group": "7@1"
                 },
                 {
                     "command": "azureSpringApps.app.openPublicEndpoint",
