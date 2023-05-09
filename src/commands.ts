@@ -99,7 +99,10 @@ export async function openAppsLiveView(context: IActionContext, n?: AppsItem): P
     const item: AppsItem = await getAppsItem(context, n);
     const service: EnhancedService = item.service;
     if (!(await service.isDevToolsPublic()) || !(await service.isLiveViewEnabled())) {
-        await context.ui.showWarningMessage(`Live View is not enabled or publicly accessible for Apps ${service.name}. Do you want to enable it and make it publicly accessible?`, { modal: true }, DialogResponses.yes);
+        const response = await context.ui.showWarningMessage(`Live View is not enabled or publicly accessible for Apps ${service.name}. Do you want to enable it and make it publicly accessible?`, { modal: true }, DialogResponses.learnMore, DialogResponses.yes);
+        if (response === DialogResponses.learnMore) {
+            return openUrl("https://learn.microsoft.com/en-us/azure/spring-apps/how-to-use-application-live-view?tabs=Portal");
+        }
         const enabling: string = `enabling Live View for Apps ${service.name}`;
         const enabled: string = `Live View for Apps ${service.name} is successfully enabled.`;
         await utils.runInBackground(enabling, enabled, () => service.enableLiveView())
@@ -114,7 +117,10 @@ export async function openAppLiveView(context: IActionContext, n?: AppItem): Pro
     const item: AppItem = await getAppItem(context, n);
     const app: EnhancedApp = item.app;
     if (!(await app.service.isDevToolsPublic()) || !(await app.service.isLiveViewEnabled())) {
-        await context.ui.showWarningMessage(`Live View is not enabled or publicly accessible for Apps ${app.service.name}. Do you want to enable it and make it publicly accessible?`, { modal: true }, DialogResponses.yes);
+        const response = await context.ui.showWarningMessage(`Live View is not enabled or publicly accessible for Apps ${app.service.name}. Do you want to enable it and make it publicly accessible?`, { modal: true }, DialogResponses.learnMore, DialogResponses.yes);
+        if (response === DialogResponses.learnMore) {
+            return openUrl("https://learn.microsoft.com/en-us/azure/spring-apps/how-to-use-application-live-view?tabs=Portal");
+        }
         const enabling: string = `enabling Live View for Apps ${app.service.name}`;
         const enabled: string = `Live View for Apps ${app.service.name} is successfully enabled.`;
         await utils.runInBackground(enabling, enabled, () => app.service.enableLiveView())
