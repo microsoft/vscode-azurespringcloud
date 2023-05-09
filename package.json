@@ -100,6 +100,12 @@
                 "icon": "$(remove)"
             },
             {
+                "command": "azureSpringApps.apps.openLiveView",
+                "title": "Open Live View",
+                "category": "Azure Spring Apps",
+                "icon": "$(globe)"
+            },
+            {
                 "command": "azureSpringApps.app.openPublicEndpoint",
                 "title": "%azureSpringApps.app.openPublicEndpoint%",
                 "category": "Azure Spring App",
@@ -216,6 +222,12 @@
                 "category": "Azure Spring Apps"
             },
             {
+                "command": "azureSpringApps.app.openLiveView",
+                "title": "Open Live View",
+                "category": "Azure Spring App",
+                "icon": "$(globe)"
+            },
+            {
                 "command": "azureSpringApps.focus",
                 "title": "Focus on Spring Apps View",
                 "category": "Azure Spring Apps",
@@ -231,13 +243,18 @@
                 },
                 {
                     "command": "azureSpringApps.app.create",
-                    "when": "view == azureResourceGroups && viewItem =~ /azureSpringApps\\.apps/i",
+                    "when": "view == azureResourceGroups && viewItem =~ /^azureSpringApps\\.apps;/i",
                     "group": "5@1"
                 },
                 {
                     "command": "azureSpringApps.apps.delete",
-                    "when": "view == azureResourceGroups && viewItem =~ /azureSpringApps\\.apps/i",
+                    "when": "view == azureResourceGroups && viewItem =~ /^azureSpringApps\\.apps;/i",
                     "group": "5@2"
+                },
+                {
+                    "command": "azureSpringApps.apps.openLiveView",
+                    "when": "view == azureResourceGroups && viewItem =~ /^azureSpringApps\\.apps;tier-enterprise;/i",
+                    "group": "8@1"
                 },
                 {
                     "command": "azureSpringApps.app.openPublicEndpoint",
@@ -298,6 +315,11 @@
                     "command": "azureSpringApps.app.deploy",
                     "when": "view == azureResourceGroups && viewItem =~ /^azureSpringApps\\.app;status-(running|stopped);/i",
                     "group": "6@1"
+                },
+                {
+                    "command": "azureSpringApps.app.openLiveView",
+                    "when": "view == azureResourceGroups && viewItem =~ /^azureSpringApps\\.app;.+;tier-enterprise;/i",
+                    "group": "8@1"
                 },
                 {
                     "command": "azureSpringApps.common.refresh",

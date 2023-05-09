@@ -14,7 +14,6 @@ import { AppItem } from "./AppItem";
 import { ResourceItemBase } from "./SpringAppsBranchDataProvider";
 
 export default class AppsItem implements ResourceItemBase {
-    public static contextValue: string = 'azureSpringApps.apps';
     private _deleted: boolean;
     private _children: Promise<AppItem[] | undefined>;
 
@@ -33,9 +32,14 @@ export default class AppsItem implements ResourceItemBase {
             label: this.service.name,
             iconPath: utils.getThemedIconPath('azure-spring-apps'),
             description: this.description,
-            contextValue: AppsItem.contextValue,
+            contextValue: this.contextValue,
             collapsibleState: TreeItemCollapsibleState.Collapsed,
         }
+    }
+
+    public get contextValue(): string {
+        const tier: string = this.service.isEnterpriseTier() ? 'enterprise' : this.service.isConsumptionTier() ? 'consumption' : 'other';
+        return `azureSpringApps.apps;tier-${tier};`;
     }
 
     public get id(): string {

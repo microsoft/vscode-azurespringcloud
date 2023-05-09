@@ -69,7 +69,8 @@ export class AppItem implements ResourceItemBase {
 
     public get contextValue(): string {
         const debugging: string = this._debuggingEnabled === undefined ? 'unknown' : this._debuggingEnabled ? 'enabled' : 'disabled'
-        return `azureSpringApps.app;status-${this._status};debugging-${debugging};public-${this.app.properties?.public};`;
+        const tier: string = this.app.service.isEnterpriseTier() ? 'enterprise' : this.app.service.isConsumptionTier() ? 'consumption' : 'other';
+        return `azureSpringApps.app;status-${this._status};debugging-${debugging};public-${this.app.properties?.public};tier-${tier};`;
     }
 
     public async scaleInstances(context: IActionContext): Promise<void> {

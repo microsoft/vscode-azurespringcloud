@@ -217,6 +217,11 @@ export class EnhancedApp {
         return this.client.apps.getResourceUploadUrl(this.service.resourceGroup, this.service.name, this.name);
     }
 
+    public async getLiveViewUrl(): Promise<string | undefined> {
+        const url: string | undefined = await this.service.getLiveViewUrl();
+        return url ? `${url}/apps/${this.name}` : undefined;
+    }
+
     public async uploadArtifact(path: string): Promise<string | undefined> {
         const uploadDefinition: ResourceUploadDefinition = await this.getUploadDefinition();
         if (!uploadDefinition.uploadUrl) {

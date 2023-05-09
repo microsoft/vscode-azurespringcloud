@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import { AppPlatformManagementClient, AppResource, ClusterResourceProperties, ServiceResource, Sku } from "@azure/arm-appplatform";
+import { AppPlatformManagementClient, AppResource, ClusterResourceProperties, DevToolPortalResource, ServiceResource, Sku } from "@azure/arm-appplatform";
 import { AzureSubscription } from '@microsoft/vscode-azureresources-api';
 import { ext } from "../extensionVariables";
 import { EnhancedApp } from "./EnhancedApp";
@@ -14,6 +14,7 @@ export class EnhancedService {
     public readonly subscription: AzureSubscription;
     private _remote: ServiceResource;
     private _resourceGroup: string;
+    private _devToolsPortal: Promise<DevToolPortalResource | undefined>;
 
     public constructor(client: AppPlatformManagementClient, subscription: AzureSubscription, resource: ServiceResource) {
         this.client = client;
@@ -65,9 +66,57 @@ export class EnhancedService {
         return apps.map(app => new EnhancedApp(this, app));
     }
 
+    public async loadDevTools(): Promise<DevToolPortalResource | undefined> {
+        for await (const portal of this.client.devToolPortals.list(this.resourceGroup, this.name)) {
+            if (portal.properties?.public) {
+                return portal;
+            }
+        }
+        return undefined;
+    }
+
+    public async getLiveViewUrl(): Promise<string | undefined> {
+        const devToolsPortal: DevToolPortalResource | undefined = await this._devToolsPortal;
+        if (devToolsPortal && await this.isLiveViewEnabled()) {
+            return `https://${devToolsPortal.properties?.url}/${devToolsPortal.properties?.features?.applicationLiveView?.route}`
+        }
+        return undefined;
+    }
+
+    public async enableLiveView(): Promise<void> {
+        this._devToolsPortal = this.client.devToolPortals.beginCreateOrUpdateAndWait(this.resourceGroup, this.name, 'default', {
+            properties: {
+                features: {
+                    applicationLiveView: {
+                        state: "Enabled"
+                    }
+                },
+                public: true
+            }
+        });
+        await this._devToolsPortal;
+    }
+
+    public async isLiveViewEnabled(): Promise<boolean> {
+        const devToolsPortal: DevToolPortalResource | undefined = await this._devToolsPortal;
+        return devToolsPortal?.properties?.features?.applicationLiveView?.state?.toLowerCase() === "enabled";
+    }
+
+    public async isDevToolsPublic(): Promise<boolean> {
+        const devToolsPortal: DevToolPortalResource | undefined = await this._devToolsPortal;
+        return devToolsPortal?.properties?.public ?? false;
+    }
+
+    public async isDevToolsRunning(): Promise<boolean> {
+        const devToolsPortal: DevToolPortalResource | undefined = await this._devToolsPortal;
+        return (devToolsPortal?.properties?.instances?.length ?? 0) > 0 &&
+            devToolsPortal?.properties?.instances?.[0].status?.toLowerCase() === 'running';
+    }
+
     public async refresh(): Promise<EnhancedService> {
         const remote: ServiceResource = await this.client.services.get(this.resourceGroup, this.name);
         this.setRemote(remote);
+        this._devToolsPortal = this.loadDevTools();
         return this;
     }
 
