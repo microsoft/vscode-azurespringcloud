@@ -101,7 +101,7 @@
             },
             {
                 "command": "azureSpringApps.apps.openLiveView",
-                "title": "Open Live View",
+                "title": "Open App Live View",
                 "category": "Azure Spring Apps",
                 "icon": "$(globe)"
             },
@@ -223,7 +223,7 @@
             },
             {
                 "command": "azureSpringApps.app.openLiveView",
-                "title": "Open Live View",
+                "title": "Open App Live View",
                 "category": "Azure Spring App",
                 "icon": "$(globe)"
             },
