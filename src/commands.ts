@@ -99,7 +99,7 @@ export async function openAppsLiveView(context: IActionContext, n?: AppsItem): P
     const item: AppsItem = await getAppsItem(context, n);
     const service: EnhancedService = item.service;
     if (!(await service.isDevToolsPublic()) || !(await service.isLiveViewEnabled())) {
-        const response = await context.ui.showWarningMessage(`App Live View of Spring Apps "${service.name}" is not enabled or publicly accessible.`, { modal: true }, DialogResponses.learnMore);
+        const response = await context.ui.showWarningMessage(`Application Live View of Spring Apps "${service.name}" is not enabled or publicly accessible.`, { modal: true }, DialogResponses.learnMore);
         if (response === DialogResponses.learnMore) {
             return openUrl("https://learn.microsoft.com/en-us/azure/spring-apps/how-to-use-application-live-view?tabs=Portal");
         }
@@ -115,7 +115,7 @@ export async function openAppLiveView(context: IActionContext, n?: AppItem): Pro
     const item: AppItem = await getAppItem(context, n);
     const app: EnhancedApp = item.app;
     if (!(await app.service.isDevToolsPublic()) || !(await app.service.isLiveViewEnabled())) {
-        const response = await context.ui.showWarningMessage(`App Live View of Spring Apps "${app.service.name}" is not enabled or publicly accessible.`, { modal: true }, DialogResponses.learnMore);
+        const response = await context.ui.showWarningMessage(`Application Live View of Spring Apps "${app.service.name}" is not enabled or publicly accessible.`, { modal: true }, DialogResponses.learnMore);
         if (response === DialogResponses.learnMore) {
             return openUrl("https://learn.microsoft.com/en-us/azure/spring-apps/how-to-use-application-live-view?tabs=Portal");
         }
