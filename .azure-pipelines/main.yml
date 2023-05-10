@@ -3,40 +3,41 @@ variables:
   ${{ if eq(variables['Build.Reason'], 'Schedule') }}:
     ENABLE_LONG_RUNNING_TESTS: true
     ENABLE_COMPLIANCE: true
-  
+
 jobs:
-- job: Windows
-  pool:
-    vmImage: windows-latest
-  steps:
-  - template: common/build.yml
-  - template: common/lint.yml
-  - template: compliance/compliance.yml # Only works on Windows
-  - template: common/test.yml
+  - job: Windows
+    pool:
+      vmImage: windows-latest
+    steps:
+      - template: common/build.yml
+      - template: common/lint.yml
+      - template: compliance/compliance.yml # Only works on Windows
+      - template: common/test.yml
 
-- job: Linux
-  pool:
-    vmImage: ubuntu-latest
-  steps:
-  - template: common/build.yml
-  - template: common/publish-vsix.yml # Only publish vsix from linux build since we use this to release and want to stay consistent
-  - template: common/lint.yml
-  - template: common/test.yml
+  - job: Linux
+    pool:
+      vmImage: ubuntu-latest
+    steps:
+      - template: common/build.yml
+      - template: common/publish-vsix.yml # Only publish vsix from linux build since we use this to release and want to stay consistent
+      - template: common/lint.yml
+      - template: common/test.yml
 
-- job: macOS
-  pool:
-    vmImage: macOS-latest
-  steps:
-  - template: common/build.yml
-  - template: common/lint.yml
+  - job: macOS
+    pool:
+      vmImage: macOS-latest
+    steps:
+      - template: common/build.yml
+      - template: common/lint.yml
 # - template: common/test.yml
 
 trigger:
   branches:
     include:
-    - main
+      - main
 
 pr:
   branches:
     include:
-    - main
+      - main
+      - develop

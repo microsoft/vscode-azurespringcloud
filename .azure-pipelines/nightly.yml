@@ -3,23 +3,22 @@ variables:
   ForPreRelease: true
 
 jobs:
-
-- job: Linux
-  pool:
-    vmImage: ubuntu-latest
-  steps:
-  - template: common/snapshot-version.yml
-  - template: common/build.yml
-  - template: common/publish-vsix.yml # Only publish vsix from linux build since we use this to release and want to stay consistent
-  - template: common/lint.yml
-  - template: common/test.yml
+  - job: Linux
+    pool:
+      vmImage: ubuntu-latest
+    steps:
+      - template: common/snapshot-version.yml
+      - template: common/build.yml
+      - template: common/publish-vsix.yml # Only publish vsix from linux build since we use this to release and want to stay consistent
+      - template: common/lint.yml
+      - template: common/test.yml
 
 trigger: none
 pr: none
 
 schedules:
-- cron: "0 0 * * *"
-  displayName: Daily 0am build
-  branches:
-    include:
-    - main
+  - cron: "0 0 * * *"
+    displayName: Daily 0am build
+    branches:
+      include:
+        - develop
