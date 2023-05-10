@@ -1,7 +1,16 @@
 # Change Log
 
+## 0.8.0 - 2023-05-10
+- Validate artifact's java bytecode version to runtime version of target app when deploying artifact to Azure.
+- Open application log stream after deploying artifact to target app.
+- Add support for Azure Spring Apps consumption plan.
+- Add `Open Application Live View` action on enterprise tier spring apps.
+- Improve performance of creating apps.
+- Refactor code structure and upgrade dependencies.
+- Fix: spring apps doesn't load sub apps proactively sometimes.
+
 ## 0.7.1 - 2023-04-05
-- Fix: [#54](https://github.com/microsoft/vscode-azurespringcloud/issues/54) Entry "view live information" is missing from context menu of app node 
+- Fix: [#54](https://github.com/microsoft/vscode-azurespringcloud/issues/54) Entry "view live information" is missing from context menu of app node
 - Fix: user have to select instance starting from Spring Apps but not current selected Spring App when `Attach Debugger`.
 
 ## 0.7.0 - 2023-03-24
