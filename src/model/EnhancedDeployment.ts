@@ -100,8 +100,8 @@ export class EnhancedDeployment {
         const rawMem: number = settings.memory ?? 1;
         const rawCpu: number = settings.cpu ?? 1;
         const sku: Sku | undefined = this.app.service.sku;
-        const cpu: string = rawCpu < 1 ? `${rawCpu * 1000}m` : `${Math.floor(rawCpu)}`;
-        const memory: string = rawMem < 1 ? `${rawMem * 1024}Mi` : `${Math.floor(rawMem)}Gi`;
+        const cpu: string = `${rawCpu * 1000}m`;
+        const memory: string = `${rawMem * 1024}Mi`;
         const resource: DeploymentResource = {
             properties: {
                 deploymentSettings: {
@@ -112,6 +112,13 @@ export class EnhancedDeployment {
                 ...sku, capacity: settings.capacity ?? sku?.capacity
             }
         };
+        if (this.app.service.isConsumptionTier()) {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            resource.properties!.deploymentSettings!.scale = {
+                minReplicas: this._remote.properties?.deploymentSettings?.scale?.minReplicas ?? 1,
+                maxReplicas: settings.capacity ?? sku?.capacity ?? 10
+            }
+        }
         ext.outputChannel.appendLog(`[Deployment] update scale settings of deployment (${this.name}).`);
         this._remote = await this.client.deployments.beginUpdateAndWait(this.app.service.resourceGroup, this.app.service.name, this.app.name, this.name, resource);
         ext.outputChannel.appendLog(`[Deployment] scale settings of deployment (${this.name}) is updated.`);
@@ -161,7 +168,11 @@ export class EnhancedDeployment {
         const memory: number = resourceRequests?.memory ? (resourceRequests?.memory?.endsWith('Mi') ?
             parseInt(resourceRequests?.memory) / 1024 :
             parseInt(resourceRequests?.memory)) : 1;
-        return { cpu, memory, capacity: this.properties?.instances?.length ?? 0 };
+        const capacity: number = this.app.service.isConsumptionTier() ?
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            this.properties?.deploymentSettings?.scale?.maxReplicas as number ?? 0 :
+            this.properties?.instances?.length ?? 0
+        return { cpu, memory, capacity };
     }
 
     public async getDebuggingConfig(): Promise<RemoteDebugging | undefined> {
