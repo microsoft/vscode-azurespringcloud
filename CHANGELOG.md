@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.8.1 - 2023-05-11
+- Fix duplicate message about assigning public endpoint.
+- Fix scaling issues about apps of standard consumption plan.
+
 ## 0.8.0 - 2023-05-10
 - Validate artifact's java bytecode version to runtime version of target app when deploying artifact to Azure.
 - Open application log stream after deploying artifact to target app.
