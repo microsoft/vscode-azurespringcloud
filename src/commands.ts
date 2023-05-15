@@ -132,9 +132,7 @@ export async function openPublicEndpoint(context: IActionContext, n?: AppItem): 
     const app: EnhancedApp = item.app;
     if (!app.properties?.public) {
         await context.ui.showWarningMessage(`App "${app.name}" is not publicly accessible. Do you want to assign it a public endpoint?`, { modal: true }, DialogResponses.yes);
-        const enabling: string = `assigning public endpoint to App ${app.name}`;
-        const enabled: string = `Public endpoint is successfully assigned to App ${app.name}.`;
-        await utils.runInBackground(enabling, enabled, () => assignEndpoint(context, item))
+        await assignEndpoint(context, item);
     }
     const endpoint: string | undefined = await app.getPublicEndpoint();
     if (endpoint && endpoint.toLowerCase() !== 'none') {
