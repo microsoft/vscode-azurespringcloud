@@ -139,9 +139,11 @@ export async function openAppAccelerator(context: IActionContext, n?: AppsItem):
         }
         return;
     }
-    const endpoint: string | undefined = await service.getAppAcceleratorUrl();
-    if (endpoint && endpoint.toLowerCase() !== 'none') {
-        await vscode.workspace.getConfiguration('tanzu-app-accelerator').update('tanzuApplicationPlatformGuiUrl', endpoint, vscode.ConfigurationTarget.Global);
+    const config = await service.getAppAcceleratorConfig();
+    if (config) {
+        await vscode.workspace.getConfiguration('tanzu-app-accelerator').update('tanzuApplicationPlatformGuiUrl', config.guiUrl, vscode.ConfigurationTarget.Global);
+        config.authClientId && await vscode.workspace.getConfiguration('tanzu-app-accelerator').update('authClientId', config.authClientId, vscode.ConfigurationTarget.Global);
+        config.authIssuerUrl && await vscode.workspace.getConfiguration('tanzu-app-accelerator').update('authIssuerUrl', config.authIssuerUrl, vscode.ConfigurationTarget.Global);
         await vscode.commands.executeCommand('tanzu-app-accelerator.AcceleratorList.focus');
         await vscode.commands.executeCommand('tanzu-app-accelerator.refreshAccelerators');
     }

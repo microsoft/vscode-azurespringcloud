@@ -83,10 +83,16 @@ export class EnhancedService {
         return undefined;
     }
 
-    public async getAppAcceleratorUrl(): Promise<string | undefined> {
+    public async getAppAcceleratorConfig(): Promise<{ authClientId?: string, authIssuerUrl?: string, guiUrl: string } | undefined> {
         const devToolsPortal: DevToolPortalResource | undefined = await this._devToolsPortal;
         if (devToolsPortal && await this.isAppAcceleratorEnabled()) {
-            return `https://${devToolsPortal.properties?.url}`
+            const ssoProperties = devToolsPortal?.properties?.ssoProperties;
+            const url = ssoProperties?.metadataUrl;
+            return {
+                authClientId: ssoProperties?.clientId,
+                authIssuerUrl: url?.substring(0, url.indexOf("/.well-known")),
+                guiUrl: `https://${devToolsPortal.properties?.url}`
+            };
         }
         return undefined;
     }
