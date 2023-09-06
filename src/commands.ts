@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 import { CommandCallback, DialogResponses, IActionContext, IParsedError, openReadOnlyJson, openUrl, parseError, registerCommandWithTreeNodeUnwrapping, registerErrorHandler, registerReportIssueCommand } from '@microsoft/vscode-azext-utils';
+import * as vscode from 'vscode';
 import { MessageItem, OpenDialogOptions, TextEditor, Uri, WorkspaceFolder, window, workspace } from "vscode";
 import { instrumentOperation } from 'vscode-extension-telemetry-wrapper';
 import { ext } from "./extensionVariables";
@@ -30,6 +31,7 @@ export function registerCommands(): void {
     registerCommandWithTelemetryWrapper('azureSpringApps.app.create', createSpringApp);
     registerCommandWithTelemetryWrapper('azureSpringApps.apps.delete', deleteService);
     registerCommandWithTelemetryWrapper('azureSpringApps.apps.openLiveView', openAppsLiveView);
+    registerCommandWithTelemetryWrapper('azureSpringApps.apps.openAppAccelerator', openAppAccelerator);
     registerCommandWithTelemetryWrapper('azureSpringApps.app.openPublicEndpoint', openPublicEndpoint);
     registerCommandWithTelemetryWrapper('azureSpringApps.app.openTestEndpoint', openTestEndpoint);
     registerCommandWithTelemetryWrapper('azureSpringApps.app.assignEndpoint', assignEndpoint);
@@ -124,6 +126,24 @@ export async function openAppLiveView(context: IActionContext, n?: AppItem): Pro
     const endpoint: string | undefined = await app.getLiveViewUrl();
     if (endpoint && endpoint.toLowerCase() !== 'none') {
         await openUrl(endpoint);
+    }
+}
+
+export async function openAppAccelerator(context: IActionContext, n?: AppsItem): Promise<void> {
+    const item: AppsItem = await getAppsItem(context, n);
+    const service: EnhancedService = item.service;
+    if (!(await service.isDevToolsPublic()) || !(await service.isAppAcceleratorEnabled())) {
+        const response = await context.ui.showWarningMessage(`Application Accelerator of Spring Apps "${service.name}"  is not enabled or publicly accessible.`, { modal: true }, DialogResponses.learnMore);
+        if (response === DialogResponses.learnMore) {
+            return openUrl("https://learn.microsoft.com/en-us/azure/spring-apps/how-to-use-accelerator?tabs=Portal");
+        }
+        return;
+    }
+    const endpoint: string | undefined = await service.getAppAcceleratorUrl();
+    if (endpoint && endpoint.toLowerCase() !== 'none') {
+        await vscode.workspace.getConfiguration('tanzu-app-accelerator').update('tanzuApplicationPlatformGuiUrl', endpoint, vscode.ConfigurationTarget.Global);
+        await vscode.commands.executeCommand('tanzu-app-accelerator.AcceleratorList.focus');
+        await vscode.commands.executeCommand('tanzu-app-accelerator.refreshAccelerators');
     }
 }
 

@@ -177,7 +177,6 @@ export class EnhancedDeployment {
 
     public async getDebuggingConfig(): Promise<RemoteDebugging | undefined> {
         if (this.app.service.isConsumptionTier()) {
-            ext.outputChannel.appendLog(`[Deployment] remote debugging is not supported for apps of consumption plan.`);
             return undefined;
         }
         return this.client.deployments.getRemoteDebuggingConfig(this.app.service.resourceGroup, this.app.service.name, this.app.name, this.name);

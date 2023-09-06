@@ -83,6 +83,14 @@ export class EnhancedService {
         return undefined;
     }
 
+    public async getAppAcceleratorUrl(): Promise<string | undefined> {
+        const devToolsPortal: DevToolPortalResource | undefined = await this._devToolsPortal;
+        if (devToolsPortal && await this.isAppAcceleratorEnabled()) {
+            return `https://${devToolsPortal.properties?.url}`
+        }
+        return undefined;
+    }
+
     public async enableLiveView(): Promise<void> {
         this._devToolsPortal = this.client.devToolPortals.beginCreateOrUpdateAndWait(this.resourceGroup, this.name, 'default', {
             properties: {
@@ -100,6 +108,11 @@ export class EnhancedService {
     public async isLiveViewEnabled(): Promise<boolean> {
         const devToolsPortal: DevToolPortalResource | undefined = await this._devToolsPortal;
         return devToolsPortal?.properties?.features?.applicationLiveView?.state?.toLowerCase() === "enabled";
+    }
+
+    public async isAppAcceleratorEnabled(): Promise<boolean> {
+        const devToolsPortal: DevToolPortalResource | undefined = await this._devToolsPortal;
+        return devToolsPortal?.properties?.features?.applicationAccelerator?.state?.toLowerCase() === "enabled";
     }
 
     public async isDevToolsPublic(): Promise<boolean> {
