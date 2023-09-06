@@ -67,7 +67,8 @@ export class EnhancedService {
     }
 
     public async loadDevTools(): Promise<DevToolPortalResource | undefined> {
-        for await (const portal of this.client.devToolPortals.list(this.resourceGroup, this.name)) {
+        if (this.isEnterpriseTier()) {
+            const portal = await this.client.devToolPortals.get(this.resourceGroup, this.name, 'default');
             if (portal.properties?.public) {
                 return portal;
             }
@@ -83,10 +84,16 @@ export class EnhancedService {
         return undefined;
     }
 
-    public async getAppAcceleratorUrl(): Promise<string | undefined> {
+    public async getAppAcceleratorConfig(): Promise<{ authClientId?: string, authIssuerUrl?: string, guiUrl: string } | undefined> {
         const devToolsPortal: DevToolPortalResource | undefined = await this._devToolsPortal;
         if (devToolsPortal && await this.isAppAcceleratorEnabled()) {
-            return `https://${devToolsPortal.properties?.url}`
+            const ssoProperties = devToolsPortal?.properties?.ssoProperties;
+            const url = ssoProperties?.metadataUrl;
+            return {
+                authClientId: ssoProperties?.clientId,
+                authIssuerUrl: url?.substring(0, url.indexOf("/.well-known")),
+                guiUrl: `https://${devToolsPortal.properties?.url}`
+            };
         }
         return undefined;
     }
