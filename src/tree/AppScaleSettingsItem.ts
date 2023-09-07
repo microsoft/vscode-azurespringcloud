@@ -35,7 +35,7 @@ export class AppScaleSettingsItem extends AppSettingsItem {
         super(parent);
     }
 
-    getTreeItem(): TreeItem | Thenable<TreeItem> {
+    public getTreeItem(): TreeItem | Thenable<TreeItem> {
         return {
             id: this.id,
             label: this.label,
@@ -46,15 +46,15 @@ export class AppScaleSettingsItem extends AppSettingsItem {
     }
 
     public async updateSettingsValue(context: IActionContext, key?: string): Promise<string> {
-        const deployment: EnhancedDeployment | undefined = await this.parent.app.getActiveDeployment();
+        const deployment: EnhancedDeployment | undefined = await this.parent.app.activeDeployment;
         if (deployment) {
             const scaling: string = localize('scaling', 'Scaling "{0}"', deployment.app.name);
             const scaled: string = localize('scaled', 'Successfully scaled "{0}".', deployment.app.name);
 
-            const newSettings: IScaleSettings = { ...deployment.getScaleSettings() };
+            const newSettings: IScaleSettings = { ... await deployment.getScaleSettings() };
             const subContext = createSubscriptionContext(this.parent.app.subscription);
             const wizardContext: IScaleSettingsUpdateWizardContext = Object.assign(context, subContext, { newSettings });
-            const steps: AzureWizardPromptStep<IScaleSettingsUpdateWizardContext>[] = this.parent.app.service.isConsumptionTier() ?
+            const steps: AzureWizardPromptStep<IScaleSettingsUpdateWizardContext>[] = await this.parent.app.service.isConsumptionTier() ?
                 [
                     new InputConsumptionPlanScaleOutValueStep(deployment),
                     new InputConsumptionPlanScaleUpValueStep(deployment),
@@ -68,7 +68,7 @@ export class AppScaleSettingsItem extends AppSettingsItem {
             if (!key) {
                 promptSteps.push(...steps);
             } else {
-                if (this.parent.app.service.isConsumptionTier()) {
+                if (await this.parent.app.service.isConsumptionTier()) {
                     promptSteps.push(steps[key === 'capacity' ? 0 : 1]);
                 } else {
                     promptSteps.push(steps[['capacity', 'memory', 'cpu'].indexOf(key)]);
@@ -94,9 +94,9 @@ export class AppScaleSettingsItem extends AppSettingsItem {
     }
 
     protected async loadChildren(): Promise<AppSettingItem[] | undefined> {
-        const deployment: EnhancedDeployment | undefined = await this.parent.app.getActiveDeployment();
-        const settings: IScaleSettings = deployment?.getScaleSettings() ?? {};
-        const capacityLabel: string = this.parent.app.service.isConsumptionTier() ? 'Max replicas' : 'Instance count';
+        const deployment: EnhancedDeployment | undefined = await this.parent.app.activeDeployment;
+        const settings: IScaleSettings = await deployment?.getScaleSettings() ?? {};
+        const capacityLabel: string = await this.parent.app.service.isConsumptionTier() ? 'Max replicas' : 'Instance count';
         return [
             new AppSettingItem(this, 'capacity', `${settings.capacity}`.trim(), Object.assign({ label: capacityLabel }, AppScaleSettingsItem._options)),
             new AppSettingItem(this, 'cpu', `${settings.cpu}`.trim(), Object.assign({ label: 'vCPU' }, AppScaleSettingsItem._options)),

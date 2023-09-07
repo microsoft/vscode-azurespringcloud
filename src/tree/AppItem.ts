@@ -20,57 +20,53 @@ export class AppItem implements ResourceItemBase {
     public static contextValue: RegExp = /^azureSpringApps\.app;status-.+;debugging-.+;public-.+;/i;
     public static readonly ACCESS_PUBLIC_ENDPOINT: string = 'Access public endpoint';
     public static readonly ACCESS_TEST_ENDPOINT: string = 'Access test endpoint';
-    public readonly app: EnhancedApp;
     private _children: Promise<ResourceItemBase[] | undefined>;
     private _scaleSettingsItem: AppScaleSettingsItem;
-    private _status: string = 'unknown';
-    private _debuggingEnabled: boolean | undefined;
     private deleted: boolean;
+    private _stateProperties: {} | undefined = undefined;
 
-    constructor(public readonly parent: AppsItem, app: EnhancedApp) {
-        this.app = app;
-        void this.refresh();
+    constructor(public readonly parent: AppsItem, public readonly app: EnhancedApp) {
+        this._children = this.loadChildren();
     }
 
-    get viewProperties(): ViewPropertiesModel {
+    public get id(): string {
+        return this.azureResourceId;
+    }
+
+    public get azureResourceId(): string {
+        return utils.nonNullProp(this.app, 'id');
+    }
+
+    public get viewProperties(): ViewPropertiesModel {
         return {
             label: this.app.name,
             data: this.app.remote
         };
     }
 
-    get portalUrl(): Uri {
+    public get portalUrl(): Uri {
         return utils.createPortalUrl(this.app.service.subscription, this.app.id);
     }
 
-    async getChildren(): Promise<ResourceItemBase[]> {
+    public async getChildren(): Promise<ResourceItemBase[]> {
         return await this._children ?? [];
     }
 
-    getTreeItem(): TreeItem {
+    public async getTreeItem(): Promise<TreeItem> {
+        if (this._stateProperties === undefined) {
+            void this.refresh();
+            this._stateProperties = {
+                iconPath: utils.getThemedIconPath(`app-status-loading`),
+                contextValue: `azureSpringApps.app;status-loading;debugging-disabled;public-false;tier-other;`,
+                description: 'loading'
+            }
+        }
         return {
             id: this.id,
             label: this.app.name,
-            iconPath: utils.getThemedIconPath(`app-status-${this._status}`),
-            contextValue: this.contextValue,
-            description: this.description,
             collapsibleState: TreeItemCollapsibleState.Collapsed,
+            ...this._stateProperties ?? {}
         }
-    }
-
-    public get id(): string {
-        return utils.nonNullProp(this.app, 'id');
-    }
-
-    public get description(): string | undefined {
-        const state: string | undefined = this.app.properties?.provisioningState;
-        return state?.toLowerCase() === 'succeeded' ? this.app.activeDeployment?.runtimeVersion?.split(/[\s\_]/).join(" ") : state;
-    }
-
-    public get contextValue(): string {
-        const debugging: string = this._debuggingEnabled === undefined ? 'unknown' : this._debuggingEnabled ? 'enabled' : 'disabled'
-        const tier: string = this.app.service.isEnterpriseTier() ? 'enterprise' : this.app.service.isConsumptionTier() ? 'consumption' : 'other';
-        return `azureSpringApps.app;status-${this._status};debugging-${debugging};public-${this.app.properties?.public};tier-${tier};`;
     }
 
     public async scaleInstances(context: IActionContext): Promise<void> {
@@ -79,13 +75,27 @@ export class AppItem implements ResourceItemBase {
 
     public async refresh(): Promise<void> {
         if (!this.deleted) {
+            this._stateProperties = undefined;
             await ext.state.runWithTemporaryDescription(this.app.id, utils.localize('loading', 'Loading...'), async () => {
                 await this.app.refresh();
-                void this.reload();
-                this._status = await this.app.getStatus();
-                const deployment: EnhancedDeployment | undefined = await this.app.getActiveDeployment();
+                this._children = this.loadChildren();
+
+                const appProperties = (await this.app.properties);
+                const deployment: EnhancedDeployment | undefined = await this.app.activeDeployment;
+                const runtimeVersion = deployment?.runtimeVersion;
                 const config: RemoteDebugging | undefined = await deployment?.getDebuggingConfig();
-                this._debuggingEnabled = config?.enabled;
+                const status = await this.app.getStatus();
+                const state: string | undefined = appProperties?.provisioningState;
+                const description = state?.toLowerCase() === 'succeeded' ? (await runtimeVersion)?.split(/[\s\_]/).join(" ") : state;
+                const debugging: string = config?.enabled === undefined ? 'unknown' : config?.enabled ? 'enabled' : 'disabled'
+                const tier: string = await this.app.service.isEnterpriseTier() ? 'enterprise' : await this.app.service.isConsumptionTier() ? 'consumption' : 'other';
+                const contextValue = `azureSpringApps.app;status-${status};debugging-${debugging};public-${appProperties?.public};tier-${tier};`;
+                this._stateProperties = {
+                    iconPath: utils.getThemedIconPath(`app-status-${status}`),
+                    description,
+                    contextValue,
+                }
+
                 ext.state.notifyChildrenChanged(this.id);
             });
         }
@@ -120,19 +130,16 @@ export class AppItem implements ResourceItemBase {
         await ext.state.runWithTemporaryDescription(this.id, description, async () => {
             await this.app.remove();
             this.deleted = true;
-            void this.parent.reloadChildren();
-            ext.state.notifyChildrenChanged(this.parent.id);
+            void this.parent.refresh();
         });
     }
 
-    private async reload(): Promise<void> {
-        this._children = (async () => {
-            const activeDeployment: EnhancedDeployment | undefined = await this.app.getActiveDeployment();
-            if (!activeDeployment) {
-                return [];
-            }
-            this._scaleSettingsItem = new AppScaleSettingsItem(this);
-            return [new AppInstancesItem(this), new AppEnvVariablesItem(this), this._scaleSettingsItem, new AppJvmOptionsItem(this)];
-        })();
+    private async loadChildren(): Promise<ResourceItemBase[]> {
+        const activeDeployment: EnhancedDeployment | undefined = await this.app.activeDeployment;
+        if (!activeDeployment) {
+            return [];
+        }
+        this._scaleSettingsItem = new AppScaleSettingsItem(this);
+        return [new AppInstancesItem(this), new AppEnvVariablesItem(this), this._scaleSettingsItem, new AppJvmOptionsItem(this)];
     }
 }

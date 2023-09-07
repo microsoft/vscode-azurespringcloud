@@ -22,7 +22,7 @@ export class UploadArtifactStep extends AzureWizardExecuteStep<IAppDeploymentWiz
         const message: string = localize('uploadingArtifact', 'Uploading artifact "{0}" to Azure...', this.artifactPath);
         progress.report({ message });
         context.relativePathOrBuildResultId = await this.app.uploadArtifact(this.artifactPath);
-        if (this.app?.service.isEnterpriseTier()) {
+        if (await this.app?.service.isEnterpriseTier()) {
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             context.relativePathOrBuildResultId = await this.app.enqueueBuild(context.relativePathOrBuildResultId!);
         }

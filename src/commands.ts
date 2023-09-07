@@ -152,7 +152,7 @@ export async function openAppAccelerator(context: IActionContext, n?: AppsItem):
 export async function openPublicEndpoint(context: IActionContext, n?: AppItem): Promise<void> {
     const item: AppItem = await getAppItem(context, n);
     const app: EnhancedApp = item.app;
-    if (!app.properties?.public) {
+    if (!(await app.properties)?.public) {
         await context.ui.showWarningMessage(`App "${app.name}" is not publicly accessible. Do you want to assign it a public endpoint?`, { modal: true }, DialogResponses.yes);
         await assignEndpoint(context, item);
     }
@@ -165,7 +165,7 @@ export async function openPublicEndpoint(context: IActionContext, n?: AppItem): 
 export async function openTestEndpoint(context: IActionContext, n?: AppItem): Promise<void> {
     const item: AppItem = await getAppItem(context, n);
     const app: EnhancedApp = item.app;
-    if (app.service.isConsumptionTier()) {
+    if (await app.service.isConsumptionTier()) {
         void window.showErrorMessage(`Test endpoint is not supported for Azure Spring apps of consumption plan for now.`);
         return;
     }
@@ -283,7 +283,7 @@ export async function enableRemoteDebugging(context: IActionContext, n?: AppItem
     await ext.state.runWithTemporaryDescription(item.id, 'Updating...', async () => {
         const doing: string = `Enabling remote debugging for app "${item.app.name}".`;
         await utils.runInBackground(doing, null, async () => {
-            const deployment: EnhancedDeployment | undefined = await item.app.getActiveDeployment();
+            const deployment: EnhancedDeployment | undefined = await item.app.activeDeployment;
             if (!deployment) {
                 void window.showWarningMessage(`Failed to enable remote debugging for app "${item.app.name}", because it has no active deployment.`);
                 return;
@@ -311,7 +311,7 @@ export async function disableRemoteDebugging(context: IActionContext, n?: AppIte
     const done: string = `Successfully disabled remote debugging for app "${item.app.name}".`;
     await ext.state.runWithTemporaryDescription(item.id, 'Updating...', async () => {
         await utils.runInBackground(doing, done, async () => {
-            const deployment: EnhancedDeployment | undefined = await item.app.getActiveDeployment();
+            const deployment: EnhancedDeployment | undefined = await item.app.activeDeployment;
             if (!deployment) {
                 void window.showWarningMessage(`Disable Remote Debugging: App "${item.app.name}" has no active deployment.`);
                 return;

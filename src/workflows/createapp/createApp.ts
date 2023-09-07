@@ -19,7 +19,7 @@ export async function createApp(context: IActionContext, item: AppsItem): Promis
     const promptSteps: AzureWizardPromptStep<IAppCreationWizardContext>[] = [];
     const executeSteps: AzureWizardExecuteStep<IAppCreationWizardContext>[] = [];
     promptSteps.push(new InputAppNameStep(service));
-    promptSteps.push(new SelectAppStackStep(service));
+    (!await service.isEnterpriseTier()) && promptSteps.push(new SelectAppStackStep(service));
     executeSteps.push(new VerifyProvidersStep(['Microsoft.AppPlatform']));
     executeSteps.push(new CreateAppStep(service));
     executeSteps.push(new CreateAppDeploymentStep());

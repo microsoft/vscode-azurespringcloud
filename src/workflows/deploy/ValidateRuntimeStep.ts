@@ -26,7 +26,7 @@ export class ValidateRuntimeStep extends AzureWizardExecuteStep<IAppDeploymentWi
     public async execute(context: IAppDeploymentWizardContext, progress: Progress<{ message?: string; increment?: number }>): Promise<void> {
         const message: string = localize('validatingRuntime', 'Validating class bytecode version of artifact "{0}" to runtime version of target app...', this.artifactPath);
         progress.report({ message });
-        const versionStr = this.deployment.runtimeVersion?.split(/[\s\_]/)?.[1];
+        const versionStr = (await this.deployment.runtimeVersion)?.split(/[\s\_]/)?.[1];
         if (!versionStr) {
             void context.ui.showWarningMessage(`Skip runtime version check because getting runtime version of target app ${this.deployment.app.name} failed.`);
             return;
@@ -40,7 +40,7 @@ export class ValidateRuntimeStep extends AzureWizardExecuteStep<IAppDeploymentWi
     }
 
     public shouldExecute(_context: IAppDeploymentWizardContext): boolean {
-        return !this.deployment.app.service.isEnterpriseTier() && this.deployment.runtimeVersion?.split(/[\s\_]/)?.[0].toLowerCase() === 'java';
+        return true;
     }
 
     private async getClassByteCodeVersion(jarFilePath: string): Promise<number> {

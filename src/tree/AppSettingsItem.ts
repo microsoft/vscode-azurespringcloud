@@ -27,12 +27,8 @@ export abstract class AppSettingsItem implements ResourceItemBase {
     }
 
     public async refresh(): Promise<void> {
-        this.reloadChildren();
-        ext.state.notifyChildrenChanged(this.id);
-    }
-
-    public reloadChildren(): void {
         this._children = this.loadChildren();
+        ext.state.notifyChildrenChanged(this.id);
     }
 
     public async getChildren(): Promise<AppSettingItem[]> {

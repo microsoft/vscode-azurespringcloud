@@ -21,14 +21,14 @@ export class InputConsumptionPlanScaleOutValueStep extends AzureWizardPromptStep
 
     public async prompt(context: IScaleSettingsUpdateWizardContext): Promise<void> {
         const prompt: string = `Enter new value of "Max replicas" that'll be deployed in response to a trigger event.`;
-        const settings: IScaleSettings = this.deployment.getScaleSettings();
+        const settings: IScaleSettings = await this.deployment.getScaleSettings();
         const value: string = `${settings.capacity}`;
         context.newSettings.capacity = Number((await context.ui.showInputBox({ prompt, value, validateInput: this.validateInput })).trim());
         return Promise.resolve(undefined);
     }
 
     public shouldPrompt(_context: IScaleSettingsUpdateWizardContext): boolean {
-        return this.deployment.app.service.isConsumptionTier();
+        return true;
     }
 
     private async validateInput(val: string): Promise<string | undefined> {

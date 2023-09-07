@@ -147,7 +147,7 @@ export class DebugProxy extends EventEmitter {
         const appName: string = deployment.app.name;
         const deploymentName: string = deployment.name;
         const instanceName: string = this._instance.name ?? 'unknown-instance';
-        const fqdn: string = deployment.app.properties?.fqdn ?? 'unknown-host';
+        const fqdn: string = (await deployment.app.properties)?.fqdn ?? 'unknown-host';
         const url: string = `wss://${fqdn}/api/remoteDebugging/apps/${appName}/deployments/${deploymentName}/instances/${instanceName}?port=${serverPort}`;
         ext.outputChannel.appendLog(`[Proxy Server] connecting server "${url}"`);
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion

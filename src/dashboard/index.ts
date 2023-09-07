@@ -39,7 +39,7 @@ export async function initialize(context: vscode.ExtensionContext): Promise<void
 
             const app = appNode.app;
             let endpoint: string | undefined = await app.getPublicEndpoint();
-            if (!app.properties?.public || !endpoint || endpoint.toLowerCase() === 'none') {
+            if (!(await app.properties)?.public || !endpoint || endpoint.toLowerCase() === 'none') {
                 const choice = await vscode.window.showWarningMessage(`App "${app.name}" is not publicly accessible. Do you want to assign it a public endpoint?`, { modal: true }, "Yes");
                 if (!choice) {
                     return;
@@ -50,9 +50,9 @@ export async function initialize(context: vscode.ExtensionContext): Promise<void
             if (endpoint) {
                 await ensureProviderRegistered();
 
-                provider.addAppData(appNode);
+                await provider.addAppData(appNode);
                 // connect right now
-                const appData = provider.toRemoteBootAppData(appNode);
+                const appData = await provider.toRemoteBootAppData(appNode);
                 if (appData) {
                     dashboardExt.exports.connectRemoteApp(appData);
                 }
@@ -87,18 +87,19 @@ class AzureSpringAppsProvider implements RemoteBootAppDataProvider {
         return Array.from(this.store.values());
     }
 
-    public addAppData(appNode: AppItem) {
-        const appData = this.toRemoteBootAppData(appNode);
+    public async addAppData(appNode: AppItem) {
+        const appData = await this.toRemoteBootAppData(appNode);
         if (appData) {
             this.store.set(appData.name, appData);
             this.onDidChangeDataEmitter.fire();
         }
     }
 
-    public toRemoteBootAppData(appNode: AppItem): RemoteBootAppData | undefined {
+    public async toRemoteBootAppData(appNode: AppItem): Promise<RemoteBootAppData | undefined> {
         const app = appNode.app;
-        if (app.properties?.url) {
-            const uri = vscode.Uri.parse(app.properties.url);
+        const url = (await app.properties)?.url;
+        if (url) {
+            const uri = vscode.Uri.parse(url);
             const host = uri.authority;
             const jmxurl = uri.with({ path: "/actuator" }).toString();
             return {

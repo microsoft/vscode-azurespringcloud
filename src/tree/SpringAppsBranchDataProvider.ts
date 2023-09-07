@@ -6,13 +6,13 @@
 import { AppPlatformManagementClient } from '@azure/arm-appplatform';
 import { createAzureClient } from '@microsoft/vscode-azext-azureutils';
 import { callWithTelemetryAndErrorHandling, createSubscriptionContext, IActionContext } from '@microsoft/vscode-azext-utils';
-import { AzureResource, AzureResourceBranchDataProvider, AzureSubscription, ResourceModelBase } from '@microsoft/vscode-azureresources-api';
+import { AzureResource, AzureResourceBranchDataProvider, AzureResourceModel, AzureSubscription } from '@microsoft/vscode-azureresources-api';
 import * as vscode from 'vscode';
 import { ext } from '../extensionVariables';
 import { EnhancedService } from '../model/EnhancedService';
 import AppsItem from './AppsItem';
 
-export interface ResourceItemBase extends ResourceModelBase {
+export interface ResourceItemBase extends AzureResourceModel {
     getChildren?(): vscode.ProviderResult<ResourceItemBase[]>;
     getTreeItem(): vscode.TreeItem | Thenable<vscode.TreeItem>;
     refresh(): Promise<void>;
@@ -54,7 +54,6 @@ export class SpringAppsBranchDataProvider extends vscode.Disposable implements A
                 const subContext = createSubscriptionContext(element.subscription);
                 const client: AppPlatformManagementClient = createAzureClient([context, subContext], AppPlatformManagementClient);
                 const apps: EnhancedService = new EnhancedService(client, element.subscription, element);
-                await apps.refresh();
                 return new AppsItem(apps);
             });
 
