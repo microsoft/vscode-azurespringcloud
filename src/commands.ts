@@ -139,14 +139,25 @@ export async function openAppAccelerator(context: IActionContext, n?: AppsItem):
         }
         return;
     }
-    const acceleratorExt = vscode.extensions.getExtension("vmware.tanzu-app-accelerator");
+    let acceleratorExt = vscode.extensions.getExtension("vmware.tanzu-app-accelerator");
     if (!acceleratorExt) {
         await context.ui.showWarningMessage(`This feature depends on extension "Tanzu App Accelerator" provided by VMWare, do you want to install it?`, { modal: true }, DialogResponses.yes)
-        // install directly
-        await vscode.commands.executeCommand('workbench.extensions.installExtension', 'vmware.tanzu-app-accelerator');
-        await window.showInformationMessage('"Tanzu App Accelerator" is installed.');
-        // void vscode.commands.executeCommand('workbench.extensions.action.installExtensions', 'vmware.tanzu-app-accelerator');
-        // return;
+        const installing = 'Installing extension "Tanzu App Accelerator".';
+        const installed = 'Extension "Tanzu App Accelerator" is successfully installed.';
+        await utils.runInBackground(installing, installed, async () => {
+            // install directly
+            await vscode.commands.executeCommand('workbench.extensions.installExtension', 'vmware.tanzu-app-accelerator');
+            // void vscode.commands.executeCommand('workbench.extensions.action.installExtensions', 'vmware.tanzu-app-accelerator');
+            acceleratorExt = vscode.extensions.getExtension("vmware.tanzu-app-accelerator");
+            let rounds: number = 0;
+            while (!acceleratorExt && rounds++ < 15) {
+                await utils.wait(1000);
+                acceleratorExt = vscode.extensions.getExtension("vmware.tanzu-app-accelerator");
+            }
+            if (!acceleratorExt) {
+                throw new Error('"Tanzu App Accelerator" is not ready, try later please.')
+            }
+        });
     }
     const config = await service.getAppAcceleratorConfig();
     if (config) {

@@ -25,6 +25,10 @@ export const springAppsFilter: AppResourceFilter = {
     type: 'microsoft.appplatform/spring'
 };
 
+export function wait(delay: number): Promise<void> {
+    return new Promise(res => setTimeout(res, delay));
+}
+
 export interface GenericItemOptions extends IGenericTreeItemOptions {
     commandArgs?: unknown[];
 }
