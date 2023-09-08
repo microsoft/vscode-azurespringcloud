@@ -139,6 +139,15 @@ export async function openAppAccelerator(context: IActionContext, n?: AppsItem):
         }
         return;
     }
+    const acceleratorExt = vscode.extensions.getExtension("vmware.tanzu-app-accelerator");
+    if (!acceleratorExt) {
+        await context.ui.showWarningMessage(`This feature depends on extension "Tanzu App Accelerator" provided by VMWare, do you want to install it?`, { modal: true }, DialogResponses.yes)
+        // install directly
+        await vscode.commands.executeCommand('workbench.extensions.installExtension', 'vmware.tanzu-app-accelerator');
+        await window.showInformationMessage('"Tanzu App Accelerator" is installed.');
+        // void vscode.commands.executeCommand('workbench.extensions.action.installExtensions', 'vmware.tanzu-app-accelerator');
+        // return;
+    }
     const config = await service.getAppAcceleratorConfig();
     if (config) {
         await vscode.workspace.getConfiguration('tanzu-app-accelerator').update('tanzuApplicationPlatformGuiUrl', config.guiUrl, vscode.ConfigurationTarget.Global);
