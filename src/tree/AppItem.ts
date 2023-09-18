@@ -40,7 +40,10 @@ export class AppItem implements ResourceItemBase {
     public get viewProperties(): ViewPropertiesModel {
         return {
             label: this.app.name,
-            data: this.app.remote
+            getData: async () => {
+                const r = await this.app.remote;
+                return r.properties ?? {};
+            }
         };
     }
 

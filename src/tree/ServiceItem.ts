@@ -54,7 +54,10 @@ export default class ServiceItem implements ResourceItemBase {
     get viewProperties(): ViewPropertiesModel {
         return {
             label: this.service.name,
-            data: this.service.remote
+            getData: async () => {
+                const r = await this.service.remote;
+                return r.properties ?? {};
+            }
         };
     }
 

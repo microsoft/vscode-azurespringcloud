@@ -1,541 +1,541 @@
 {
-  "name": "vscode-azurespringcloud",
-  "displayName": "Azure Spring Apps",
-  "description": "%azureSpringApps.description%",
-  "version": "0.9.0-SNAPSHOT",
-  "publisher": "vscjava",
-  "icon": "resources/azure-spring-apps.png",
-  "aiKey": "0c6ae279ed8443289764825290e4f9e2-1a736e7c-1324-4338-be46-fc2a58ae4d14-7255",
-  "engines": {
-    "vscode": "^1.76.0"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Microsoft/vscode-azurespringcloud"
-  },
-  "galleryBanner": {
-    "color": "#3a3d41",
-    "theme": "dark"
-  },
-  "homepage": "https://github.com/Microsoft/vscode-azurespringcloud/blob/main/README.md",
-  "license": "SEE LICENSE IN LICENSE.md",
-  "categories": [
-    "Azure"
-  ],
-  "keywords": [
-    "Azure",
-    "Java",
-    "microservice",
-    "spring",
-    "cloud"
-  ],
-  "preview": true,
-  "activationEvents": [
-    "onView:azureResourceGroups",
-    "onView:azureResourceGroupsV2",
-    "onCommand:azureSpringApps.file.deploy"
-  ],
-  "main": "./main.js",
-  "contributes": {
-    "x-azResources": {
-      "azure": {
-        "branches": [
-          {
-            "type": "SpringApps"
-          }
-        ]
-      },
-      "commands": [
-        {
-          "command": "azureSpringApps.apps.createInPortal",
-          "title": "%azureSpringApps.apps.createInPortal%",
-          "type": "microsoft.appplatform/spring",
-          "detail": "%azureSpringApps.apps.create.info%"
-        }
-      ],
-      "activation": {
-        "onFetch": [
-          "microsoft.appplatform/spring"
+    "name": "vscode-azurespringcloud",
+    "displayName": "Azure Spring Apps",
+    "description": "%azureSpringApps.description%",
+    "version": "0.9.0-SNAPSHOT",
+    "publisher": "vscjava",
+    "icon": "resources/azure-spring-apps.png",
+    "aiKey": "0c6ae279ed8443289764825290e4f9e2-1a736e7c-1324-4338-be46-fc2a58ae4d14-7255",
+    "engines": {
+        "vscode": "^1.76.0"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Microsoft/vscode-azurespringcloud"
+    },
+    "galleryBanner": {
+        "color": "#3a3d41",
+        "theme": "dark"
+    },
+    "homepage": "https://github.com/Microsoft/vscode-azurespringcloud/blob/main/README.md",
+    "license": "SEE LICENSE IN LICENSE.md",
+    "categories": [
+        "Azure"
+    ],
+    "keywords": [
+        "Azure",
+        "Java",
+        "microservice",
+        "spring",
+        "cloud"
+    ],
+    "preview": true,
+    "activationEvents": [
+        "onView:azureResourceGroups",
+        "onView:azureResourceGroupsV2",
+        "onCommand:azureSpringApps.file.deploy"
+    ],
+    "main": "./main.js",
+    "contributes": {
+        "x-azResources": {
+            "azure": {
+                "branches": [
+                    {
+                        "type": "SpringApps"
+                    }
+                ]
+            },
+            "commands": [
+                {
+                    "command": "azureSpringApps.apps.createInPortal",
+                    "title": "%azureSpringApps.apps.createInPortal%",
+                    "type": "microsoft.appplatform/spring",
+                    "detail": "%azureSpringApps.apps.create.info%"
+                }
+            ],
+            "activation": {
+                "onFetch": [
+                    "microsoft.appplatform/spring"
+                ],
+                "onResolve": [
+                    "microsoft.appplatform/spring"
+                ]
+            }
+        },
+        "commands": [
+            {
+                "command": "springApps.reportIssue",
+                "title": "%springApps.reportIssue%",
+                "category": "Azure Spring Apps",
+                "icon": "$(report)"
+            },
+            {
+                "command": "azureSpringApps.file.deploy",
+                "title": "%azureSpringApps.file.deploy%",
+                "category": "Azure Spring Apps",
+                "icon": "$(cloud-upload)"
+            },
+            {
+                "command": "azureSpringApps.common.refresh",
+                "title": "%azureSpringApps.common.refresh%",
+                "category": "Azure Spring Apps",
+                "icon": "$(refresh)"
+            },
+            {
+                "command": "azureSpringApps.apps.createInPortal",
+                "title": "%azureSpringApps.apps.createInPortal%",
+                "category": "Azure Spring Apps",
+                "icon": "$(add)"
+            },
+            {
+                "command": "azureSpringApps.app.create",
+                "title": "%azureSpringApps.app.create%",
+                "category": "Azure Spring Apps",
+                "icon": "$(add)"
+            },
+            {
+                "command": "azureSpringApps.apps.delete",
+                "title": "%azureSpringApps.common.delete%",
+                "category": "Azure Spring Apps",
+                "icon": "$(remove)"
+            },
+            {
+                "command": "azureSpringApps.apps.openLiveView",
+                "title": "Open Application Live View",
+                "category": "Azure Spring Apps",
+                "icon": "$(globe)"
+            },
+            {
+                "command": "azureSpringApps.apps.openAppAccelerator",
+                "title": "Open Application Accelerator",
+                "category": "Azure Spring Apps",
+                "icon": "$(globe)"
+            },
+            {
+                "command": "azureSpringApps.app.openPublicEndpoint",
+                "title": "%azureSpringApps.app.openPublicEndpoint%",
+                "category": "Azure Spring App",
+                "icon": "$(globe)"
+            },
+            {
+                "command": "azureSpringApps.app.openTestEndpoint",
+                "title": "%azureSpringApps.app.openTestEndpoint%",
+                "category": "Azure Spring App",
+                "icon": "$(globe)"
+            },
+            {
+                "command": "azureSpringApps.app.assignEndpoint",
+                "title": "%azureSpringApps.app.assignEndpoint%",
+                "category": "Azure Spring App"
+            },
+            {
+                "command": "azureSpringApps.app.unassignEndpoint",
+                "title": "%azureSpringApps.app.unassignEndpoint%",
+                "category": "Azure Spring App"
+            },
+            {
+                "command": "azureSpringApps.app.start",
+                "title": "%azureSpringApps.common.start%",
+                "category": "Azure Spring App",
+                "icon": "$(run)"
+            },
+            {
+                "command": "azureSpringApps.app.stop",
+                "title": "%azureSpringApps.common.stop%",
+                "category": "Azure Spring App",
+                "icon": "$(debug-stop)"
+            },
+            {
+                "command": "azureSpringApps.app.restart",
+                "title": "%azureSpringApps.common.restart%",
+                "category": "Azure Spring App",
+                "icon": "$(debug-restart)"
+            },
+            {
+                "command": "azureSpringApps.app.delete",
+                "title": "%azureSpringApps.common.delete%",
+                "category": "Azure Spring App",
+                "icon": "$(remove)"
+            },
+            {
+                "command": "azureSpringApps.app.deploy",
+                "title": "%azureSpringApps.app.deploy%",
+                "category": "Azure Spring App",
+                "icon": "$(cloud-upload)"
+            },
+            {
+                "command": "azureSpringApps.app.scale",
+                "title": "%azureSpringApps.app.scale%",
+                "category": "Azure Spring App",
+                "icon": "$(settings)"
+            },
+            {
+                "command": "azureSpringApps.app.enableRemoteDebugging",
+                "title": "%azureSpringApps.app.enableRemoteDebugging%",
+                "category": "Azure Spring App"
+            },
+            {
+                "command": "azureSpringApps.app.disableRemoteDebugging",
+                "title": "%azureSpringApps.app.disableRemoteDebugging%",
+                "category": "Azure Spring App"
+            },
+            {
+                "command": "azureSpringApps.app.instance.startRemoteDebugging",
+                "title": "%azureSpringApps.app.instance.startRemoteDebugging%",
+                "category": "Azure Spring App Instance"
+            },
+            {
+                "command": "azureSpringApps.app.instance.startStreamingLog",
+                "title": "%azureSpringApps.app.instance.startStreamingLog%",
+                "category": "Azure Spring App Instance"
+            },
+            {
+                "command": "azureSpringApps.app.instance.stopStreamingLog",
+                "title": "%azureSpringApps.app.instance.stopStreamingLog%",
+                "category": "Azure Spring App Instance"
+            },
+            {
+                "command": "azureSpringApps.app.settings.add",
+                "title": "%azureSpringApps.common.add%",
+                "category": "Azure Spring App Settings"
+            },
+            {
+                "command": "azureSpringApps.app.settings.edit",
+                "title": "%azureSpringApps.common.edit%",
+                "category": "Azure Spring App Settings"
+            },
+            {
+                "command": "azureSpringApps.common.toggleVisibility",
+                "title": "%azureSpringApps.common.toggleVisibility%",
+                "category": "Azure Spring Apps",
+                "icon": "$(eye)"
+            },
+            {
+                "command": "azureSpringApps.app.setting.edit",
+                "title": "%azureSpringApps.common.edit%",
+                "category": "Azure Spring App",
+                "icon": "$(edit)"
+            },
+            {
+                "command": "azureSpringApps.app.setting.delete",
+                "title": "%azureSpringApps.common.delete%",
+                "category": "Azure Spring App",
+                "icon": "$(remove)"
+            },
+            {
+                "command": "azureSpringApps.app.showLiveInformation",
+                "title": "View Live Information",
+                "category": "Azure Spring Apps"
+            },
+            {
+                "command": "azureSpringApps.app.openLiveView",
+                "title": "Open Application Live View",
+                "category": "Azure Spring App",
+                "icon": "$(globe)"
+            },
+            {
+                "command": "azureSpringApps.focus",
+                "title": "Focus on Spring Apps View",
+                "category": "Azure Spring Apps",
+                "icon": "$(arrow-right)"
+            }
         ],
-        "onResolve": [
-          "microsoft.appplatform/spring"
+        "menus": {
+            "view/item/context": [
+                {
+                    "command": "azureSpringApps.apps.createInPortal",
+                    "when": "viewItem =~ /springapps/i && viewItem =~ /azureResourceTypeGroup/i",
+                    "group": "5@1"
+                },
+                {
+                    "command": "azureSpringApps.app.create",
+                    "when": "viewItem =~ /^azureSpringApps\\.apps;/i",
+                    "group": "5@1"
+                },
+                {
+                    "command": "azureSpringApps.apps.delete",
+                    "when": "viewItem =~ /^azureSpringApps\\.apps;/i",
+                    "group": "5@2"
+                },
+                {
+                    "command": "azureSpringApps.apps.openLiveView",
+                    "when": "viewItem =~ /^azureSpringApps\\.apps;tier-enterprise;/i",
+                    "group": "7@1"
+                },
+                {
+                    "command": "azureSpringApps.apps.openAppAccelerator",
+                    "when": "viewItem =~ /^azureSpringApps\\.apps;tier-enterprise;/i",
+                    "group": "7@2"
+                },
+                {
+                    "command": "azureSpringApps.app.openPublicEndpoint",
+                    "when": "viewItem =~ /^azureSpringApps\\.app;status-running;/i",
+                    "group": "2@1"
+                },
+                {
+                    "command": "azureSpringApps.app.openTestEndpoint",
+                    "when": "viewItem =~ /^azureSpringApps\\.app;status-running;/i",
+                    "group": "2@2"
+                },
+                {
+                    "command": "azureSpringApps.app.assignEndpoint",
+                    "when": "viewItem =~ /^azureSpringApps\\.app;status-(running|stopped);.*;public-false;/i",
+                    "group": "3@1"
+                },
+                {
+                    "command": "azureSpringApps.app.unassignEndpoint",
+                    "when": "viewItem =~ /^azureSpringApps\\.app;status-(running|stopped);.*;public-true;/i",
+                    "group": "3@1"
+                },
+                {
+                    "command": "azureSpringApps.app.start",
+                    "when": "viewItem =~ /^azureSpringApps\\.app;status-stopped;/i",
+                    "group": "5@1"
+                },
+                {
+                    "command": "azureSpringApps.app.enableRemoteDebugging",
+                    "when": "viewItem =~ /^azureSpringApps\\.app;status-running;debugging-disabled;/i",
+                    "group": "4@2"
+                },
+                {
+                    "command": "azureSpringApps.app.disableRemoteDebugging",
+                    "when": "viewItem =~ /^azureSpringApps\\.app;status-running;debugging-enabled;/i",
+                    "group": "4@2"
+                },
+                {
+                    "command": "azureSpringApps.app.stop",
+                    "when": "viewItem =~ /^azureSpringApps\\.app;status-running;/i",
+                    "group": "5@2"
+                },
+                {
+                    "command": "azureSpringApps.app.restart",
+                    "when": "viewItem =~ /^azureSpringApps\\.app;status-running;/i",
+                    "group": "5@3"
+                },
+                {
+                    "command": "azureSpringApps.app.delete",
+                    "when": "viewItem =~ /^azureSpringApps\\.app;status-.+;/i",
+                    "group": "5@4"
+                },
+                {
+                    "command": "azureSpringApps.app.scale",
+                    "when": "viewItem =~ /^azureSpringApps\\.app;status-(running|stopped);/i",
+                    "group": "5@5"
+                },
+                {
+                    "command": "azureSpringApps.app.deploy",
+                    "when": "viewItem =~ /^azureSpringApps\\.app;status-(running|stopped);/i",
+                    "group": "6@1"
+                },
+                {
+                    "command": "azureSpringApps.app.openLiveView",
+                    "when": "viewItem =~ /^azureSpringApps\\.app;.+;tier-enterprise;/i",
+                    "group": "8@1"
+                },
+                {
+                    "command": "azureSpringApps.common.refresh",
+                    "when": "viewItem =~ /^azureSpringApps\\.app;status-.+;/i",
+                    "group": "9@2"
+                },
+                {
+                    "command": "azureSpringApps.common.refresh",
+                    "when": "viewItem == azureSpringApps.app.instances",
+                    "group": "9@2"
+                },
+                {
+                    "command": "azureSpringApps.app.instance.startRemoteDebugging",
+                    "when": "viewItem =~ /^azureSpringApps\\.app(\\.instance)?;status-[Rr]unning;/i",
+                    "group": "4@1"
+                },
+                {
+                    "command": "azureSpringApps.app.instance.startStreamingLog",
+                    "when": "viewItem =~ /^azureSpringApps\\.app\\.instance;status-Running;streaming-false;/i",
+                    "group": "6@1"
+                },
+                {
+                    "command": "azureSpringApps.app.instance.stopStreamingLog",
+                    "when": "viewItem =~ /^azureSpringApps\\.app\\.instance;status-Running;streaming-true;/i",
+                    "group": "6@2"
+                },
+                {
+                    "command": "azureSpringApps.app.settings.add",
+                    "when": "viewItem =~ /^azureSpringApps\\.app\\.(jvmOptions|envVariables)$/",
+                    "group": "1@1"
+                },
+                {
+                    "command": "azureSpringApps.app.settings.edit",
+                    "when": "viewItem =~ /^azureSpringApps\\.app\\.(jvmOptions|scaleSettings)$/",
+                    "group": "1@2"
+                },
+                {
+                    "command": "azureSpringApps.common.refresh",
+                    "when": "viewItem =~ /^azureSpringApps\\.app\\.(jvmOptions|scaleSettings|envVariables)$/",
+                    "group": "2@1"
+                },
+                {
+                    "command": "azureSpringApps.common.toggleVisibility",
+                    "when": "viewItem =~ /^azureSpringApps\\.app\\.envVariable(|s)$/",
+                    "group": "inline"
+                },
+                {
+                    "command": "azureSpringApps.app.setting.edit",
+                    "when": "viewItem =~ /^azureSpringApps\\.app\\.(jvmOption|scaleSetting|envVariable)$/",
+                    "group": "1@1"
+                },
+                {
+                    "command": "azureSpringApps.app.setting.delete",
+                    "when": "viewItem =~ /^azureSpringApps\\.app\\.(jvmOption|envVariable)$/",
+                    "group": "1@2"
+                },
+                {
+                    "command": "azureSpringApps.app.showLiveInformation",
+                    "when": "spring.dashboard:enabled && viewItem =~ /^azureSpringApps\\.app;status-running;/i"
+                },
+                {
+                    "command": "azureSpringApps.focus",
+                    "when": "view == spring.apps && viewItem == spring:remoteAppProvider+Azure",
+                    "group": "inline"
+                }
+            ],
+            "commandPalette": [
+                {
+                    "command": "azureSpringApps.common.refresh",
+                    "when": "never"
+                },
+                {
+                    "command": "azureSpringApps.common.toggleVisibility",
+                    "when": "never"
+                },
+                {
+                    "command": "azureSpringApps.app.settings.add",
+                    "when": "never"
+                },
+                {
+                    "command": "azureSpringApps.app.settings.edit",
+                    "when": "never"
+                },
+                {
+                    "command": "azureSpringApps.app.setting.edit",
+                    "when": "never"
+                },
+                {
+                    "command": "azureSpringApps.app.setting.delete",
+                    "when": "never"
+                },
+                {
+                    "command": "azureSpringApps.app.showLiveInformation",
+                    "when": "never"
+                }
+            ],
+            "explorer/context": [
+                {
+                    "command": "azureSpringApps.file.deploy",
+                    "when": "explorerResourceIsFolder == true",
+                    "group": "zzz_azuretools_deploy@1"
+                },
+                {
+                    "command": "azureSpringApps.file.deploy",
+                    "when": "explorerResourceIsFolder == false && resourceExtname =~ /.jar$/",
+                    "group": "zzz_azuretools_deploy@1"
+                }
+            ]
+        },
+        "keybindings": [
+            {
+                "command": "workbench.view.extension.azure",
+                "key": "ctrl+shift+a",
+                "mac": "cmd+shift+a",
+                "linux": "shift+alt+a"
+            }
+        ],
+        "configuration": [
+            {
+                "title": "Azure Spring Apps",
+                "properties": {
+                    "azureSpringApps.enableOutputTimestamps": {
+                        "type": "boolean",
+                        "description": "%azureSpringApps.enableOutputTimestamps%",
+                        "default": true
+                    },
+                    "azureSpringApps.deleteConfirmation": {
+                        "type": "string",
+                        "enum": [
+                            "EnterName",
+                            "ClickButton"
+                        ],
+                        "description": "%azureSpringApps.deleteConfirmation%",
+                        "enumDescriptions": [
+                            "%azureSpringApps.deleteConfirmation.EnterName%",
+                            "%azureSpringApps.deleteConfirmation.ClickButton%"
+                        ],
+                        "default": "EnterName"
+                    }
+                }
+            }
         ]
-      }
     },
-    "commands": [
-      {
-        "command": "springApps.reportIssue",
-        "title": "%springApps.reportIssue%",
-        "category": "Azure Spring Apps",
-        "icon": "$(report)"
-      },
-      {
-        "command": "azureSpringApps.file.deploy",
-        "title": "%azureSpringApps.file.deploy%",
-        "category": "Azure Spring Apps",
-        "icon": "$(cloud-upload)"
-      },
-      {
-        "command": "azureSpringApps.common.refresh",
-        "title": "%azureSpringApps.common.refresh%",
-        "category": "Azure Spring Apps",
-        "icon": "$(refresh)"
-      },
-      {
-        "command": "azureSpringApps.apps.createInPortal",
-        "title": "%azureSpringApps.apps.createInPortal%",
-        "category": "Azure Spring Apps",
-        "icon": "$(add)"
-      },
-      {
-        "command": "azureSpringApps.app.create",
-        "title": "%azureSpringApps.app.create%",
-        "category": "Azure Spring Apps",
-        "icon": "$(add)"
-      },
-      {
-        "command": "azureSpringApps.apps.delete",
-        "title": "%azureSpringApps.common.delete%",
-        "category": "Azure Spring Apps",
-        "icon": "$(remove)"
-      },
-      {
-        "command": "azureSpringApps.apps.openLiveView",
-        "title": "Open Application Live View",
-        "category": "Azure Spring Apps",
-        "icon": "$(globe)"
-      },
-      {
-        "command": "azureSpringApps.apps.openAppAccelerator",
-        "title": "Open Application Accelerator",
-        "category": "Azure Spring Apps",
-        "icon": "$(globe)"
-      },
-      {
-        "command": "azureSpringApps.app.openPublicEndpoint",
-        "title": "%azureSpringApps.app.openPublicEndpoint%",
-        "category": "Azure Spring App",
-        "icon": "$(globe)"
-      },
-      {
-        "command": "azureSpringApps.app.openTestEndpoint",
-        "title": "%azureSpringApps.app.openTestEndpoint%",
-        "category": "Azure Spring App",
-        "icon": "$(globe)"
-      },
-      {
-        "command": "azureSpringApps.app.assignEndpoint",
-        "title": "%azureSpringApps.app.assignEndpoint%",
-        "category": "Azure Spring App"
-      },
-      {
-        "command": "azureSpringApps.app.unassignEndpoint",
-        "title": "%azureSpringApps.app.unassignEndpoint%",
-        "category": "Azure Spring App"
-      },
-      {
-        "command": "azureSpringApps.app.start",
-        "title": "%azureSpringApps.common.start%",
-        "category": "Azure Spring App",
-        "icon": "$(run)"
-      },
-      {
-        "command": "azureSpringApps.app.stop",
-        "title": "%azureSpringApps.common.stop%",
-        "category": "Azure Spring App",
-        "icon": "$(debug-stop)"
-      },
-      {
-        "command": "azureSpringApps.app.restart",
-        "title": "%azureSpringApps.common.restart%",
-        "category": "Azure Spring App",
-        "icon": "$(debug-restart)"
-      },
-      {
-        "command": "azureSpringApps.app.delete",
-        "title": "%azureSpringApps.common.delete%",
-        "category": "Azure Spring App",
-        "icon": "$(remove)"
-      },
-      {
-        "command": "azureSpringApps.app.deploy",
-        "title": "%azureSpringApps.app.deploy%",
-        "category": "Azure Spring App",
-        "icon": "$(cloud-upload)"
-      },
-      {
-        "command": "azureSpringApps.app.scale",
-        "title": "%azureSpringApps.app.scale%",
-        "category": "Azure Spring App",
-        "icon": "$(settings)"
-      },
-      {
-        "command": "azureSpringApps.app.enableRemoteDebugging",
-        "title": "%azureSpringApps.app.enableRemoteDebugging%",
-        "category": "Azure Spring App"
-      },
-      {
-        "command": "azureSpringApps.app.disableRemoteDebugging",
-        "title": "%azureSpringApps.app.disableRemoteDebugging%",
-        "category": "Azure Spring App"
-      },
-      {
-        "command": "azureSpringApps.app.instance.startRemoteDebugging",
-        "title": "%azureSpringApps.app.instance.startRemoteDebugging%",
-        "category": "Azure Spring App Instance"
-      },
-      {
-        "command": "azureSpringApps.app.instance.startStreamingLog",
-        "title": "%azureSpringApps.app.instance.startStreamingLog%",
-        "category": "Azure Spring App Instance"
-      },
-      {
-        "command": "azureSpringApps.app.instance.stopStreamingLog",
-        "title": "%azureSpringApps.app.instance.stopStreamingLog%",
-        "category": "Azure Spring App Instance"
-      },
-      {
-        "command": "azureSpringApps.app.settings.add",
-        "title": "%azureSpringApps.common.add%",
-        "category": "Azure Spring App Settings"
-      },
-      {
-        "command": "azureSpringApps.app.settings.edit",
-        "title": "%azureSpringApps.common.edit%",
-        "category": "Azure Spring App Settings"
-      },
-      {
-        "command": "azureSpringApps.common.toggleVisibility",
-        "title": "%azureSpringApps.common.toggleVisibility%",
-        "category": "Azure Spring Apps",
-        "icon": "$(eye)"
-      },
-      {
-        "command": "azureSpringApps.app.setting.edit",
-        "title": "%azureSpringApps.common.edit%",
-        "category": "Azure Spring App",
-        "icon": "$(edit)"
-      },
-      {
-        "command": "azureSpringApps.app.setting.delete",
-        "title": "%azureSpringApps.common.delete%",
-        "category": "Azure Spring App",
-        "icon": "$(remove)"
-      },
-      {
-        "command": "azureSpringApps.app.showLiveInformation",
-        "title": "View Live Information",
-        "category": "Azure Spring Apps"
-      },
-      {
-        "command": "azureSpringApps.app.openLiveView",
-        "title": "Open Application Live View",
-        "category": "Azure Spring App",
-        "icon": "$(globe)"
-      },
-      {
-        "command": "azureSpringApps.focus",
-        "title": "Focus on Spring Apps View",
-        "category": "Azure Spring Apps",
-        "icon": "$(arrow-right)"
-      }
-    ],
-    "menus": {
-      "view/item/context": [
-        {
-          "command": "azureSpringApps.apps.createInPortal",
-          "when": "viewItem =~ /springapps/i && viewItem =~ /azureResourceTypeGroup/i",
-          "group": "5@1"
-        },
-        {
-          "command": "azureSpringApps.app.create",
-          "when": "viewItem =~ /^azureSpringApps\\.apps;/i",
-          "group": "5@1"
-        },
-        {
-          "command": "azureSpringApps.apps.delete",
-          "when": "viewItem =~ /^azureSpringApps\\.apps;/i",
-          "group": "5@2"
-        },
-        {
-          "command": "azureSpringApps.apps.openLiveView",
-          "when": "viewItem =~ /^azureSpringApps\\.apps;tier-enterprise;/i",
-          "group": "7@1"
-        },
-        {
-          "command": "azureSpringApps.apps.openAppAccelerator",
-          "when": "viewItem =~ /^azureSpringApps\\.apps;tier-enterprise;/i",
-          "group": "7@2"
-        },
-        {
-          "command": "azureSpringApps.app.openPublicEndpoint",
-          "when": "viewItem =~ /^azureSpringApps\\.app;status-running;/i",
-          "group": "2@1"
-        },
-        {
-          "command": "azureSpringApps.app.openTestEndpoint",
-          "when": "viewItem =~ /^azureSpringApps\\.app;status-running;/i",
-          "group": "2@2"
-        },
-        {
-          "command": "azureSpringApps.app.assignEndpoint",
-          "when": "viewItem =~ /^azureSpringApps\\.app;status-(running|stopped);.*;public-false;/i",
-          "group": "3@1"
-        },
-        {
-          "command": "azureSpringApps.app.unassignEndpoint",
-          "when": "viewItem =~ /^azureSpringApps\\.app;status-(running|stopped);.*;public-true;/i",
-          "group": "3@1"
-        },
-        {
-          "command": "azureSpringApps.app.start",
-          "when": "viewItem =~ /^azureSpringApps\\.app;status-stopped;/i",
-          "group": "5@1"
-        },
-        {
-          "command": "azureSpringApps.app.enableRemoteDebugging",
-          "when": "viewItem =~ /^azureSpringApps\\.app;status-running;debugging-disabled;/i",
-          "group": "4@2"
-        },
-        {
-          "command": "azureSpringApps.app.disableRemoteDebugging",
-          "when": "viewItem =~ /^azureSpringApps\\.app;status-running;debugging-enabled;/i",
-          "group": "4@2"
-        },
-        {
-          "command": "azureSpringApps.app.stop",
-          "when": "viewItem =~ /^azureSpringApps\\.app;status-running;/i",
-          "group": "5@2"
-        },
-        {
-          "command": "azureSpringApps.app.restart",
-          "when": "viewItem =~ /^azureSpringApps\\.app;status-running;/i",
-          "group": "5@3"
-        },
-        {
-          "command": "azureSpringApps.app.delete",
-          "when": "viewItem =~ /^azureSpringApps\\.app;status-.+;/i",
-          "group": "5@4"
-        },
-        {
-          "command": "azureSpringApps.app.scale",
-          "when": "viewItem =~ /^azureSpringApps\\.app;status-(running|stopped);/i",
-          "group": "5@5"
-        },
-        {
-          "command": "azureSpringApps.app.deploy",
-          "when": "viewItem =~ /^azureSpringApps\\.app;status-(running|stopped);/i",
-          "group": "6@1"
-        },
-        {
-          "command": "azureSpringApps.app.openLiveView",
-          "when": "viewItem =~ /^azureSpringApps\\.app;.+;tier-enterprise;/i",
-          "group": "8@1"
-        },
-        {
-          "command": "azureSpringApps.common.refresh",
-          "when": "viewItem =~ /^azureSpringApps\\.app;status-.+;/i",
-          "group": "9@2"
-        },
-        {
-          "command": "azureSpringApps.common.refresh",
-          "when": "viewItem == azureSpringApps.app.instances",
-          "group": "9@2"
-        },
-        {
-          "command": "azureSpringApps.app.instance.startRemoteDebugging",
-          "when": "viewItem =~ /^azureSpringApps\\.app(\\.instance)?;status-[Rr]unning;/i",
-          "group": "4@1"
-        },
-        {
-          "command": "azureSpringApps.app.instance.startStreamingLog",
-          "when": "viewItem =~ /^azureSpringApps\\.app\\.instance;status-Running;streaming-false;/i",
-          "group": "6@1"
-        },
-        {
-          "command": "azureSpringApps.app.instance.stopStreamingLog",
-          "when": "viewItem =~ /^azureSpringApps\\.app\\.instance;status-Running;streaming-true;/i",
-          "group": "6@2"
-        },
-        {
-          "command": "azureSpringApps.app.settings.add",
-          "when": "viewItem =~ /^azureSpringApps\\.app\\.(jvmOptions|envVariables)$/",
-          "group": "1@1"
-        },
-        {
-          "command": "azureSpringApps.app.settings.edit",
-          "when": "viewItem =~ /^azureSpringApps\\.app\\.(jvmOptions|scaleSettings)$/",
-          "group": "1@2"
-        },
-        {
-          "command": "azureSpringApps.common.refresh",
-          "when": "viewItem =~ /^azureSpringApps\\.app\\.(jvmOptions|scaleSettings|envVariables)$/",
-          "group": "2@1"
-        },
-        {
-          "command": "azureSpringApps.common.toggleVisibility",
-          "when": "viewItem =~ /^azureSpringApps\\.app\\.envVariable(|s)$/",
-          "group": "inline"
-        },
-        {
-          "command": "azureSpringApps.app.setting.edit",
-          "when": "viewItem =~ /^azureSpringApps\\.app\\.(jvmOption|scaleSetting|envVariable)$/",
-          "group": "1@1"
-        },
-        {
-          "command": "azureSpringApps.app.setting.delete",
-          "when": "viewItem =~ /^azureSpringApps\\.app\\.(jvmOption|envVariable)$/",
-          "group": "1@2"
-        },
-        {
-          "command": "azureSpringApps.app.showLiveInformation",
-          "when": "spring.dashboard:enabled && viewItem =~ /^azureSpringApps\\.app;status-running;/i"
-        },
-        {
-          "command": "azureSpringApps.focus",
-          "when": "view == spring.apps && viewItem == spring:remoteAppProvider+Azure",
-          "group": "inline"
-        }
-      ],
-      "commandPalette": [
-        {
-          "command": "azureSpringApps.common.refresh",
-          "when": "never"
-        },
-        {
-          "command": "azureSpringApps.common.toggleVisibility",
-          "when": "never"
-        },
-        {
-          "command": "azureSpringApps.app.settings.add",
-          "when": "never"
-        },
-        {
-          "command": "azureSpringApps.app.settings.edit",
-          "when": "never"
-        },
-        {
-          "command": "azureSpringApps.app.setting.edit",
-          "when": "never"
-        },
-        {
-          "command": "azureSpringApps.app.setting.delete",
-          "when": "never"
-        },
-        {
-          "command": "azureSpringApps.app.showLiveInformation",
-          "when": "never"
-        }
-      ],
-      "explorer/context": [
-        {
-          "command": "azureSpringApps.file.deploy",
-          "when": "explorerResourceIsFolder == true",
-          "group": "zzz_azuretools_deploy@1"
-        },
-        {
-          "command": "azureSpringApps.file.deploy",
-          "when": "explorerResourceIsFolder == false && resourceExtname =~ /.jar$/",
-          "group": "zzz_azuretools_deploy@1"
-        }
-      ]
+    "scripts": {
+        "vscode:prepublish": "npm run webpack-prod",
+        "build": "tsc",
+        "cleanReadme": "gulp cleanReadme",
+        "compile": "tsc -watch",
+        "package": "vsce package",
+        "package:pre-release": "vsce package --pre-release",
+        "lint": "eslint --ext .ts .",
+        "lint-fix": "eslint --ext .ts . --fix",
+        "listIcons": "gulp listIcons",
+        "pretest": "npm run webpack-prod && gulp preTest",
+        "test": "node ./out/test/runTest.js",
+        "webpack": "npm run build && gulp webpack-dev",
+        "webpack-prod": "npm run build && gulp webpack-prod",
+        "webpack-profile": "webpack --profile --json --mode production > webpack-stats.json && echo Use http://webpack.github.io/analyse to analyze the stats",
+        "all": "npm i && npm run lint && npm test"
     },
-    "keybindings": [
-      {
-        "command": "workbench.view.extension.azure",
-        "key": "ctrl+shift+a",
-        "mac": "cmd+shift+a",
-        "linux": "shift+alt+a"
-      }
+    "devDependencies": {
+        "@microsoft/eslint-config-azuretools": "^0.1.0",
+        "@microsoft/vscode-azext-dev": "^0.1.4",
+        "@types/fs-extra": "^8.1.1",
+        "@types/gulp": "^4.0.9",
+        "@types/mocha": "^8.2.2",
+        "@types/node": "^16.0.0",
+        "@types/request": "^2.48.4",
+        "@types/vscode": "1.76.0",
+        "@types/websocket": "^1.0.5",
+        "@typescript-eslint/eslint-plugin": "^4.28.3",
+        "@vscode/vsce": "^2.19.0",
+        "eslint": "^7.19.0",
+        "eslint-plugin-import": "^2.22.1",
+        "fs-extra": "^11.1.1",
+        "glob": "^7.1.6",
+        "gulp": "^4.0.2",
+        "mocha": "^10.0.0",
+        "mocha-junit-reporter": "^2.0.0",
+        "mocha-multi-reporters": "^1.5.1",
+        "ts-node": "^10.9.1",
+        "typescript": "^4.9.4",
+        "vscode-test": "^1.5.2",
+        "webpack": "^5.76.0",
+        "webpack-cli": "^4.10.0"
+    },
+    "dependencies": {
+        "@azure/arm-appplatform": "^3.0.0-beta.1",
+        "@azure/core-client": "^1.7.2",
+        "@azure/ms-rest-js": "^2.6.6",
+        "@azure/storage-file-share": "^12.14.0",
+        "@microsoft/vscode-azext-azureutils": "^2.0.2",
+        "@microsoft/vscode-azext-utils": "^2.1.0",
+        "@microsoft/vscode-azureresources-api": "^2.1.0",
+        "axios": "^1.3.6",
+        "node-stream-zip": "^1.15.0",
+        "vscode-extension-telemetry-wrapper": "^0.13.3",
+        "vscode-nls": "^5.2.0",
+        "websocket": "^1.0.34"
+    },
+    "extensionDependencies": [
+        "ms-vscode.azure-account",
+        "ms-azuretools.vscode-azureresourcegroups"
     ],
-    "configuration": [
-      {
-        "title": "Azure Spring Apps",
-        "properties": {
-          "azureSpringApps.enableOutputTimestamps": {
-            "type": "boolean",
-            "description": "%azureSpringApps.enableOutputTimestamps%",
-            "default": true
-          },
-          "azureSpringApps.deleteConfirmation": {
-            "type": "string",
-            "enum": [
-              "EnterName",
-              "ClickButton"
-            ],
-            "description": "%azureSpringApps.deleteConfirmation%",
-            "enumDescriptions": [
-              "%azureSpringApps.deleteConfirmation.EnterName%",
-              "%azureSpringApps.deleteConfirmation.ClickButton%"
-            ],
-            "default": "EnterName"
-          }
-        }
-      }
-    ]
-  },
-  "scripts": {
-    "vscode:prepublish": "npm run webpack-prod",
-    "build": "tsc",
-    "cleanReadme": "gulp cleanReadme",
-    "compile": "tsc -watch",
-    "package": "vsce package",
-    "package:pre-release": "vsce package --pre-release",
-    "lint": "eslint --ext .ts .",
-    "lint-fix": "eslint --ext .ts . --fix",
-    "listIcons": "gulp listIcons",
-    "pretest": "npm run webpack-prod && gulp preTest",
-    "test": "node ./out/test/runTest.js",
-    "webpack": "npm run build && gulp webpack-dev",
-    "webpack-prod": "npm run build && gulp webpack-prod",
-    "webpack-profile": "webpack --profile --json --mode production > webpack-stats.json && echo Use http://webpack.github.io/analyse to analyze the stats",
-    "all": "npm i && npm run lint && npm test"
-  },
-  "devDependencies": {
-    "@microsoft/eslint-config-azuretools": "^0.1.0",
-    "@microsoft/vscode-azext-dev": "^0.1.4",
-    "@types/fs-extra": "^8.1.1",
-    "@types/gulp": "^4.0.9",
-    "@types/mocha": "^8.2.2",
-    "@types/node": "^16.0.0",
-    "@types/request": "^2.48.4",
-    "@types/vscode": "1.76.0",
-    "@types/websocket": "^1.0.5",
-    "@typescript-eslint/eslint-plugin": "^4.28.3",
-    "@vscode/vsce": "^2.19.0",
-    "eslint": "^7.19.0",
-    "eslint-plugin-import": "^2.22.1",
-    "fs-extra": "^11.1.1",
-    "glob": "^7.1.6",
-    "gulp": "^4.0.2",
-    "mocha": "^10.0.0",
-    "mocha-junit-reporter": "^2.0.0",
-    "mocha-multi-reporters": "^1.5.1",
-    "ts-node": "^10.9.1",
-    "typescript": "^4.9.4",
-    "vscode-test": "^1.5.2",
-    "webpack": "^5.76.0",
-    "webpack-cli": "^4.10.0"
-  },
-  "dependencies": {
-    "@azure/arm-appplatform": "^3.0.0-beta.1",
-    "@azure/core-client": "^1.7.2",
-    "@azure/ms-rest-js": "^2.6.6",
-    "@azure/storage-file-share": "^12.14.0",
-    "@microsoft/vscode-azext-azureutils": "^1.1.5",
-    "@microsoft/vscode-azext-utils": "^1.2.2",
-    "@microsoft/vscode-azureresources-api": "^2.0.4",
-    "axios": "^1.3.6",
-    "node-stream-zip": "^1.15.0",
-    "vscode-extension-telemetry-wrapper": "^0.13.3",
-    "vscode-nls": "^5.2.0",
-    "websocket": "^1.0.34"
-  },
-  "extensionDependencies": [
-    "ms-vscode.azure-account",
-    "ms-azuretools.vscode-azureresourcegroups"
-  ],
-  "optionalDependencies": {
-    "fsevents": "^2.3.2"
-  }
+    "optionalDependencies": {
+        "fsevents": "^2.3.2"
+    }
 }
