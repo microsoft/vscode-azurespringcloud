@@ -13,7 +13,7 @@ import { AppEnvVariablesItem } from "./AppEnvVariablesItem";
 import { AppInstancesItem } from "./AppInstancesItem";
 import { AppJvmOptionsItem } from "./AppJvmOptionsItem";
 import { AppScaleSettingsItem } from "./AppScaleSettingsItem";
-import AppsItem from './AppsItem';
+import ServiceItem from './ServiceItem';
 import { ResourceItemBase } from './SpringAppsBranchDataProvider';
 
 export class AppItem implements ResourceItemBase {
@@ -25,7 +25,7 @@ export class AppItem implements ResourceItemBase {
     private deleted: boolean;
     private _stateProperties: {} | undefined = undefined;
 
-    constructor(public readonly parent: AppsItem, public readonly app: EnhancedApp) {
+    constructor(public readonly parent: ServiceItem, public readonly app: EnhancedApp) {
         this._children = this.loadChildren();
     }
 

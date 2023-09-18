@@ -13,7 +13,7 @@ import * as utils from "../utils";
 import { AppItem } from "./AppItem";
 import { ResourceItemBase } from "./SpringAppsBranchDataProvider";
 
-export default class AppsItem implements ResourceItemBase {
+export default class ServiceItem implements ResourceItemBase {
     private _deleted: boolean;
     private _children: Promise<AppItem[] | undefined>;
     private _stateProperties: {} | undefined = undefined;

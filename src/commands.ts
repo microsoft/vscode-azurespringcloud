@@ -15,8 +15,8 @@ import { AppItem } from "./tree/AppItem";
 import { AppJvmOptionsItem } from "./tree/AppJvmOptionsItem";
 import { AppSettingItem } from "./tree/AppSettingItem";
 import { AppSettingsItem } from "./tree/AppSettingsItem";
-import AppsItem from "./tree/AppsItem";
 import { pickApp, pickAppInstance, pickApps } from "./tree/ItemPicker";
+import ServiceItem from "./tree/ServiceItem";
 import { ResourceItemBase } from "./tree/SpringAppsBranchDataProvider";
 import * as utils from "./utils";
 import { showError } from './utils';
@@ -83,13 +83,13 @@ export async function createServiceInPortal(_context: IActionContext): Promise<v
     await openUrl('https://portal.azure.com/#create/Microsoft.AppPlatform');
 }
 
-export async function createSpringApp(context: IActionContext, n?: AppsItem): Promise<void> {
-    const item: AppsItem = await getAppsItem(context, n);
+export async function createSpringApp(context: IActionContext, n?: ServiceItem): Promise<void> {
+    const item: ServiceItem = await getAppsItem(context, n);
     await createApp(context, item);
 }
 
-export async function deleteService(context: IActionContext, n?: AppsItem): Promise<void> {
-    const item: AppsItem = await getAppsItem(context, n);
+export async function deleteService(context: IActionContext, n?: ServiceItem): Promise<void> {
+    const item: ServiceItem = await getAppsItem(context, n);
     const service: EnhancedService = item.service;
     await context.ui.showWarningMessage(`Are you sure to delete "${item.service.name}"?`, { modal: true }, DialogResponses.deleteResponse);
     const deleting: string = utils.localize('deletingSpringCLoudService', 'Deleting Azure Spring Apps "{0}"...', service.name);
@@ -97,8 +97,8 @@ export async function deleteService(context: IActionContext, n?: AppsItem): Prom
     await utils.runInBackground(deleting, deleted, () => item.remove(context));
 }
 
-export async function openAppsLiveView(context: IActionContext, n?: AppsItem): Promise<void> {
-    const item: AppsItem = await getAppsItem(context, n);
+export async function openAppsLiveView(context: IActionContext, n?: ServiceItem): Promise<void> {
+    const item: ServiceItem = await getAppsItem(context, n);
     const service: EnhancedService = item.service;
     if (!(await service.isDevToolsPublic()) || !(await service.isLiveViewEnabled())) {
         const response = await context.ui.showWarningMessage(`Application Live View of Spring Apps "${service.name}" is not enabled or publicly accessible.`, { modal: true }, DialogResponses.learnMore);
@@ -129,8 +129,8 @@ export async function openAppLiveView(context: IActionContext, n?: AppItem): Pro
     }
 }
 
-export async function openAppAccelerator(context: IActionContext, n?: AppsItem): Promise<void> {
-    const item: AppsItem = await getAppsItem(context, n);
+export async function openAppAccelerator(context: IActionContext, n?: ServiceItem): Promise<void> {
+    const item: ServiceItem = await getAppsItem(context, n);
     const service: EnhancedService = item.service;
     if (!(await service.isDevToolsPublic()) || !(await service.isAppAcceleratorEnabled())) {
         const response = await context.ui.showWarningMessage(`Application Accelerator of Spring Apps "${service.name}"  is not enabled or publicly accessible.`, { modal: true }, DialogResponses.learnMore);
@@ -402,8 +402,8 @@ export async function deleteSetting(context: IActionContext, item: AppSettingIte
     await ext.state.runWithTemporaryDescription(item.id, description, () => item.remove(context));
 }
 
-async function getAppsItem(context: IActionContext, item?: ResourceItemBase): Promise<AppsItem> {
-    if (item instanceof AppsItem) {
+async function getAppsItem(context: IActionContext, item?: ResourceItemBase): Promise<ServiceItem> {
+    if (item instanceof ServiceItem) {
         return item;
     }
     return await pickApps(context, item);

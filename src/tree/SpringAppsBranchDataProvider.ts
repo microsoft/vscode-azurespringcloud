@@ -10,7 +10,7 @@ import { AzureResource, AzureResourceBranchDataProvider, AzureResourceModel, Azu
 import * as vscode from 'vscode';
 import { ext } from '../extensionVariables';
 import { EnhancedService } from '../model/EnhancedService';
-import AppsItem from './AppsItem';
+import ServiceItem from './ServiceItem';
 
 export interface ResourceItemBase extends AzureResourceModel {
     getChildren?(): vscode.ProviderResult<ResourceItemBase[]>;
@@ -53,8 +53,8 @@ export class SpringAppsBranchDataProvider extends vscode.Disposable implements A
                 context.errorHandling.rethrow = true;
                 const subContext = createSubscriptionContext(element.subscription);
                 const client: AppPlatformManagementClient = createAzureClient([context, subContext], AppPlatformManagementClient);
-                const apps: EnhancedService = new EnhancedService(client, element.subscription, element);
-                return new AppsItem(apps);
+                const service: EnhancedService = new EnhancedService(client, element.subscription, element);
+                return new ServiceItem(service);
             });
 
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion

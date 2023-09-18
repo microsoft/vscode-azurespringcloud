@@ -4,7 +4,7 @@ import { window } from "vscode";
 import { ext } from "../../extensionVariables";
 import { EnhancedService } from "../../model/EnhancedService";
 import { AppItem } from "../../tree/AppItem";
-import AppsItem from "../../tree/AppsItem";
+import ServiceItem from "../../tree/ServiceItem";
 import * as utils from "../../utils";
 import { CreateAppDeploymentStep } from "./CreateAppDeploymentStep";
 import { CreateAppStep } from "./CreateAppStep";
@@ -12,7 +12,7 @@ import { IAppCreationWizardContext } from "./IAppCreationWizardContext";
 import { InputAppNameStep } from "./InputAppNameStep";
 import { SelectAppStackStep } from "./SelectAppStackStep";
 
-export async function createApp(context: IActionContext, item: AppsItem): Promise<AppItem> {
+export async function createApp(context: IActionContext, item: ServiceItem): Promise<AppItem> {
     const service: EnhancedService = item.service;
     const subContext = createSubscriptionContext(service.subscription);
     const wizardContext: IAppCreationWizardContext = Object.assign(context, subContext, { service });
