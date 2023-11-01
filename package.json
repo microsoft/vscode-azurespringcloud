@@ -509,7 +509,7 @@
     "dependencies": {
         "@azure/arm-appplatform": "^3.0.0-beta.1",
         "@azure/core-client": "^1.7.2",
-        "@azure/ms-rest-js": "^2.6.6",
+        "@azure/ms-rest-js": "^2.7.0",
         "@azure/storage-file-share": "^12.14.0",
         "@microsoft/vscode-azext-azureutils": "^1.1.5",
         "@microsoft/vscode-azext-utils": "^1.2.2",
