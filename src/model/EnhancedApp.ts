@@ -28,8 +28,8 @@ export class EnhancedApp {
     public readonly name: string;
     public readonly id: string;
     public readonly service: EnhancedService;
-    private _remote: AppResource;
-    private _activeDeployment: EnhancedDeployment | undefined;
+    private _remote: Promise<AppResource>;
+    private _activeDeployment: Promise<EnhancedDeployment | undefined>;
 
     public constructor(service: EnhancedService, resource: AppResource) {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -37,35 +37,35 @@ export class EnhancedApp {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         this.id = resource.id!;
         this.service = service;
-        this._remote = resource;
-        void this.getActiveDeployment();
+        this._remote = Promise.resolve(resource);
+        this._activeDeployment = this.loadActiveDeployment();
     }
 
-    public get properties(): AppResourceProperties | undefined {
-        return this._remote.properties;
+    public get properties(): Promise<AppResourceProperties | undefined> {
+        return this._remote.then(r => r.properties);
     }
 
-    get client(): AppPlatformManagementClient {
+    public get client(): AppPlatformManagementClient {
         return this.service.client;
     }
 
-    get subscription(): AzureSubscription {
+    public get subscription(): AzureSubscription {
         return this.service.subscription;
     }
 
-    get activeDeployment(): EnhancedDeployment | undefined {
+    public get activeDeployment(): Promise<EnhancedDeployment | undefined> {
         return this._activeDeployment;
     }
 
-    public get remote(): AppResource {
+    public get remote(): Promise<AppResource> {
         return this._remote;
     }
 
     public async getStatus(): Promise<string> {
-        const activeDeployment: EnhancedDeployment | undefined = await this.getActiveDeployment();
-        let _status: string = ((activeDeployment?.properties?.status ||
-            activeDeployment?.properties?.provisioningState ||
-            this.properties?.provisioningState) ?? 'Unknown').toLowerCase();
+        const activeDeployment: EnhancedDeployment | undefined = await this.activeDeployment;
+        let _status: string = (((await activeDeployment?.properties)?.status ||
+            (await activeDeployment?.properties)?.provisioningState ||
+            (await this.properties)?.provisioningState) ?? 'Unknown').toLowerCase();
         if (_status.endsWith('ing') && _status !== 'running') {
             _status = 'pending';
         }
@@ -77,7 +77,7 @@ export class EnhancedApp {
 
     public async start(): Promise<void> {
         ext.outputChannel.appendLog(`[App] starting app ${this.name}.`);
-        const activeDeploymentName: string | undefined = (await this.getActiveDeployment())?.name;
+        const activeDeploymentName: string | undefined = (await this.activeDeployment)?.name;
         if (!activeDeploymentName) {
             throw new Error(`app ${this.name} has no active deployment.`);
         }
@@ -87,7 +87,7 @@ export class EnhancedApp {
 
     public async stop(): Promise<void> {
         ext.outputChannel.appendLog(`[App] stopping app ${this.name}.`);
-        const activeDeploymentName: string | undefined = (await this.getActiveDeployment())?.name;
+        const activeDeploymentName: string | undefined = (await this.activeDeployment)?.name;
         if (!activeDeploymentName) {
             throw new Error(`app ${this.name} has no active deployment.`);
         }
@@ -97,7 +97,7 @@ export class EnhancedApp {
 
     public async restart(): Promise<void> {
         ext.outputChannel.appendLog(`[App] restarting app ${this.name}.`);
-        const activeDeploymentName: string | undefined = (await this.getActiveDeployment())?.name;
+        const activeDeploymentName: string | undefined = (await this.activeDeployment)?.name;
         if (!activeDeploymentName) {
             throw new Error(`app ${this.name} has no active deployment.`);
         }
@@ -112,10 +112,9 @@ export class EnhancedApp {
     }
 
     public async refresh(): Promise<EnhancedApp> {
-        this._remote = await this.client.apps.get(this.service.resourceGroup, this.service.name, this.name);
-        this._activeDeployment = undefined;
-        await this.getActiveDeployment(true);
-        return this;
+        this._remote = this.client.apps.get(this.service.resourceGroup, this.service.name, this.name);
+        this._activeDeployment = this.loadActiveDeployment();
+        return Promise.all([this._remote, this._activeDeployment]).then(() => this);
     }
 
     public async getDeployments(): Promise<EnhancedDeployment[]> {
@@ -127,25 +126,31 @@ export class EnhancedApp {
         return deployments.map(a => new EnhancedDeployment(this, a));
     }
 
-    public async getActiveDeployment(force: boolean = false): Promise<EnhancedDeployment | undefined> {
-        if (force || !this._activeDeployment) {
-            this._activeDeployment = (await this.getDeployments()).find(d => d.properties?.active);
+    private async loadActiveDeployment(): Promise<EnhancedDeployment | undefined> {
+        let activeDeployment: Promise<EnhancedDeployment | undefined> = Promise.resolve(undefined);
+        const deploymentResources: AsyncIterable<DeploymentResource> = this.client.deployments.list(this.service.resourceGroup, this.service.name, this.name);
+        for await (const deploymentResource of deploymentResources) {
+            if (deploymentResource.properties?.active) {
+                activeDeployment = Promise.resolve(new EnhancedDeployment(this, deploymentResource));
+                break;
+            }
         }
-        return this._activeDeployment;
+        return activeDeployment;
     }
 
     public async setActiveDeployment(deploymentName: string): Promise<void> {
         ext.outputChannel.appendLog(`[App] setting (${deploymentName}) as the new active deployment of app (${this.name}).`);
-        this._remote = await this.client.apps.beginSetActiveDeploymentsAndWait(this.service.resourceGroup, this.service.name, this.name, {
+        this._remote = this.client.apps.beginSetActiveDeploymentsAndWait(this.service.resourceGroup, this.service.name, this.name, {
             activeDeploymentNames: [deploymentName]
         });
+        this._activeDeployment = this.loadActiveDeployment();
         ext.outputChannel.appendLog(`[App] (${deploymentName}) is set as new active deployment of app (${this.name}).`);
     }
 
     public async createDeployment(name: string, runtime?: KnownSupportedRuntimeValue): Promise<EnhancedDeployment> {
         let source: UserSourceInfoUnion | undefined;
         ext.outputChannel.appendLog(`[Deployment] creating deployment (${name}) of app (${this.name}).`);
-        if (this.service.isEnterpriseTier()) {
+        if (await this.service.isEnterpriseTier()) {
             source = { type: 'BuildResult', buildResultId: '<default>' };
         } else {
             source = { type: 'Jar', relativePath: '<default>', runtimeVersion: runtime ?? EnhancedApp.DEFAULT_RUNTIME };
@@ -157,7 +162,7 @@ export class EnhancedApp {
                 source,
                 deploymentSettings: {
                     resourceRequests: {
-                        memory: this.service.isConsumptionTier() ? '2Gi' : '1Gi',
+                        memory: await this.service.isConsumptionTier() ? '2Gi' : '1Gi',
                         cpu: '1'
                     }
                 },
@@ -186,7 +191,7 @@ export class EnhancedApp {
     }
 
     public async getTestEndpoint(): Promise<string | undefined> {
-        if (this.service.isConsumptionTier()) {
+        if (await this.service.isConsumptionTier()) {
             throw new Error(`Test endpoint is not supported for apps of consumption plan.`);
         }
         const testKeys: TestKeys | undefined = await this.getTestKeys();
@@ -194,22 +199,23 @@ export class EnhancedApp {
     }
 
     public async getPublicEndpoint(): Promise<string | undefined> {
-        if (this.properties?.url && this.properties?.url !== 'None') {
-            return this.properties?.url;
+        const p = await this.properties;
+        if (p?.url && p?.url !== 'None') {
+            return p?.url;
         }
         return undefined;
     }
 
     public async setPublic(isPublic: boolean): Promise<void> {
         ext.outputChannel.appendLog(`[App] setting app (${this.name}) public.`);
-        this._remote = await this.client.apps.beginCreateOrUpdateAndWait(this.service.resourceGroup, this.service.name, this.name, {
+        this._remote = this.client.apps.beginCreateOrUpdateAndWait(this.service.resourceGroup, this.service.name, this.name, {
             properties: { public: isPublic }
         });
         ext.outputChannel.appendLog(`[App] app (${this.name}) is set public.`);
     }
 
     public async togglePublic(): Promise<void> {
-        const isPublic: boolean = this.properties?.public ?? false;
+        const isPublic: boolean = (await this.properties)?.public ?? false;
         await this.setPublic(!isPublic);
     }
 

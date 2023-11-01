@@ -8,12 +8,9 @@ import { localize } from "../../utils";
 import { IAppCreationWizardContext } from "./IAppCreationWizardContext";
 
 export class SelectAppStackStep extends AzureWizardPromptStep<IAppCreationWizardContext> {
-    private readonly service: EnhancedService;
 
-    constructor(service: EnhancedService) {
+    constructor(_service: EnhancedService) {
         super();
-        this.service = service;
-        // tslint:disable-next-line:no-unsafe-any
     }
 
     public async prompt(context: IAppCreationWizardContext): Promise<void> {
@@ -28,6 +25,6 @@ export class SelectAppStackStep extends AzureWizardPromptStep<IAppCreationWizard
     }
 
     public shouldPrompt(context: IAppCreationWizardContext): boolean {
-        return !this.service.isEnterpriseTier() && !(<string>context.newAppRuntime);
+        return !(<string>context.newAppRuntime);
     }
 }

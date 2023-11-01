@@ -19,15 +19,15 @@ import { ext } from "../extensionVariables";
 import { AppInstanceItem } from "../tree/AppInstanceItem";
 import { AppInstancesItem } from "../tree/AppInstancesItem";
 import { AppItem } from "../tree/AppItem";
-import AppsItem from "../tree/AppsItem";
 import { ResourceItemBase } from "../tree/SpringAppsBranchDataProvider";
 import { localize } from "../utils";
+import ServiceItem from "./ServiceItem";
 
 export interface PickItemOptions {
     title?: string;
 }
 
-export async function pickApps(context: IActionContext, startingNode?: ResourceItemBase, options?: PickItemOptions): Promise<AppsItem> {
+export async function pickApps(context: IActionContext, startingNode?: ResourceItemBase, options?: PickItemOptions): Promise<ServiceItem> {
     return await runQuickPickWizard(context, {
         promptSteps: getPickAppsSteps(ext.rgApiV2.resources.azureResourceTreeDataProvider, startingNode),
         title: options?.title,
@@ -49,7 +49,7 @@ export async function pickAppInstance(context: IActionContext, startingNode?: Re
 }
 
 function getPickAppsSteps(tdp: vscode.TreeDataProvider<unknown>, startingNode?: ResourceItemBase): AzureWizardPromptStep<AzureResourceQuickPickWizardContext>[] {
-    if (startingNode instanceof AppsItem) {
+    if (startingNode instanceof ServiceItem) {
         return [];
     }
     const types = [AzExtResourceType.SpringApps];

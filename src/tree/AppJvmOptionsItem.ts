@@ -48,9 +48,9 @@ export class AppJvmOptionsItem extends AppSettingsItem {
 
     public get options(): Promise<string[]> {
         return (async () => {
-            const deployment: EnhancedDeployment | undefined = await this.parent.app.getActiveDeployment();
-            const enterpriseOptionsStr: string | undefined = deployment?.properties?.deploymentSettings?.environmentVariables?.JAVA_OPTS;
-            const source: JarUploadedUserSourceInfo = <JarUploadedUserSourceInfo>deployment?.properties?.source;
+            const deployment: EnhancedDeployment | undefined = await this.parent.app.activeDeployment;
+            const enterpriseOptionsStr: string | undefined = (await deployment?.properties)?.deploymentSettings?.environmentVariables?.JAVA_OPTS;
+            const source: JarUploadedUserSourceInfo = <JarUploadedUserSourceInfo>(await deployment?.properties)?.source;
             const oldOptionsStr: string | undefined = source?.jvmOptions?.trim();
             const optionsStr: string | undefined = enterpriseOptionsStr ?? oldOptionsStr;
             if (optionsStr) {
@@ -102,7 +102,7 @@ export class AppJvmOptionsItem extends AppSettingsItem {
     }
 
     public async updateSettingsValue(context: IActionContext, newJvmOptions?: string[]): Promise<void> {
-        const deployment: EnhancedDeployment | undefined = await this.parent.app.getActiveDeployment();
+        const deployment: EnhancedDeployment | undefined = await this.parent.app.activeDeployment;
         if (deployment) {
             const updating: string = localize('updatingJvmOptions', 'Updating JVM options of "{0}"', deployment.app.name);
             const updated: string = localize('updatedJvmOptions', 'Successfully updated JVM options of "{0}".', deployment.app.name);

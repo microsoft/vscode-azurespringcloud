@@ -18,7 +18,7 @@ export class UpdateScaleSettingsStep extends AzureWizardExecuteStep<IScaleSettin
     }
 
     public async execute(context: IScaleSettingsUpdateWizardContext, progress: Progress<{ message?: string; increment?: number }>): Promise<void> {
-        const o: IScaleSettings = this.deployment.getScaleSettings();
+        const o: IScaleSettings = await this.deployment.getScaleSettings();
         const n: IScaleSettings = context.newSettings;
         if (n.capacity === o.capacity && n.memory === o.memory && n.cpu === o.cpu) {
             progress.report({ message: localize('noScaleSettingChanged', 'No setting is changed') });

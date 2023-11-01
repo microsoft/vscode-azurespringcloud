@@ -79,12 +79,12 @@ function createLogStream(outputChannel: vscode.OutputChannel, response: Incoming
 async function getLogRequest(instance: EnhancedInstance): Promise<IncomingMessage> {
     const app: EnhancedApp = instance.deployment.app;
     const service: EnhancedService = app.service;
-    if (app.service.isConsumptionTier()) {
+    if (await app.service.isConsumptionTier()) {
         const subscription: AzureSubscription = service.subscription;
         const subContext = createSubscriptionContext(subscription);
         const token: { token: string } = <{ token: string }>await subContext.credentials.getToken();
         // refer to https://github.com/Azure/azure-cli-extensions/blob/main/src/spring/azext_spring/custom.py#L511
-        const url = `https://${service.properties?.fqdn}/proxy/logstream${instance.id}?follow=true&tailLines=300&tenantId=${subscription.tenantId}`;
+        const url = `https://${(await service.properties)?.fqdn}/proxy/logstream${instance.id}?follow=true&tailLines=300&tenantId=${subscription.tenantId}`;
         const response: AxiosResponse<IncomingMessage> = await axios.get(url, {
             headers: {
                 Authorization: `Bearer ${token.token}`

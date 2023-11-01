@@ -25,7 +25,7 @@ export class AppSettingItem implements ResourceItemBase {
         public readonly options: IOptions = { deletable: true }) {
     }
 
-    getTreeItem(): vscode.TreeItem | Thenable<vscode.TreeItem> {
+    public getTreeItem(): vscode.TreeItem | Thenable<vscode.TreeItem> {
         return {
             id: this.id,
             label: this.label,
