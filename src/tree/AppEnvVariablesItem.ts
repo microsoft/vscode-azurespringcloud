@@ -26,7 +26,7 @@ export class AppEnvVariablesItem extends AppSettingsItem {
         super(parent);
     }
 
-    getTreeItem(): vscode.TreeItem | Thenable<vscode.TreeItem> {
+    public getTreeItem(): vscode.TreeItem | Thenable<vscode.TreeItem> {
         return {
             id: this.id,
             label: this.label,
@@ -38,8 +38,8 @@ export class AppEnvVariablesItem extends AppSettingsItem {
 
     public get variables(): Promise<{ [p: string]: string }> {
         return (async () => {
-            const deployment: EnhancedDeployment | undefined = await this.parent.app.getActiveDeployment();
-            const rawEnvVars: { [p: string]: string } = deployment?.properties?.deploymentSettings?.environmentVariables ?? {};
+            const deployment: EnhancedDeployment | undefined = await this.parent.app.activeDeployment;
+            const rawEnvVars: { [p: string]: string } = (await deployment?.properties)?.deploymentSettings?.environmentVariables ?? {};
             if (!rawEnvVars.JAVA_OPTS) {
                 delete rawEnvVars.JAVA_OPTS;
             }
@@ -87,7 +87,7 @@ export class AppEnvVariablesItem extends AppSettingsItem {
     }
 
     public async updateSettingsValue(_context: IActionContext, newVars?: { [p: string]: string }): Promise<void> {
-        const deployment: EnhancedDeployment | undefined = await this.parent.app.getActiveDeployment();
+        const deployment: EnhancedDeployment | undefined = await this.parent.app.activeDeployment;
         if (deployment) {
             const description = utils.localize('updating', 'Updating...');
             await ext.state.runWithTemporaryDescription(this.id, description, async () => {

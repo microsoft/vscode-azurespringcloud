@@ -23,19 +23,19 @@ export class InputScaleValueStep extends AzureWizardPromptStep<IScaleSettingsUpd
 
     public async prompt(context: IScaleSettingsUpdateWizardContext): Promise<void> {
         const prompt: string = localize('numberInputPrompt', 'Enter new value of "{0}".', IScaleSettings.LABELS[this.key]);
-        const settings: IScaleSettings = this.deployment.getScaleSettings();
+        const settings: IScaleSettings = await this.deployment.getScaleSettings();
         const value: string = `${settings[this.key]}`;
         context.newSettings[this.key] = Number((await context.ui.showInputBox({ prompt, value, validateInput: this.validateInput })).trim());
         return Promise.resolve(undefined);
     }
 
     public shouldPrompt(_context: IScaleSettingsUpdateWizardContext): boolean {
-        return !this.deployment.app.service.isConsumptionTier();
+        return true;
     }
 
     private async validateInput(val: string): Promise<string | undefined> {
         const numVal: number = Number(val);
-        const tier: string | undefined = this.deployment.app.service.sku?.tier;
+        const tier: string | undefined = (await this.deployment.app.service.sku)?.tier;
         const scope: { max: number; min: number } = IScaleSettings.SCOPES[tier ?? 'Basic'][this.key];
         if (this.key === 'cpu') {
             const valid: boolean = numVal === 0.5 || (Number.isInteger(numVal) && numVal <= scope.max && numVal >= scope.min);

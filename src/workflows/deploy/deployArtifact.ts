@@ -14,7 +14,7 @@ import { ValidateRuntimeStep } from "./ValidateRuntimeStep";
 
 export async function deployArtifact(context: IActionContext, item: AppItem, artifactPath: string): Promise<void> {
     const app: EnhancedApp = item.app;
-    const deployment: EnhancedDeployment | undefined = await app.getActiveDeployment();
+    const deployment: EnhancedDeployment | undefined = await app.activeDeployment;
     if (!deployment) {
         throw new Error(`App "${app.name}" has no active deployment.`);
     }
@@ -22,7 +22,9 @@ export async function deployArtifact(context: IActionContext, item: AppItem, art
     const deployed: string = utils.localize('deployed', 'Successfully deployed artifact to "{0}".', app.name);
     const wizardContext: IAppDeploymentWizardContext = Object.assign(context, createSubscriptionContext(app.service.subscription), { app });
     const executeSteps: AzureWizardExecuteStep<IAppDeploymentWizardContext>[] = [];
-    executeSteps.push(new ValidateRuntimeStep(deployment, artifactPath));
+    if (!(await deployment.app.service.isEnterpriseTier()) && (await deployment.runtimeVersion)?.split(/[\s\_]/)?.[0].toLowerCase() === 'java') {
+        executeSteps.push(new ValidateRuntimeStep(deployment, artifactPath));
+    }
     executeSteps.push(new UploadArtifactStep(app, artifactPath));
     executeSteps.push(new UpdateDeploymentStep(deployment));
     executeSteps.push(new OpenLogStreamStep(deployment));

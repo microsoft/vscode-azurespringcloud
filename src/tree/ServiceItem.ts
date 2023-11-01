@@ -13,48 +13,51 @@ import * as utils from "../utils";
 import { AppItem } from "./AppItem";
 import { ResourceItemBase } from "./SpringAppsBranchDataProvider";
 
-export default class AppsItem implements ResourceItemBase {
+export default class ServiceItem implements ResourceItemBase {
     private _deleted: boolean;
     private _children: Promise<AppItem[] | undefined>;
+    private _stateProperties: {} | undefined = undefined;
 
     constructor(public readonly service: EnhancedService) {
         this.service = service;
-        void this.reloadChildren();
+        this._children = this.loadChildren();
     }
 
     async getChildren(): Promise<AppItem[]> {
         return await this._children ?? [];
     }
 
-    getTreeItem(): TreeItem {
+    async getTreeItem(): Promise<TreeItem> {
+        if (this._stateProperties === undefined) {
+            void this.refresh();
+            this._stateProperties = {
+                contextValue: `azureSpringApps.apps;tier-other;`,
+            }
+        }
         return {
             id: this.id,
             label: this.service.name,
             iconPath: utils.getThemedIconPath('azure-spring-apps'),
-            description: this.description,
-            contextValue: this.contextValue,
             collapsibleState: TreeItemCollapsibleState.Collapsed,
+            ...this._stateProperties
         }
     }
 
-    public get contextValue(): string {
-        const tier: string = this.service.isEnterpriseTier() ? 'enterprise' : this.service.isConsumptionTier() ? 'consumption' : 'other';
-        return `azureSpringApps.apps;tier-${tier};`;
-    }
-
     public get id(): string {
-        return utils.nonNullProp(this.service, 'id');
+        return this.azureResourceId;
     }
 
-    public get description(): string | undefined {
-        const state: string | undefined = this.service.properties?.provisioningState;
-        return state?.toLowerCase() === 'succeeded' ? undefined : state;
+    public get azureResourceId(): string {
+        return utils.nonNullProp(this.service, 'id');
     }
 
     get viewProperties(): ViewPropertiesModel {
         return {
             label: this.service.name,
-            data: this.service.remote
+            getData: async () => {
+                const r = await this.service.remote;
+                return r.properties ?? {};
+            }
         };
     }
 
@@ -77,18 +80,24 @@ export default class AppsItem implements ResourceItemBase {
 
     public async refresh(): Promise<void> {
         if (!this._deleted) {
+            this._stateProperties = undefined;
             await ext.state.runWithTemporaryDescription(this.id, utils.localize('loading', 'Loading...'), async () => {
                 await this.service.refresh();
-                void this.reloadChildren();
+                this._children = this.loadChildren();
+
+                const state: string | undefined = (await this.service.properties)?.provisioningState;
+                const description = state?.toLowerCase() === 'succeeded' ? undefined : state;
+                const tier: string = await this.service.isEnterpriseTier() ? 'enterprise' : await this.service.isConsumptionTier() ? 'consumption' : 'other';
+                const contextValue = `azureSpringApps.apps;tier-${tier};`;
+                this._stateProperties = { description, contextValue };
+
                 ext.state.notifyChildrenChanged(this.id);
             });
         }
     }
 
-    public async reloadChildren(): Promise<void> {
-        this._children = (async () => {
-            const apps: EnhancedApp[] = await this.service.getApps();
-            return apps.map(ca => new AppItem(this, ca));
-        })();
+    private async loadChildren(): Promise<AppItem[]> {
+        const apps: EnhancedApp[] = await this.service.getApps();
+        return apps.map(ca => new AppItem(this, ca));
     }
 }

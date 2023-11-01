@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 import { CommandCallback, DialogResponses, IActionContext, IParsedError, openReadOnlyJson, openUrl, parseError, registerCommandWithTreeNodeUnwrapping, registerErrorHandler, registerReportIssueCommand } from '@microsoft/vscode-azext-utils';
+import * as vscode from 'vscode';
 import { MessageItem, OpenDialogOptions, TextEditor, Uri, WorkspaceFolder, window, workspace } from "vscode";
 import { instrumentOperation } from 'vscode-extension-telemetry-wrapper';
 import { ext } from "./extensionVariables";
@@ -14,8 +15,8 @@ import { AppItem } from "./tree/AppItem";
 import { AppJvmOptionsItem } from "./tree/AppJvmOptionsItem";
 import { AppSettingItem } from "./tree/AppSettingItem";
 import { AppSettingsItem } from "./tree/AppSettingsItem";
-import AppsItem from "./tree/AppsItem";
 import { pickApp, pickAppInstance, pickApps } from "./tree/ItemPicker";
+import ServiceItem from "./tree/ServiceItem";
 import { ResourceItemBase } from "./tree/SpringAppsBranchDataProvider";
 import * as utils from "./utils";
 import { showError } from './utils';
@@ -30,6 +31,7 @@ export function registerCommands(): void {
     registerCommandWithTelemetryWrapper('azureSpringApps.app.create', createSpringApp);
     registerCommandWithTelemetryWrapper('azureSpringApps.apps.delete', deleteService);
     registerCommandWithTelemetryWrapper('azureSpringApps.apps.openLiveView', openAppsLiveView);
+    registerCommandWithTelemetryWrapper('azureSpringApps.apps.openAppAccelerator', openAppAccelerator);
     registerCommandWithTelemetryWrapper('azureSpringApps.app.openPublicEndpoint', openPublicEndpoint);
     registerCommandWithTelemetryWrapper('azureSpringApps.app.openTestEndpoint', openTestEndpoint);
     registerCommandWithTelemetryWrapper('azureSpringApps.app.assignEndpoint', assignEndpoint);
@@ -81,13 +83,13 @@ export async function createServiceInPortal(_context: IActionContext): Promise<v
     await openUrl('https://portal.azure.com/#create/Microsoft.AppPlatform');
 }
 
-export async function createSpringApp(context: IActionContext, n?: AppsItem): Promise<void> {
-    const item: AppsItem = await getAppsItem(context, n);
+export async function createSpringApp(context: IActionContext, n?: ServiceItem): Promise<void> {
+    const item: ServiceItem = await getAppsItem(context, n);
     await createApp(context, item);
 }
 
-export async function deleteService(context: IActionContext, n?: AppsItem): Promise<void> {
-    const item: AppsItem = await getAppsItem(context, n);
+export async function deleteService(context: IActionContext, n?: ServiceItem): Promise<void> {
+    const item: ServiceItem = await getAppsItem(context, n);
     const service: EnhancedService = item.service;
     await context.ui.showWarningMessage(`Are you sure to delete "${item.service.name}"?`, { modal: true }, DialogResponses.deleteResponse);
     const deleting: string = utils.localize('deletingSpringCLoudService', 'Deleting Azure Spring Apps "{0}"...', service.name);
@@ -95,8 +97,8 @@ export async function deleteService(context: IActionContext, n?: AppsItem): Prom
     await utils.runInBackground(deleting, deleted, () => item.remove(context));
 }
 
-export async function openAppsLiveView(context: IActionContext, n?: AppsItem): Promise<void> {
-    const item: AppsItem = await getAppsItem(context, n);
+export async function openAppsLiveView(context: IActionContext, n?: ServiceItem): Promise<void> {
+    const item: ServiceItem = await getAppsItem(context, n);
     const service: EnhancedService = item.service;
     if (!(await service.isDevToolsPublic()) || !(await service.isLiveViewEnabled())) {
         const response = await context.ui.showWarningMessage(`Application Live View of Spring Apps "${service.name}" is not enabled or publicly accessible.`, { modal: true }, DialogResponses.learnMore);
@@ -127,10 +129,50 @@ export async function openAppLiveView(context: IActionContext, n?: AppItem): Pro
     }
 }
 
+export async function openAppAccelerator(context: IActionContext, n?: ServiceItem): Promise<void> {
+    const item: ServiceItem = await getAppsItem(context, n);
+    const service: EnhancedService = item.service;
+    if (!(await service.isDevToolsPublic()) || !(await service.isAppAcceleratorEnabled())) {
+        const response = await context.ui.showWarningMessage(`Application Accelerator of Spring Apps "${service.name}"  is not enabled or publicly accessible.`, { modal: true }, DialogResponses.learnMore);
+        if (response === DialogResponses.learnMore) {
+            return openUrl("https://learn.microsoft.com/en-us/azure/spring-apps/how-to-use-accelerator?tabs=Portal");
+        }
+        return;
+    }
+    let acceleratorExt = vscode.extensions.getExtension("vmware.tanzu-app-accelerator");
+    if (!acceleratorExt) {
+        await context.ui.showWarningMessage(`This feature depends on extension "Tanzu App Accelerator" provided by VMWare, do you want to install it?`, { modal: true }, DialogResponses.yes)
+        const installing = 'Installing extension "Tanzu App Accelerator".';
+        const installed = 'Extension "Tanzu App Accelerator" is successfully installed.';
+        await utils.runInBackground(installing, installed, async () => {
+            // install directly
+            await vscode.commands.executeCommand('workbench.extensions.installExtension', 'vmware.tanzu-app-accelerator');
+            // void vscode.commands.executeCommand('workbench.extensions.action.installExtensions', 'vmware.tanzu-app-accelerator');
+            acceleratorExt = vscode.extensions.getExtension("vmware.tanzu-app-accelerator");
+            let rounds: number = 0;
+            while (!acceleratorExt && rounds++ < 15) {
+                await utils.wait(1000);
+                acceleratorExt = vscode.extensions.getExtension("vmware.tanzu-app-accelerator");
+            }
+            if (!acceleratorExt) {
+                throw new Error('"Tanzu App Accelerator" is not ready, try later please.')
+            }
+        });
+    }
+    const config = await service.getAppAcceleratorConfig();
+    if (config) {
+        await vscode.workspace.getConfiguration('tanzu-app-accelerator').update('tanzuApplicationPlatformGuiUrl', config.guiUrl, vscode.ConfigurationTarget.Global);
+        config.authClientId && await vscode.workspace.getConfiguration('tanzu-app-accelerator').update('authClientId', config.authClientId, vscode.ConfigurationTarget.Global);
+        config.authIssuerUrl && await vscode.workspace.getConfiguration('tanzu-app-accelerator').update('authIssuerUrl', config.authIssuerUrl, vscode.ConfigurationTarget.Global);
+        await vscode.commands.executeCommand('tanzu-app-accelerator.AcceleratorList.focus');
+        await vscode.commands.executeCommand('tanzu-app-accelerator.refreshAccelerators');
+    }
+}
+
 export async function openPublicEndpoint(context: IActionContext, n?: AppItem): Promise<void> {
     const item: AppItem = await getAppItem(context, n);
     const app: EnhancedApp = item.app;
-    if (!app.properties?.public) {
+    if (!(await app.properties)?.public) {
         await context.ui.showWarningMessage(`App "${app.name}" is not publicly accessible. Do you want to assign it a public endpoint?`, { modal: true }, DialogResponses.yes);
         await assignEndpoint(context, item);
     }
@@ -143,7 +185,7 @@ export async function openPublicEndpoint(context: IActionContext, n?: AppItem): 
 export async function openTestEndpoint(context: IActionContext, n?: AppItem): Promise<void> {
     const item: AppItem = await getAppItem(context, n);
     const app: EnhancedApp = item.app;
-    if (app.service.isConsumptionTier()) {
+    if (await app.service.isConsumptionTier()) {
         void window.showErrorMessage(`Test endpoint is not supported for Azure Spring apps of consumption plan for now.`);
         return;
     }
@@ -261,7 +303,7 @@ export async function enableRemoteDebugging(context: IActionContext, n?: AppItem
     await ext.state.runWithTemporaryDescription(item.id, 'Updating...', async () => {
         const doing: string = `Enabling remote debugging for app "${item.app.name}".`;
         await utils.runInBackground(doing, null, async () => {
-            const deployment: EnhancedDeployment | undefined = await item.app.getActiveDeployment();
+            const deployment: EnhancedDeployment | undefined = await item.app.activeDeployment;
             if (!deployment) {
                 void window.showWarningMessage(`Failed to enable remote debugging for app "${item.app.name}", because it has no active deployment.`);
                 return;
@@ -289,7 +331,7 @@ export async function disableRemoteDebugging(context: IActionContext, n?: AppIte
     const done: string = `Successfully disabled remote debugging for app "${item.app.name}".`;
     await ext.state.runWithTemporaryDescription(item.id, 'Updating...', async () => {
         await utils.runInBackground(doing, done, async () => {
-            const deployment: EnhancedDeployment | undefined = await item.app.getActiveDeployment();
+            const deployment: EnhancedDeployment | undefined = await item.app.activeDeployment;
             if (!deployment) {
                 void window.showWarningMessage(`Disable Remote Debugging: App "${item.app.name}" has no active deployment.`);
                 return;
@@ -360,8 +402,8 @@ export async function deleteSetting(context: IActionContext, item: AppSettingIte
     await ext.state.runWithTemporaryDescription(item.id, description, () => item.remove(context));
 }
 
-async function getAppsItem(context: IActionContext, item?: ResourceItemBase): Promise<AppsItem> {
-    if (item instanceof AppsItem) {
+async function getAppsItem(context: IActionContext, item?: ResourceItemBase): Promise<ServiceItem> {
+    if (item instanceof ServiceItem) {
         return item;
     }
     return await pickApps(context, item);
