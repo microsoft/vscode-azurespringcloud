@@ -1,5 +1,8 @@
 # Change Log
 
+## 0.9.0 - 2023-11-01
+- Add `Open Application Accelerator`(integrate with `Tanzu App Accelerator` extension) action on enterprise tier spring apps.
+
 ## 0.8.1 - 2023-05-11
 - Fix duplicate message about assigning public endpoint.
 - Fix scaling issues about apps of standard consumption plan.
