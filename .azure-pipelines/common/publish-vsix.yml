@@ -4,7 +4,10 @@ steps:
   inputs:
     command: custom
     customCommand: run cleanReadme
-
+- task: CmdLine@2
+  displayName: Replace AI Key
+  inputs:
+    script: npx json@9.0.6 -I -f package.json -e "this.aiKey=\"$AI_KEY\""
 - task: Npm@1
   displayName: 'Package'
   inputs:

@@ -3,41 +3,103 @@ variables:
   ${{ if eq(variables['Build.Reason'], 'Schedule') }}:
     ENABLE_LONG_RUNNING_TESTS: true
     ENABLE_COMPLIANCE: true
-
-jobs:
-  - job: Windows
-    pool:
-      vmImage: windows-latest
-    steps:
-      - template: common/build.yml
-      - template: common/lint.yml
-      - template: compliance/compliance.yml # Only works on Windows
-      - template: common/test.yml
-
-  - job: Linux
-    pool:
-      vmImage: ubuntu-latest
-    steps:
-      - template: common/build.yml
-      - template: common/publish-vsix.yml # Only publish vsix from linux build since we use this to release and want to stay consistent
-      - template: common/lint.yml
-      - template: common/test.yml
-
-  - job: macOS
-    pool:
-      vmImage: macOS-latest
-    steps:
-      - template: common/build.yml
-      - template: common/lint.yml
-# - template: common/test.yml
-
+resources:
+  repositories:
+    - repository: self
+      type: git
+      ref: refs/heads/main
+    - repository: 1esPipelines
+      type: git
+      name: 1ESPipelineTemplates/1ESPipelineTemplates
+      ref: refs/tags/release
 trigger:
   branches:
     include:
       - main
-
 pr:
   branches:
     include:
       - main
       - develop
+extends:
+  template: v1/1ES.Official.PipelineTemplate.yml@1esPipelines
+  parameters:
+    pool:
+      name: 1ES_JavaTooling_Pool
+      image: 1ES_JavaTooling_Ubuntu-2004
+      os: linux
+    sdl:
+      sourceAnalysisPool:
+        name: 1ES_JavaTooling_Pool
+        image: 1ES_JavaTooling_Windows_2022
+        os: windows
+    customBuildTags:
+      - MigrationTooling-mseng-VSJava-AZURE-SPRING-Tool
+    stages:
+      - stage: Build
+        jobs:
+          - job: Linux
+            displayName: build vsix
+            templateContext:
+              outputs:
+                - output: pipelineArtifact
+                  artifactName: drop
+                  targetPath: $(build.artifactstagingdirectory)
+                  displayName: "Publish Artifact: drop"
+            steps:
+              - checkout: self
+                clean: true
+                fetchTags: false
+              - script: |
+                  CUSTOM_BRANCH=$(BRANCH)
+                  if [[ -n ${CUSTOM_BRANCH} ]]; then
+                    git fetch origin $(BRANCH)
+                    git checkout $(BRANCH)
+                  else
+                    echo "no need to switch branch"
+                  fi
+                displayName: switch to $(BRANCH)
+              - task: NodeTool@0
+                displayName: 'Use Node 16.x'
+                inputs:
+                  versionSpec: 16.x
+              - task: Npm@1
+                displayName: 'npm ci'
+                inputs:
+                  command: ci
+              - task: Npm@1
+                displayName: 'Build'
+                inputs:
+                  command: custom
+                  customCommand: run build
+              - task: Npm@1
+                displayName: 'Lint'
+                inputs:
+                  command: custom
+                  customCommand: run lint
+              - task: Npm@1
+                displayName: 'cleanReadme'
+                inputs:
+                  command: custom
+                  customCommand: run cleanReadme
+              - task: CmdLine@2
+                displayName: Replace AI Key
+                inputs:
+                  script: npx json@9.0.6 -I -f package.json -e "this.aiKey=\"$(AI_KEY)\""
+              - task: Npm@1
+                displayName: 'Package'
+                inputs:
+                  command: custom
+                  customCommand: run package
+                condition: ne(variables['ForPreRelease'], 'true')
+              - task: Npm@1
+                displayName: 'Package for Pre Release'
+                inputs:
+                  command: custom
+                  customCommand: run package:pre-release
+                condition: eq(variables['ForPreRelease'], 'true')
+              - task: CopyFiles@2
+                displayName: 'Copy vsix to staging directory'
+                inputs:
+                  Contents: '**/*.vsix'
+                  TargetFolder: '$(build.artifactstagingdirectory)'
