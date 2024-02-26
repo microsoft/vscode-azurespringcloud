@@ -102,7 +102,7 @@ extends:
                 displayName: Run APIScan
                 inputs:
                   softwareFolder: $(Agent.TempDirectory)/APIScanFiles
-                  softwareName: "Azure Toolkit for Java"
+                  softwareName: "vscode-azurespringcloud"
                   softwareVersionNum: "$(Build.BuildId)"
                   isLargeApp: false
                   toolVersion: "Latest"
