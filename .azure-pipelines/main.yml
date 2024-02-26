@@ -50,15 +50,6 @@ extends:
               - checkout: self
                 clean: true
                 fetchTags: false
-              - script: |
-                  CUSTOM_BRANCH=$(BRANCH)
-                  if [[ -n ${CUSTOM_BRANCH} ]]; then
-                    git fetch origin $(BRANCH)
-                    git checkout $(BRANCH)
-                  else
-                    echo "no need to switch branch"
-                  fi
-                displayName: switch to $(BRANCH)
               - task: NodeTool@0
                 displayName: 'Use Node 16.x'
                 inputs:
