@@ -533,7 +533,6 @@
         "websocket": "^1.0.34"
     },
     "extensionDependencies": [
-        "ms-vscode.azure-account",
         "ms-azuretools.vscode-azureresourcegroups"
     ],
     "optionalDependencies": {
