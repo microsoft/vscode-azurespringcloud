@@ -1,0 +1,9 @@
+steps:
+  - task: CopyFiles@2
+    displayName: "Copy Files to staging directory"
+    inputs:
+      Contents: |
+        extension.vsix
+        extension.manifest
+        extension.signature.p7s
+      TargetFolder: "$(build.artifactstagingdirectory)"

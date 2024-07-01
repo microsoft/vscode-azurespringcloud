@@ -43,57 +43,44 @@ extends:
             templateContext:
               outputs:
                 - output: pipelineArtifact
-                  artifactName: drop
+                  artifactName: extension
                   targetPath: $(build.artifactstagingdirectory)
-                  displayName: "Publish Artifact: drop"
+                  displayName: "Publish Artifact: extension"
             steps:
               - checkout: self
                 clean: true
-                fetchTags: false
+                fetchTags: true
               - task: NodeTool@0
-                displayName: 'Use Node 16.x'
+                displayName: "Use Node 18.x"
                 inputs:
-                  versionSpec: 16.x
+                  versionSpec: 18.x
               - task: Npm@1
-                displayName: 'npm ci'
+                displayName: "npm ci"
                 inputs:
                   command: ci
               - task: Npm@1
-                displayName: 'Build'
-                inputs:
-                  command: custom
-                  customCommand: run build
-              - task: Npm@1
-                displayName: 'Lint'
+                displayName: "Lint"
                 inputs:
                   command: custom
                   customCommand: run lint
               - task: Npm@1
-                displayName: 'cleanReadme'
+                displayName: "cleanReadme"
                 inputs:
                   command: custom
                   customCommand: run cleanReadme
-              - task: CmdLine@2
+              - task: Bash@3
                 displayName: Replace AI Key
                 inputs:
                   script: npx json@9.0.6 -I -f package.json -e "this.aiKey=\"$(AI_KEY)\""
-              - task: Npm@1
-                displayName: 'Package'
+              - task: Bash@3
+                displayName: "Package"
                 inputs:
-                  command: custom
-                  customCommand: run package
-                condition: ne(variables['ForPreRelease'], 'true')
-              - task: Npm@1
-                displayName: 'Package for Pre Release'
-                inputs:
-                  command: custom
-                  customCommand: run package:pre-release
-                condition: eq(variables['ForPreRelease'], 'true')
+                  script: npx @vscode/vsce@latest package -o extension.vsix
               ### Copy files for APIScan
               - task: CopyFiles@2
                 displayName: "Copy Files for APIScan"
                 inputs:
-                  Contents: "**/*.vsix"
+                  Contents: "*.vsix"
                   TargetFolder: $(Agent.TempDirectory)/APIScanFiles
                 condition: and(succeeded(), ne(variables['DisableAPIScan'], 'true'))
 
@@ -109,8 +96,46 @@ extends:
                 condition: and(succeeded(), ne(variables['DisableAPIScan'], 'true'))
                 env:
                   AzureServicesAuthConnectionString: runAs=App;AppId=$(ApiScanClientId);TenantId=$(ApiScanTenant);AppKey=$(ApiScanSecret)
-              - task: CopyFiles@2
-                displayName: 'Copy vsix to staging directory'
+              - task: Bash@3
+                displayName: "Generate extension manifest"
                 inputs:
-                  Contents: '**/*.vsix'
-                  TargetFolder: '$(build.artifactstagingdirectory)'
+                  script: npx @vscode/vsce@latest generate-manifest -i extension.vsix -o extension.manifest
+              - task: Bash@3
+                displayName: "Prepare manifest for signing"
+                inputs:
+                  targetType: inline
+                  script: cp extension.manifest extension.signature.p7s
+              - task: SFP.build-tasks.custom-build-task-1.EsrpCodeSigning@5
+                inputs:
+                  ConnectedServiceName: "ESRP-Release-Test"
+                  AppRegistrationClientId: "1992ee18-e9d2-42d6-ab20-94dd947a44b6"
+                  AppRegistrationTenantId: "72f988bf-86f1-41af-91ab-2d7cd011db47"
+                  AuthAKVName: "vscjavaci"
+                  AuthCertName: "vscjava-esrprelease-auth"
+                  AuthSignCertName: "VSCJava-CodeSign"
+                  FolderPath: "."
+                  Pattern: "extension.signature.p7s"
+                  signConfigType: inlineSignParams
+                  inlineOperation: |
+                    [
+                      {
+                        "keyCode": "CP-401405",
+                        "operationSetCode": "VSCodePublisherSign",
+                        "parameters" : [],
+                        "toolName": "sign",
+                        "toolVersion": "1.0"
+                      }
+                    ]
+                  SessionTimeout: 90
+                  MaxConcurrency: 25
+                  MaxRetryAttempts: 5
+                  PendingAnalysisWaitTimeoutMinutes: 5
+                displayName: "Sign extension"
+              - task: CopyFiles@2
+                displayName: "Copy Files to staging directory"
+                inputs:
+                  Contents: |
+                    extension.vsix
+                    extension.manifest
+                    extension.signature.p7s
+                  TargetFolder: "$(build.artifactstagingdirectory)"
