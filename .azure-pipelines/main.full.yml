@@ -1,0 +1,144 @@
+variables:
+  Codeql.Enabled: true
+  ${{ if eq(variables['Build.Reason'], 'Schedule') }}:
+    ENABLE_LONG_RUNNING_TESTS: true
+    ENABLE_COMPLIANCE: true
+resources:
+  repositories:
+    - repository: self
+      type: git
+      ref: refs/heads/main
+    - repository: 1esPipelines
+      type: git
+      name: 1ESPipelineTemplates/1ESPipelineTemplates
+      ref: refs/tags/release
+trigger:
+  branches:
+    include:
+      - main
+pr:
+  branches:
+    include:
+      - main
+      - develop
+extends:
+  template: v1/1ES.Official.PipelineTemplate.yml@1esPipelines
+  parameters:
+    pool:
+      name: 1ES_JavaTooling_Pool
+      image: 1ES_JavaTooling_Windows_2022
+      os: windows
+    sdl:
+      sourceAnalysisPool:
+        name: 1ES_JavaTooling_Pool
+        image: 1ES_JavaTooling_Windows_2022
+        os: windows
+    customBuildTags:
+      - MigrationTooling-mseng-VSJava-AZURE-SPRING-Tool
+    stages:
+      - stage: Build
+        jobs:
+          - job: Linux
+            displayName: build vsix
+            templateContext:
+              outputs:
+                - output: pipelineArtifact
+                  artifactName: extension
+                  targetPath: $(build.artifactstagingdirectory)
+                  displayName: "Publish Artifact: extension"
+            steps:
+              - checkout: self
+                clean: true
+                fetchTags: true
+              - task: NodeTool@0
+                displayName: "Use Node 16.x"
+                inputs:
+                  versionSpec: 16.x
+              - task: Npm@1
+                displayName: "npm ci"
+                inputs:
+                  command: ci
+              - task: Npm@1
+                displayName: "Lint"
+                inputs:
+                  command: custom
+                  customCommand: run lint
+              - task: Npm@1
+                displayName: "cleanReadme"
+                inputs:
+                  command: custom
+                  customCommand: run cleanReadme
+              - task: Bash@3
+                displayName: Replace AI Key
+                inputs:
+                  targetType: inline
+                  script: npx json@9.0.6 -I -f package.json -e "this.aiKey=\"$(AI_KEY)\""
+              - task: Bash@3
+                displayName: "Package"
+                inputs:
+                  targetType: inline
+                  script: npx @vscode/vsce@latest package -o extension.vsix
+              ### Copy files for APIScan
+              - task: CopyFiles@2
+                displayName: "Copy Files for APIScan"
+                inputs:
+                  Contents: "*.vsix"
+                  TargetFolder: $(Agent.TempDirectory)/APIScanFiles
+                condition: and(succeeded(), ne(variables['DisableAPIScan'], 'true'))
+
+              ### Run latest version of APIScan listed at https://www.1eswiki.com/wiki/APIScan_Build_Task
+              - task: APIScan@2
+                displayName: Run APIScan
+                inputs:
+                  softwareFolder: $(Agent.TempDirectory)/APIScanFiles
+                  softwareName: "vscode-azurespringcloud"
+                  softwareVersionNum: "$(Build.BuildId)"
+                  isLargeApp: false
+                  toolVersion: "Latest"
+                condition: and(succeeded(), ne(variables['DisableAPIScan'], 'true'))
+                env:
+                  AzureServicesAuthConnectionString: runAs=App;AppId=$(ApiScanClientId);TenantId=$(ApiScanTenant);AppKey=$(ApiScanSecret)
+              - task: Bash@3
+                displayName: "Generate extension manifest"
+                inputs:
+                  targetType: inline
+                  script: npx @vscode/vsce@latest generate-manifest -i extension.vsix -o extension.manifest
+              - task: Bash@3
+                displayName: "Prepare manifest for signing"
+                inputs:
+                  targetType: inline
+                  script: cp extension.manifest extension.signature.p7s
+              - task: SFP.build-tasks.custom-build-task-1.EsrpCodeSigning@5
+                inputs:
+                  ConnectedServiceName: "ESRP-Release-Test"
+                  AppRegistrationClientId: "1992ee18-e9d2-42d6-ab20-94dd947a44b6"
+                  AppRegistrationTenantId: "72f988bf-86f1-41af-91ab-2d7cd011db47"
+                  AuthAKVName: "vscjavaci"
+                  AuthCertName: "vscjava-esrprelease-auth"
+                  AuthSignCertName: "VSCJava-CodeSign"
+                  FolderPath: "."
+                  Pattern: "extension.signature.p7s"
+                  signConfigType: inlineSignParams
+                  inlineOperation: |
+                    [
+                      {
+                        "keyCode": "CP-401405",
+                        "operationSetCode": "VSCodePublisherSign",
+                        "parameters" : [],
+                        "toolName": "sign",
+                        "toolVersion": "1.0"
+                      }
+                    ]
+                  SessionTimeout: 90
+                  MaxConcurrency: 25
+                  MaxRetryAttempts: 5
+                  PendingAnalysisWaitTimeoutMinutes: 5
+                displayName: "Sign extension"
+              - task: CopyFiles@2
+                displayName: "Copy Files to staging directory"
+                inputs:
+                  Contents: |
+                    extension.vsix
+                    extension.manifest
+                    extension.signature.p7s
+                  TargetFolder: "$(build.artifactstagingdirectory)"

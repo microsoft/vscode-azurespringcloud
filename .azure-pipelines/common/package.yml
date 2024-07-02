@@ -1,7 +1,13 @@
 steps:
-  - script: npx @vscode/vsce@latest package -o extension.vsix
+  - task: Bash@3
     displayName: "Package"
     condition: ne(variables['ForPreRelease'], 'true')
-  - script: npx @vscode/vsce@latest package --pre-release -o extension.vsix
+    inputs:
+      targetType: inline
+      script: npx @vscode/vsce@latest package -o extension.vsix
+  - task: Bash@3
     displayName: "Package"
     condition: eq(variables['ForPreRelease'], 'true')
+    inputs:
+      targetType: inline
+      script: npx @vscode/vsce@latest package --pre-release -o extension.vsix
