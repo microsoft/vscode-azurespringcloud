@@ -71,10 +71,12 @@ extends:
               - task: Bash@3
                 displayName: Replace AI Key
                 inputs:
+                  targetType: inline
                   script: npx json@9.0.6 -I -f package.json -e "this.aiKey=\"$(AI_KEY)\""
               - task: Bash@3
                 displayName: "Package"
                 inputs:
+                  targetType: inline
                   script: npx @vscode/vsce@latest package --pre-release -o extension.vsix
               ### Copy files for APIScan
               - task: CopyFiles@2
@@ -99,6 +101,7 @@ extends:
               - task: Bash@3
                 displayName: "Generate extension manifest"
                 inputs:
+                  targetType: inline
                   script: npx @vscode/vsce@latest generate-manifest -i extension.vsix -o extension.manifest
               - task: Bash@3
                 displayName: "Prepare manifest for signing"
