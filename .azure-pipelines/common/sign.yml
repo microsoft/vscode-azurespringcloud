@@ -1,8 +1,14 @@
 steps:
-  - script: npx @vscode/vsce@latest generate-manifest -i extension.vsix -o extension.manifest
+  - task: Bash@3
     displayName: "Generate extension manifest"
-  - script: cp extension.manifest extension.signature.p7s
+    inputs:
+      targetType: inline
+      script: npx @vscode/vsce@latest generate-manifest -i extension.vsix -o extension.manifest
+  - task: Bash@3
     displayName: "Prepare manifest for signing"
+    inputs:
+      targetType: inline
+      script: cp extension.manifest extension.signature.p7s
   - task: SFP.build-tasks.custom-build-task-1.EsrpCodeSigning@5
     displayName: "Sign extension"
     inputs:
