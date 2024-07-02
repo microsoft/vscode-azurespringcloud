@@ -51,9 +51,9 @@ extends:
                 clean: true
                 fetchTags: true
               - task: NodeTool@0
-                displayName: "Use Node 18.x"
+                displayName: "Use Node 16.x"
                 inputs:
-                  versionSpec: 18.x
+                  versionSpec: 16.x
               - task: Npm@1
                 displayName: "npm ci"
                 inputs:
