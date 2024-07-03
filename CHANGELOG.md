@@ -3,6 +3,7 @@
 ## 0.10.0 - 2024-05-16
 - Upgrade dependencies
 - Remove dependencies on `Azure Account` extension.
+- declare supporting virtual workspace
 
 ## 0.9.0 - 2023-11-01
 - Add `Open Application Accelerator`(integrate with `Tanzu App Accelerator` extension) action on enterprise tier spring apps.

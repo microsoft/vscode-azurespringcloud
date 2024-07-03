@@ -32,10 +32,12 @@
     "preview": true,
     "activationEvents": [
         "onView:azureResourceGroups",
-        "onView:azureResourceGroupsV2",
-        "onCommand:azureSpringApps.file.deploy"
+        "onView:azureResourceGroupsV2"
     ],
     "main": "./main.js",
+    "capabilities": {
+        "virtualWorkspaces": true
+    },
     "contributes": {
         "x-azResources": {
             "azure": {
@@ -344,7 +346,7 @@
                 },
                 {
                     "command": "azureSpringApps.app.instance.startRemoteDebugging",
-                    "when": "viewItem =~ /^azureSpringApps\\.app(\\.instance)?;status-[Rr]unning;/i",
+                    "when": "!virtualWorkspace && viewItem =~ /^azureSpringApps\\.app(\\.instance)?;status-[Rr]unning;/i",
                     "group": "4@1"
                 },
                 {
